@@ -2,15 +2,15 @@ package com.example.reactfromassets
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.webkit.WebSettings
-import android.webkit.WebView
+import android.util.Log
+import android.webkit.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.ui.AppBarConfiguration
 import com.example.reactfromassets.databinding.ActivityMainBinding
+import com.frankie.expressionmanager.usecase.ScriptEngine
+import com.frankie.expressionmanager.usecase.ValidationUseCaseWrapperImpl
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -19,14 +19,20 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.webview.settings.javaScriptEnabled = true
-        binding.webview.settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW;
-        binding.webview.settings.domStorageEnabled = true
-        if (BuildConfig.DEBUG) {
-            WebView.setWebContentsDebuggingEnabled(true)
-        }
-        binding.webview.loadUrl("file:///android_asset/build/index.html?url=10.0.2.2:8081&sid=1");
+        binding.webview.loadUrl("file:///android_asset/build/index.html?url=18.198.94.221:8081&sid=1")
+        val impl = ValidationUseCaseWrapperImpl(
+            object : ScriptEngine {
+                override fun executeScript(method: String, script: String): String {
+                    return ""
+                }
+            },
+            application.assets.open("surveyFile.json").bufferedReader().use {
+                it.readText()
+            }
+        )
 
+        val koko = impl.validate()
+        Log.v("blah", koko.toString())
 
     }
 }
