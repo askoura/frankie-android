@@ -34,7 +34,7 @@ class EMNavProcessor constructor(
 
     }
 
-    fun koko(
+    fun navigate(
         validationJsonOutput: ValidationJsonOutput,
         navigationUseCaseInput: NavigationUseCaseInput,
         navListener: NavigationListener
@@ -58,6 +58,10 @@ class EMNavProcessor constructor(
                 }
             }
         }
+    }
+
+    companion object {
+        private const val TAG = "EMNavProcessor"
     }
 }
 

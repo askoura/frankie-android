@@ -40,17 +40,21 @@ class MainActivity : AppCompatActivity() {
         val validationJsonOutput: ValidationJsonOutput =
             jacksonKtMapper.readValue(processedComponents, jacksonTypeRef<ValidationJsonOutput>())
         val navigationUseCaseInput = NavigationUseCaseInput(defaultLang = SurveyLang.EN)
-        emNavProcessor.koko(
+        emNavProcessor.navigate(
             validationJsonOutput,
             navigationUseCaseInput,
             object : NavigationListener {
                 override fun onResult(navigationJsonOutput: NavigationJsonOutput) {
-                    Log.v("bla", navigationJsonOutput.toString())
+                    Log.v(TAG, navigationJsonOutput.toString())
                 }
 
                 override fun onError(error: Throwable) {
                     error.printStackTrace()
                 }
             })
+    }
+
+    companion object {
+        private const val TAG = "MainActivity"
     }
 }

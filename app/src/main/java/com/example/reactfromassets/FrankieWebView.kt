@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
 import android.webkit.*
+import androidx.webkit.*
 
 @SuppressLint("SetJavaScriptEnabled")
 class FrankieWebView
@@ -32,20 +33,25 @@ class FrankieWebView
                 view: WebView?,
                 request: WebResourceRequest?
             ): WebResourceResponse? {
-                Log.v("", request?.url.toString())
+                Log.v(TAG, request?.url.toString())
                 return super.shouldInterceptRequest(view, request)
             }
 
+            @Suppress("DEPRECATION")
             @Deprecated("Deprecated in Java")
             override fun shouldInterceptRequest(
                 view: WebView?,
                 url: String
             ): WebResourceResponse? {
-                Log.v("", url)
+                Log.v(TAG, url)
                 return super.shouldInterceptRequest(view, url)
             }
 
 
         }
+    }
+
+    companion object {
+        private const val TAG = "FrankieWebView"
     }
 }
