@@ -27,7 +27,7 @@ class EMNavProcessor constructor(
     }
 
     private fun loadJavaScript(input: String) {
-        val javascript = "<script>$input</script>"
+        val javascript = "<script>console.log(window.navigator.userAgent)\n$input</script>"
         val data = javascript.toByteArray(charset("UTF-8"))
         val base64 = Base64.encodeToString(data, Base64.DEFAULT)
         webView.loadUrl("data:text/html;charset=utf-8;base64,$base64")

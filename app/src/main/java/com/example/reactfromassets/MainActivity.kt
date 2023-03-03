@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.webkit.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.webkit.WebViewCompat
 import com.example.reactfromassets.databinding.ActivityMainBinding
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.frankie.expressionmanager.model.NavigationUseCaseInput
@@ -24,12 +25,13 @@ class MainActivity : AppCompatActivity() {
         emNavProcessor = EMNavProcessor(this)
         setContentView(binding.root)
         binding.webview.loadUrl("file:///android_asset/build/index.html?url=18.198.94.221:8081&sid=1")
+//        binding.webview.loadUrl("http://18.198.94.221:3000/?url=18.198.94.221:8081&sid=1&lang=en&navigation_mode=ALL_IN_ONE")
 
     }
 
     override fun onStart() {
         super.onStart()
-        binding.root.postDelayed({ navigate() }, 2000)
+//        binding.root.postDelayed({ navigate() }, 2000)
     }
 
     fun navigate() {
