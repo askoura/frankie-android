@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.webkit.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.reactfromassets.databinding.ActivityMainBinding
+import com.example.reactfromassets.db.FrankieDb
 import com.frankie.expressionmanager.model.*
 import com.frankie.expressionmanager.usecase.ApiNavigationOutput
 import java.util.*

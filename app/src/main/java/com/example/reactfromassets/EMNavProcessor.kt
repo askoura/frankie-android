@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.util.Base64
 import android.webkit.*
+import com.example.reactfromassets.db.FrankieDb
 import com.example.reactfromassets.db.model.Response
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.frankie.expressionmanager.ext.ScriptUtils
@@ -63,7 +64,7 @@ class EMNavProcessor constructor(
 
     }
 
-    fun navigateStart(useCaseInput: ApiUseCaseInput, navListener: NavigationListener) {
+    private fun navigateStart(useCaseInput: ApiUseCaseInput, navListener: NavigationListener) {
         val navigationUseCaseInput = NavigationUseCaseInput(
             values = useCaseInput.values,
             navigationInfo = NavigationInfo(
@@ -74,7 +75,7 @@ class EMNavProcessor constructor(
             defaultLang = SurveyLang.EN,
             lang = useCaseInput.lang?.toSurveyLang() ?: SurveyLang.EN,
         )
-        navigate(
+        navigationUseCase(
             navigationUseCaseInput,
             onSuccess = { navigationJsonOutput ->
                 val responseId = Random().nextInt()
@@ -91,12 +92,13 @@ class EMNavProcessor constructor(
         )
     }
 
-    fun navigateElse(useCaseInput: ApiUseCaseInput, navListener: NavigationListener) {
+    private fun navigateElse(useCaseInput: ApiUseCaseInput, navListener: NavigationListener) {
         var response: Response
         val responseId = useCaseInput.responseId!!
         runBlocking {
             response = frankieDb.responseDao().get(responseId)
         }
+        val lang = useCaseInput.lang?.toSurveyLang() ?: response.lang
         val navigationUseCaseInput = NavigationUseCaseInput(
             values = response.values.toMutableMap().apply {
                 putAll(useCaseInput.values)
@@ -107,12 +109,11 @@ class EMNavProcessor constructor(
                 navigationIndex = response.navigationIndex
             ),
             defaultLang = SurveyLang.EN,
-            lang = useCaseInput.lang?.toSurveyLang() ?: SurveyLang.EN,
+            lang = lang,
         )
-        navigate(
+        navigationUseCase(
             navigationUseCaseInput,
             onSuccess = { navigationJsonOutput ->
-                val lang = useCaseInput.lang?.toSurveyLang() ?: response.lang
                 val result = navigationJsonOutput
                     .with(
                         responseId,
@@ -126,7 +127,7 @@ class EMNavProcessor constructor(
         )
     }
 
-    private fun navigate(
+    private fun navigationUseCase(
         navigationUseCaseInput: NavigationUseCaseInput,
         onSuccess: (NavigationJsonOutput) -> Unit,
         onError: (Throwable) -> Unit
