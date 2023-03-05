@@ -1,22 +1,26 @@
 package com.example.reactfromassets
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.util.Base64
 import android.webkit.*
+import com.example.reactfromassets.db.model.Response
+import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.frankie.expressionmanager.ext.ScriptUtils
-import com.frankie.expressionmanager.model.NavigationUseCaseInput
-import com.frankie.expressionmanager.usecase.NavigationJsonOutput
-import com.frankie.expressionmanager.usecase.NavigationUseCaseWrapperImpl
-import com.frankie.expressionmanager.usecase.ScriptEngine
-import com.frankie.expressionmanager.usecase.ValidationJsonOutput
+import com.frankie.expressionmanager.model.*
+import com.frankie.expressionmanager.usecase.*
 import kotlinx.coroutines.*
+import java.util.*
 
 @SuppressLint("SetJavaScriptEnabled")
 class EMNavProcessor constructor(
-    context: Context
+    activityContext: Context
 ) {
-    val webView = WebView(context)
+    private val webView = WebView(activityContext)
+    private val frankieDb = FrankieDb.getDatabase(activityContext)
+
+    fun getActivity(): Activity = webView.context as Activity
 
     init {
         webView.clearCache(true)
@@ -34,10 +38,98 @@ class EMNavProcessor constructor(
 
     }
 
-    fun navigate(
-        validationJsonOutput: ValidationJsonOutput,
+    // later this will take the sid as input
+    private fun getProcessedFile(): ValidationJsonOutput {
+        // this is a static file loaded in the assets
+        // later this will be a dynamic file downloaded from the internet
+        val processedComponents: String =
+            getActivity().assets.open("processed_1.json").bufferedReader().use {
+                it.readText()
+            }
+        return jacksonKtMapper.readValue(
+            processedComponents,
+            jacksonTypeRef<ValidationJsonOutput>()
+        )
+    }
+
+    fun navigate(useCaseInput: ApiUseCaseInput, navListener: NavigationListener) {
+        val navigationDirection = useCaseInput.navigationDirection
+
+        if (navigationDirection == NavigationDirection.Start) {
+            navigateStart(useCaseInput, navListener)
+        } else {
+            navigateElse(useCaseInput, navListener)
+        }
+
+    }
+
+    fun navigateStart(useCaseInput: ApiUseCaseInput, navListener: NavigationListener) {
+        val navigationUseCaseInput = NavigationUseCaseInput(
+            values = useCaseInput.values,
+            navigationInfo = NavigationInfo(
+                navigationDirection = useCaseInput.navigationDirection,
+                navigationMode = NavigationMode.GROUP_BY_GROUP,
+                navigationIndex = null
+            ),
+            defaultLang = SurveyLang.EN,
+            lang = useCaseInput.lang?.toSurveyLang() ?: SurveyLang.EN,
+        )
+        navigate(
+            navigationUseCaseInput,
+            onSuccess = { navigationJsonOutput ->
+                val responseId = Random().nextInt()
+                saveResponse(responseId, useCaseInput.lang?.toSurveyLang() ?: SurveyLang.EN, navigationJsonOutput)
+                val result = navigationJsonOutput
+                    .with(
+                        responseId,
+                        SurveyLang.EN,
+                        listOf(SurveyLang.DE, SurveyLang.AR)
+                    )
+                navListener.onSuccess(result)
+            },
+            onError = { navListener.onError(it) }
+        )
+    }
+
+    fun navigateElse(useCaseInput: ApiUseCaseInput, navListener: NavigationListener) {
+        var response: Response
+        val responseId = useCaseInput.responseId!!
+        runBlocking {
+            response = frankieDb.responseDao().get(responseId)
+        }
+        val navigationUseCaseInput = NavigationUseCaseInput(
+            values = response.values.toMutableMap().apply {
+                putAll(useCaseInput.values)
+            },
+            navigationInfo = NavigationInfo(
+                navigationDirection = useCaseInput.navigationDirection,
+                navigationMode = NavigationMode.GROUP_BY_GROUP,
+                navigationIndex = response.navigationIndex
+            ),
+            defaultLang = SurveyLang.EN,
+            lang = useCaseInput.lang?.toSurveyLang() ?: SurveyLang.EN,
+        )
+        navigate(
+            navigationUseCaseInput,
+            onSuccess = { navigationJsonOutput ->
+                val lang = useCaseInput.lang?.toSurveyLang() ?: response.lang
+                val result = navigationJsonOutput
+                    .with(
+                        responseId,
+                        lang,
+                        mutableListOf(SurveyLang.EN, SurveyLang.DE, SurveyLang.AR).apply { remove(lang) }
+                    )
+                updateResponse(response, lang, navigationJsonOutput)
+                navListener.onSuccess(result)
+            },
+            onError = { navListener.onError(it) }
+        )
+    }
+
+    private fun navigate(
         navigationUseCaseInput: NavigationUseCaseInput,
-        navListener: NavigationListener
+        onSuccess: (NavigationJsonOutput) -> Unit,
+        onError: (Throwable) -> Unit
     ) {
         val navigationUseCaseWrapperImpl = NavigationUseCaseWrapperImpl(
             object : ScriptEngine {
@@ -45,28 +137,56 @@ class EMNavProcessor constructor(
                     throw java.lang.IllegalStateException("Should not resort to Script engine")
                 }
             },
-            validationJsonOutput,
+            getProcessedFile(),
             navigationUseCaseInput
         )
         val script = navigationUseCaseWrapperImpl.getNavigationScript()
-        webView.evaluateJavascript("JSON.parse(navigate($script))") { value ->
-            value?.let {
-                try {
-                    navListener.onResult(navigationUseCaseWrapperImpl.processNavigationResult(value))
-                } catch (e: Exception) {
-                    navListener.onError(e)
+        (webView.context as Activity).runOnUiThread {
+            webView.evaluateJavascript("JSON.parse(navigate($script))") { value ->
+                value?.let {
+                    try {
+                        onSuccess(
+                            navigationUseCaseWrapperImpl.processNavigationResult(
+                                value
+                            )
+                        )
+                    } catch (e: Exception) {
+                        onError(e)
+                    }
                 }
             }
         }
     }
 
-    companion object {
-        private const val TAG = "EMNavProcessor"
+    private fun saveResponse(
+        responseId: Int,
+        surveyLang: SurveyLang,
+        result: NavigationJsonOutput
+    ) {
+        CoroutineScope(Dispatchers.IO).launch {
+            frankieDb.responseDao().insert(
+                Response(responseId, result.navigationIndex, surveyLang, mapOf())
+            )
+        }
     }
+
+    private fun updateResponse(response: Response, surveyLang: SurveyLang, result: NavigationJsonOutput) {
+        CoroutineScope(Dispatchers.IO).launch {
+            frankieDb.responseDao().update(
+                values = response.values.toMutableMap().apply {
+                    putAll(result.toSave)
+                },
+                id = response.id,
+                navigationIndex = result.navigationIndex,
+                lang = surveyLang
+
+            )
+        }
+    }
+
 }
 
 interface NavigationListener {
-    fun onResult(navigationJsonOutput: NavigationJsonOutput)
+    fun onSuccess(apiNavigationOutput: ApiNavigationOutput)
     fun onError(error: Throwable)
-
 }
