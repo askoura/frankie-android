@@ -2,7 +2,6 @@ package com.example.reactfromassets
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Message
 import android.util.AttributeSet
 import android.util.Log
 import android.webkit.*
@@ -27,7 +26,6 @@ class FrankieWebView
     lateinit var navigateListen: (apiUseCaseInput: ApiUseCaseInput, navListener: (ApiNavigationOutput) -> Unit) -> Unit
 
     init {
-
         addJavascriptInterface(object {
             @JavascriptInterface
             fun navigate(body: String) {
@@ -61,6 +59,7 @@ class FrankieWebView
             ) {
                 super.onReceivedError(view, request, error)
             }
+
             override fun shouldInterceptRequest(
                 view: WebView?,
                 request: WebResourceRequest?
@@ -81,15 +80,21 @@ class FrankieWebView
                 } else {
                     super.shouldInterceptRequest(view, request)
                 }
-
             }
-
         }
     }
 
     fun loadSurvey(sid: String) {
         this.sid = sid
         loadUrl("$ASSETS_REACT_LOCATION?url=$customDomain&sid=$sid&offline=whatever")
+    }
+
+    fun onBack(onBackHandler: (Boolean) -> Unit) {
+        evaluateJavascript("handleBack()") { value ->
+            value?.let {
+                onBackHandler(value == "true")
+            } ?: onBackHandler(false)
+        }
     }
 
     companion object {

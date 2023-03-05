@@ -3,6 +3,7 @@ package com.example.reactfromassets
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.webkit.*
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.reactfromassets.databinding.ActivityMainBinding
 import com.example.reactfromassets.db.FrankieDb
@@ -14,6 +15,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var emNavProcessor: EMNavProcessor
     private lateinit var frankieDb: FrankieDb
+    var backPressedTime: Long = 0
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,6 +32,22 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
+    @Deprecated("Use Fancy new method")
+    override fun onBackPressed() {
+        binding.webview.onBack {
+            if (!it) {
+                val t = System.currentTimeMillis()
+                if (t - backPressedTime > 3000) { // 3 secs
+                    backPressedTime = t
+                    Toast.makeText(this, "Press back again to exit.", Toast.LENGTH_SHORT).show()
+                } else {
+                    finish()
+                }
+            }
+        }
+
+    }
+
 
     private fun navigate(
         useCaseInput: ApiUseCaseInput,
@@ -41,7 +59,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onError(error: Throwable) {
-                TODO("Not yet implemented")
+//                TODO("Show an error Dialog")
             }
         })
     }
