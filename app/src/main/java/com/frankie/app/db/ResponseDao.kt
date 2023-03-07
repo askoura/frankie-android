@@ -1,11 +1,11 @@
-package com.example.reactfromassets.db
+package com.frankie.app.db
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
 import androidx.room.TypeConverters
-import com.example.reactfromassets.db.model.Response
+import com.frankie.app.db.model.Response
 import com.frankie.expressionmanager.model.NavigationIndex
 import com.frankie.expressionmanager.model.SurveyLang
 

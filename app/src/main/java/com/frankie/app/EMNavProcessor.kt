@@ -1,12 +1,12 @@
-package com.example.reactfromassets
+package com.frankie.app
 
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.util.Base64
 import android.webkit.*
-import com.example.reactfromassets.db.FrankieDb
-import com.example.reactfromassets.db.model.Response
+import com.frankie.app.db.FrankieDb
+import com.frankie.app.db.model.Response
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.frankie.expressionmanager.ext.ScriptUtils
 import com.frankie.expressionmanager.model.*

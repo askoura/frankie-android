@@ -1,12 +1,12 @@
-package com.example.reactfromassets.db.model
+package com.frankie.app.db.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.example.reactfromassets.db.JSONOConverter
-import com.example.reactfromassets.db.NavigationIndexConverter
-import com.example.reactfromassets.db.SurveyLangConverter
+import com.frankie.app.db.JSONOConverter
+import com.frankie.app.db.NavigationIndexConverter
+import com.frankie.app.db.SurveyLangConverter
 import com.frankie.expressionmanager.model.NavigationIndex
 import com.frankie.expressionmanager.model.SurveyLang
 

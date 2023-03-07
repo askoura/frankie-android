@@ -1,4 +1,4 @@
-package com.example.reactfromassets.db
+package com.frankie.app.db
 
 import androidx.room.TypeConverter
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef

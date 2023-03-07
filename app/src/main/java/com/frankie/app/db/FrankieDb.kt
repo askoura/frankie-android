@@ -1,10 +1,10 @@
-package com.example.reactfromassets.db
+package com.frankie.app.db
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.reactfromassets.db.model.Response
+import com.frankie.app.db.model.Response
 
 
 @Database(

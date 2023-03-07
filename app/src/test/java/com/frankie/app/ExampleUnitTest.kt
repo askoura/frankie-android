@@ -1,4 +1,4 @@
-package com.example.reactfromassets
+package com.frankie.app
 
 import org.junit.Test
 
