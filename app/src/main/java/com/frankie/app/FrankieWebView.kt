@@ -101,7 +101,7 @@ class FrankieWebView
     }
 
     companion object {
-        private const val ASSETS_REACT_LOCATION = "file:///android_asset/build/index.html"
+        private const val ASSETS_REACT_LOCATION = "file:///android_asset/app/index.html"
         private const val TAG = "FrankieWebView"
         private const val JAVASCRIPT_INTERFACE_NAME = "Android"
         private const val CUSTOM_DOMAIN = "CUSTOM_DOMAIN"
