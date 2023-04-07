@@ -8,13 +8,14 @@ import androidx.room.TypeConverters
 import com.frankie.app.db.model.Response
 import com.frankie.expressionmanager.model.NavigationIndex
 import com.frankie.expressionmanager.model.SurveyLang
+import java.util.UUID
 
 
 @Dao
 interface ResponseDao {
 
     @Query("SELECT * FROM response WHERE id == :id LIMIT 1")
-    suspend fun get(id: Int): Response
+    suspend fun get(id: String): Response
 
     @Insert(onConflict = REPLACE)
     suspend fun insert(response: Response)
@@ -32,6 +33,6 @@ interface ResponseDao {
         values: Map<String, Any>,
         lang: SurveyLang,
         navigationIndex: NavigationIndex,
-        id: Int
+        id: String
     )
 }
