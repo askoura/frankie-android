@@ -6,12 +6,13 @@ import android.util.AttributeSet
 import android.util.Log
 import android.webkit.*
 import androidx.webkit.*
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.frankie.expressionmanager.ext.ScriptUtils
 import com.frankie.expressionmanager.model.*
-import com.frankie.expressionmanager.usecase.ApiNavigationOutput
 import com.frankie.expressionmanager.usecase.ValidationJsonOutput
+import java.util.*
 
 @SuppressLint("SetJavaScriptEnabled")
 class FrankieWebView
@@ -20,6 +21,7 @@ class FrankieWebView
 ) : WebView(context, attrs) {
 
     private val emNavProcessor = EMNavProcessor(context)
+    private lateinit var surveyId: String
 
     private val frankieWebViewClient = object : WebViewClient() {
         override fun shouldInterceptRequest(
@@ -29,6 +31,17 @@ class FrankieWebView
             Log.v(TAG, url)
             return if (url.endsWith("runtime.js")) {
                 getRuntimeJs()
+            } else if (url.startsWith(CUSTOM_DOMAIN) && !url.endsWith("favicon.ico")) {
+                val data =
+                    context.assets.open(url.replace(CUSTOM_DOMAIN, "$REACT_APP_BUILD_FOLDER/"))
+                        .bufferedReader().use {
+                            it.readText()
+                        }
+                return WebResourceResponse(
+                    if (url.endsWith("js")) "text/javascript" else "text/css",
+                    "utf-8",
+                    data.byteInputStream()
+                )
             } else {
                 null
             }
@@ -38,11 +51,37 @@ class FrankieWebView
         @Suppress("unused")
         @JavascriptInterface
         fun navigate(body: String) {
-            val apiUseCaseInput: ApiUseCaseInput = jacksonKtMapper.readValue(body)
-            navigate(apiUseCaseInput) {
-                val string = jacksonKtMapper.writeValueAsString(it)
-                loadUrl("javascript:navigateOffline($string)")
-            }
+            val navigateRequest: NavigateRequest = jacksonObjectMapper().readValue(body)
+            emNavProcessor.navigate(navigateRequest, object : NavigationListener {
+                override fun onSuccess(apiNavigationOutput: ApiNavigationOutput) {
+                    val string = jacksonKtMapper.writeValueAsString(apiNavigationOutput)
+                    loadUrl("javascript:navigateOffline($string)")
+                }
+
+                override fun onError(error: Throwable) {
+                    // TODO("Report Error to MainActivity")
+                }
+            })
+        }
+
+        @JavascriptInterface
+        fun uploadSignature(base64: String) {
+            Log.v(TAG, base64)
+
+        }
+
+        @JavascriptInterface
+        fun start() {
+            emNavProcessor.start(SurveyLang.EN, object : NavigationListener {
+                override fun onSuccess(apiNavigationOutput: ApiNavigationOutput) {
+                    val string = jacksonKtMapper.writeValueAsString(apiNavigationOutput)
+                    loadUrl("javascript:navigateOffline($string)")
+                }
+
+                override fun onError(error: Throwable) {
+                    // TODO("Report Error to MainActivity")
+                }
+            })
         }
     }
 
@@ -57,21 +96,6 @@ class FrankieWebView
         settings.setSupportZoom(false)
 
         webViewClient = frankieWebViewClient
-    }
-
-    private fun navigate(
-        useCaseInput: ApiUseCaseInput,
-        navListener: (ApiNavigationOutput) -> Unit
-    ) {
-        emNavProcessor.navigate(useCaseInput, object : NavigationListener {
-            override fun onSuccess(apiNavigationOutput: ApiNavigationOutput) {
-                navListener(apiNavigationOutput)
-            }
-
-            override fun onError(error: Throwable) {
-                // TODO("Report Error to MainActivity")
-            }
-        })
     }
 
     private fun getRuntimeJs(): WebResourceResponse {
@@ -89,7 +113,11 @@ class FrankieWebView
 
 
     fun loadSurvey(sid: String) {
-        loadUrl("$ASSETS_REACT_LOCATION?url=$CUSTOM_DOMAIN&sid=$sid&offline=whatever")
+        surveyId = sid
+        val data = context.assets.open("$REACT_APP_BUILD_FOLDER/index.html").bufferedReader().use {
+            it.readText()
+        }
+        loadDataWithBaseURL(CUSTOM_DOMAIN, data, null, null, null)
     }
 
     fun onBack(onBackHandler: (Boolean) -> Unit) {
@@ -101,9 +129,23 @@ class FrankieWebView
     }
 
     companion object {
-        private const val ASSETS_REACT_LOCATION = "file:///android_asset/app/index.html"
         private const val TAG = "FrankieWebView"
         private const val JAVASCRIPT_INTERFACE_NAME = "Android"
-        private const val CUSTOM_DOMAIN = "CUSTOM_DOMAIN"
+        private const val CUSTOM_DOMAIN = "http://mywebsite.com/"
+        private const val REACT_APP_BUILD_FOLDER = "react-app"
     }
 }
+
+data class NavigateRequest(
+    val responseId: UUID?,
+    val lang: String? = null,
+    val navigationDirection: NavigationDirection? = null,
+    val events: List<ValueEvent> = listOf(),
+    val values: Map<String, Any> = mapOf()
+)
+
+data class ValueEvent(
+    val name: String,
+    val code: String,
+    val time: String
+)

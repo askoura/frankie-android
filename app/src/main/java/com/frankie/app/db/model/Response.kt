@@ -14,7 +14,7 @@ import com.frankie.expressionmanager.model.SurveyLang
 @TypeConverters(JSONOConverter::class, SurveyLangConverter::class, NavigationIndexConverter::class)
 data class Response(
     @PrimaryKey
-    val id: Int,
+    val id: String,
 
     @ColumnInfo(name = "navigation_index")
     val navigationIndex: NavigationIndex,

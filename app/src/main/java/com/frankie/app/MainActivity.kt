@@ -11,14 +11,12 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var emNavProcessor: EMNavProcessor
     var backPressedTime: Long = 0
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        emNavProcessor = EMNavProcessor(this)
         setContentView(binding.root)
         binding.webview.loadSurvey("1")
     }
