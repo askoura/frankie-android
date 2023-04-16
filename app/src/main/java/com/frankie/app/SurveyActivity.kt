@@ -5,19 +5,19 @@ import android.os.Bundle
 import android.webkit.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.frankie.app.databinding.ActivityMainBinding
+import com.frankie.app.databinding.ActivitySurveyBinding
 import com.frankie.expressionmanager.model.*
 import java.util.*
 
-class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
+class SurveyActivity : AppCompatActivity() {
+    private lateinit var binding: ActivitySurveyBinding
     private lateinit var emNavProcessor: EMNavProcessor
     var backPressedTime: Long = 0
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = ActivitySurveyBinding.inflate(layoutInflater)
         emNavProcessor = EMNavProcessor(this)
         setContentView(binding.root)
         binding.webview.loadSurvey("1")
