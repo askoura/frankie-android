@@ -1,6 +1,8 @@
 package com.frankie.app.ui.login
 
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -34,9 +36,14 @@ class LoginActivity : AppCompatActivity() {
 
                 if (state.isLoggedIn) {
                     startActivity(MainActivity.createIntent(this@LoginActivity))
+                    finish()
                 }
             }
         }
 
+    }
+
+    companion object {
+        fun createIntent(context: Context): Intent = Intent(context, LoginActivity::class.java)
     }
 }

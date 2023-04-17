@@ -12,7 +12,7 @@ import org.koin.dsl.module
 
 val loginModule = module {
     single<LoginService> { provideRetrofit().create(LoginService::class.java) }
-    single<LoginRepository> { LoginRepositoryImpl(get()) }
+    single<LoginRepository> { LoginRepositoryImpl(get(), get()) }
     single<LoginInteractor> { LoginInteractorImpl(get()) }
     viewModel { LoginViewModel(get()) }
 }
