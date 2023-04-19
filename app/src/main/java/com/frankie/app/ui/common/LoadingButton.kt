@@ -49,6 +49,7 @@ class LoadingButton @JvmOverloads constructor(
         set(value) {
             if (field == value) return
             field = value
+            isEnabled = !value
 
             if (value) {
                 startLoading()

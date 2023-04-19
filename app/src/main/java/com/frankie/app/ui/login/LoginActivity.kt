@@ -7,13 +7,17 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.frankie.app.databinding.ActivityLoginBinding
+import com.frankie.app.ui.common.error.ErrorDisplayManager
 import com.frankie.app.ui.main.MainActivity
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.getViewModel
+import org.koin.core.parameter.parametersOf
 
 class LoginActivity : AppCompatActivity() {
 
     private val viewModel: LoginViewModel by lazy { getViewModel() }
+    private val errorDisplayManager: ErrorDisplayManager by inject { parametersOf(this) }
     private lateinit var binding: ActivityLoginBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,7 +44,11 @@ class LoginActivity : AppCompatActivity() {
                 }
             }
         }
-
+        lifecycleScope.launch {
+            viewModel.errors.collect { error ->
+                errorDisplayManager.displayError(error)
+            }
+        }
     }
 
     companion object {
