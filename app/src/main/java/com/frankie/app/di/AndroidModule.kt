@@ -1,6 +1,8 @@
 package com.frankie.app.di
 
 import android.content.Context
+import com.frankie.app.api.TokenManager
+import com.frankie.app.api.TokenManagerImpl
 import com.frankie.app.business.settings.SharedPrefsManager
 import com.frankie.app.business.settings.SharedPrefsManagerImpl
 import com.frankie.app.ui.common.error.ErrorDisplayManager
@@ -14,6 +16,7 @@ import org.koin.dsl.module
 val androidModule = module {
     single(named("appContext")) { androidContext() }
     single<SharedPrefsManager> { SharedPrefsManagerImpl(get()) }
+    single<TokenManager> { TokenManagerImpl(get()) }
     factory<ErrorProcessor> { ErrorProcessorImpl() }
     factory<ErrorDisplayManager> { (context: Context) -> ErrorDisplayManagerImpl(context) }
 }

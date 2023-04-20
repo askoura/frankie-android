@@ -9,14 +9,25 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitProvider {
 
-    fun provideRetrofit(): Retrofit {
+    fun provideRetrofit(tokenManager: TokenManager? = null): Retrofit {
         val httpClient = OkHttpClient.Builder()
         if (BuildConfig.DEBUG) {
             val httpLoggingInterceptor = HttpLoggingInterceptor()
             httpLoggingInterceptor.level =
-                    HttpLoggingInterceptor.Level.BODY // BASIC, HEADERS or BODY
+                    HttpLoggingInterceptor.Level.BODY
             httpClient.networkInterceptors().add(httpLoggingInterceptor)
         }
+        if (tokenManager != null) {
+            httpClient.addInterceptor { chain ->
+                val original = chain.request()
+                val request = original.newBuilder()
+                        .header("Authorization", "Bearer ${tokenManager.getActiveToken()}")
+                        .method(original.method, original.body)
+                        .build()
+                chain.proceed(request)
+            }
+        }
+
         httpClient.callTimeout(1, TimeUnit.MINUTES)
         httpClient.connectTimeout(1, TimeUnit.MINUTES)
         httpClient.readTimeout(1, TimeUnit.MINUTES)
