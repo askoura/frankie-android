@@ -5,10 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.frankie.app.api.survey.Survey
 import com.frankie.app.business.survey.SurveyRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val surveyRepository: SurveyRepository) : ViewModel() {
     private val _state = MutableStateFlow(State())
+    val state = _state.asStateFlow()
     fun fetchSurveyList() {
         viewModelScope.launch {
             surveyRepository.getSurveyList().collect { result ->
