@@ -10,4 +10,7 @@ interface LoginService {
     suspend fun login(
             @Body loginRequest: LoginInput
     ): Response<LoginResponse>
+
+    @POST("user/refresh_token")
+    suspend fun refreshActiveToken(@Body refreshInput: RefreshInput): Response<LoginResponse>
 }

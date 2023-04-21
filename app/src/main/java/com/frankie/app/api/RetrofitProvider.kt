@@ -1,6 +1,8 @@
 package com.frankie.app.api
 
 import com.frankie.app.BuildConfig
+import com.frankie.app.business.login.RefreshTokenUseCase
+import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -9,7 +11,7 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitProvider {
 
-    fun provideRetrofit(tokenManager: TokenManager? = null): Retrofit {
+    fun provideRetrofit(tokenManager: TokenManager? = null, refreshTokenUseCase: RefreshTokenUseCase? = null): Retrofit {
         val httpClient = OkHttpClient.Builder()
         if (BuildConfig.DEBUG) {
             val httpLoggingInterceptor = HttpLoggingInterceptor()
@@ -17,14 +19,30 @@ object RetrofitProvider {
                     HttpLoggingInterceptor.Level.BODY
             httpClient.networkInterceptors().add(httpLoggingInterceptor)
         }
-        if (tokenManager != null) {
+        if (tokenManager != null && refreshTokenUseCase != null) {
             httpClient.addInterceptor { chain ->
                 val original = chain.request()
                 val request = original.newBuilder()
                         .header("Authorization", "Bearer ${tokenManager.getActiveToken()}")
                         .method(original.method, original.body)
                         .build()
-                chain.proceed(request)
+                val response = chain.proceed(request)
+                if (response.code == 401) {
+                    val newTokenResult = runBlocking {
+                        refreshTokenUseCase.refreshToken()
+                    }
+                    if (newTokenResult.isSuccess) {
+                        val newRequest = original.newBuilder()
+                                .header("Authorization", "Bearer ${newTokenResult.getOrNull()}")
+                                .method(original.method, original.body)
+                                .build()
+                        chain.proceed(newRequest)
+                    } else {
+                        response
+                    }
+                } else {
+                    response
+                }
             }
         }
 

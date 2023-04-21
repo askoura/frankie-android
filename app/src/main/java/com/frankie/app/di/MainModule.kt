@@ -9,7 +9,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val mainModule = module {
-    single<SurveyService> { provideRetrofit(get()).create(SurveyService::class.java) }
+    single<SurveyService> { provideRetrofit(get(), get()).create(SurveyService::class.java) }
     single<SurveyRepository> { SurveyRepositoryImpl(get()) }
     viewModel { MainViewModel(get()) }
 }

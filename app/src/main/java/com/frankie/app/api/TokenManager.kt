@@ -3,8 +3,8 @@ package com.frankie.app.api
 import com.frankie.app.business.settings.SharedPrefsManager
 
 interface TokenManager {
-    fun getActiveToken(): String?
-    fun getRefreshToken(): String?
+    fun getActiveToken(): String
+    fun getRefreshToken(): String
     fun saveActiveToken(token: String)
     fun saveRefreshToken(token: String)
 }
