@@ -8,4 +8,6 @@
     <string name="login_button_login_loading">Please wait</string>
     <string name="error_general_title">Error</string>
     <string name="error_general_description">Please try again later.</string>
+    <string name="error_auth_title">Session expired.</string>
+    <string name="error_auth_description">Please sign in again.</string>
 </resources>

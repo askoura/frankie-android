@@ -28,18 +28,16 @@ class ErrorProcessorImpl : ErrorProcessor {
             is HttpException -> {
                 processHttpException(throwable)
             }
-
             is UnknownHostException,
             is SocketTimeoutException,
             is ConnectException,
             is InterruptedIOException,
             is NoRouteToHostException,
             is SSLException -> {
-                ProcessedError(R.string.error_general_title, R.string.error_general_description)
+                ProcessedError.GeneralError
             }
-
             else -> {
-                ProcessedError(R.string.error_general_title, R.string.error_general_description)
+                ProcessedError.GeneralError
             }
         }
         _errors.emit(processedError)
@@ -47,15 +45,20 @@ class ErrorProcessorImpl : ErrorProcessor {
 
     // TODO proper error handling per code
     private fun processHttpException(throwable: HttpException): ProcessedError {
-        return ProcessedError(R.string.error_general_title, R.string.error_general_description)
-//        when(throwable.code()) {
-//            401 -> {
-//            }
-//            404 -> {
-//            }
-//        }
+        return when (throwable.code()) {
+            401 -> {
+                ProcessedError.AuthError
+            }
+
+            else -> {
+                ProcessedError.GeneralError
+            }
+        }
     }
 
 }
 
-data class ProcessedError(val titleRes: Int, val messageRes: Int)
+sealed class ProcessedError(val titleRes: Int, val messageRes: Int) {
+    object AuthError : ProcessedError(R.string.error_auth_title, R.string.error_auth_description)
+    object GeneralError : ProcessedError(R.string.error_general_title, R.string.error_general_description)
+}

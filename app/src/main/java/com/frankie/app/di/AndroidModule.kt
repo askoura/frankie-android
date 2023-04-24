@@ -18,5 +18,5 @@ val androidModule = module {
     single<SharedPrefsManager> { SharedPrefsManagerImpl(get()) }
     single<TokenManager> { TokenManagerImpl(get()) }
     factory<ErrorProcessor> { ErrorProcessorImpl() }
-    factory<ErrorDisplayManager> { (context: Context) -> ErrorDisplayManagerImpl(context) }
+    factory<ErrorDisplayManager> { (context: Context) -> ErrorDisplayManagerImpl(context, get()) }
 }
