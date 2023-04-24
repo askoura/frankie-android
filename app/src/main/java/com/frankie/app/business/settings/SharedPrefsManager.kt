@@ -5,8 +5,8 @@ import android.content.SharedPreferences
 
 interface SharedPrefsManager {
     val isActiveTokenAvailable: Boolean
-    var activeToken: String
-    var refreshToken: String
+    var activeToken: String?
+    var refreshToken: String?
 }
 
 class SharedPrefsManagerImpl(context: Context) : SharedPrefsManager {
@@ -14,23 +14,23 @@ class SharedPrefsManagerImpl(context: Context) : SharedPrefsManager {
     private val editor: SharedPreferences.Editor = preferences.edit()
 
     override val isActiveTokenAvailable: Boolean
-        get() = activeToken.isNotEmpty()
+        get() = activeToken.isNullOrEmpty()
 
-    override var refreshToken: String
+    override var refreshToken: String?
         get() = getString(KEY_REFRESH_TOKEN)
         set(value) = saveString(KEY_REFRESH_TOKEN, value)
 
-    override var activeToken: String
+    override var activeToken: String?
         get() = getString(KEY_ACTIVE_TOKEN)
         set(value) = saveString(KEY_ACTIVE_TOKEN, value)
 
-    private fun saveString(key: String, value: String) {
+    private fun saveString(key: String, value: String?) {
         editor.putString(key, value)
         editor.apply()
     }
 
-    private fun getString(key: String, defaultValue: String = ""): String {
-        return preferences.getString(key, defaultValue) ?: defaultValue
+    private fun getString(key: String, defaultValue: String? = ""): String? {
+        return preferences.getString(key, defaultValue)
     }
 
     companion object {

@@ -6,6 +6,8 @@ import com.frankie.app.business.login.LoginInteractor
 import com.frankie.app.business.login.LoginInteractorImpl
 import com.frankie.app.business.login.LoginRepository
 import com.frankie.app.business.login.LoginRepositoryImpl
+import com.frankie.app.business.login.LogoutUseCase
+import com.frankie.app.business.login.LogoutUseCaseImpl
 import com.frankie.app.business.login.RefreshTokenUseCase
 import com.frankie.app.business.login.RefreshTokenUseCaseImpl
 import com.frankie.app.ui.login.LoginViewModel
@@ -17,5 +19,6 @@ val loginModule = module {
     single<LoginRepository> { LoginRepositoryImpl(get(), get()) }
     single<LoginInteractor> { LoginInteractorImpl(get()) }
     single<RefreshTokenUseCase> { RefreshTokenUseCaseImpl(get()) }
+    single<LogoutUseCase> { LogoutUseCaseImpl(get()) }
     viewModel { LoginViewModel(get(), get()) }
 }

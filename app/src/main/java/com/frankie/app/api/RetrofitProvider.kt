@@ -27,22 +27,26 @@ object RetrofitProvider {
                         .method(original.method, original.body)
                         .build()
                 val response = chain.proceed(request)
-                if (response.code == 401) {
-                    val newTokenResult = runBlocking {
-                        refreshTokenUseCase.refreshToken()
-                    }
-                    if (newTokenResult.isSuccess) {
-                        val newRequest = original.newBuilder()
-                                .header("Authorization", "Bearer ${newTokenResult.getOrNull()}")
-                                .method(original.method, original.body)
-                                .build()
-                        chain.proceed(newRequest)
-                    } else {
-                        response
-                    }
+
+                if (response.code != 401) {
+                    return@addInterceptor response
+                }
+                val refreshToken = tokenManager.getRefreshToken() ?: return@addInterceptor response
+                val activeToken = tokenManager.getActiveToken() ?: return@addInterceptor response
+
+                val newTokenResult = runBlocking {
+                    refreshTokenUseCase(refreshToken, activeToken)
+                }
+                if (newTokenResult.isSuccess) {
+                    val newRequest = original.newBuilder()
+                            .header("Authorization", "Bearer ${newTokenResult.getOrNull()}")
+                            .method(original.method, original.body)
+                            .build()
+                    chain.proceed(newRequest)
                 } else {
                     response
                 }
+
             }
         }
 

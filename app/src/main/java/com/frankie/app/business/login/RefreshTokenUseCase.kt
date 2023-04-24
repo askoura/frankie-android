@@ -1,12 +1,12 @@
 package com.frankie.app.business.login
 
 interface RefreshTokenUseCase {
-    suspend fun refreshToken(): Result<String>
+    suspend operator fun invoke(refreshToken: String, activeToken: String): Result<String>
 }
 
 class RefreshTokenUseCaseImpl(private val loginRepository: LoginRepository) : RefreshTokenUseCase {
-    override suspend fun refreshToken(): Result<String> {
-        val result = loginRepository.refreshActiveToken()
+    override suspend fun invoke(refreshToken: String, activeToken: String): Result<String> {
+        val result = loginRepository.refreshActiveToken(refreshToken, activeToken)
         return if (result.isSuccess) {
             Result.success(result.getOrThrow().activeToken)
         } else {

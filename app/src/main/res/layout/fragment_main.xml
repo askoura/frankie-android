@@ -12,6 +12,15 @@
         android:text="Response will be here" />
 
     <Button
+        android:id="@+id/btn_logout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Logout"
+        app:layout_constraintBottom_toTopOf="@id/btn_survey_users"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="16dp" />
+
+    <Button
         android:text="All surveys"
         android:id="@+id/btn_all_surveys"
         android:layout_margin="16dp"
