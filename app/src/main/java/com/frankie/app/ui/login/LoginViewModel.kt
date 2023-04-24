@@ -21,7 +21,7 @@ class LoginViewModel(private val loginInteractor: LoginInteractor, errorProcesso
                     _loginState.value = LoginState(isLoggedIn = true, isLoading = false)
                 } else {
                     _loginState.value = LoginState(isLoading = false)
-                    processError(result.exceptionOrNull()!!)
+                    processLoginError(result.exceptionOrNull()!!)
                 }
             }
         }

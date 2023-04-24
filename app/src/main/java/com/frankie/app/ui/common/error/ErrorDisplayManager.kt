@@ -19,17 +19,19 @@ class ErrorDisplayManagerImpl(private val context: Context, private val logoutUs
                 it.dismiss()
             }
         }
-        val isCancelable = processedError !is ProcessedError.AuthError
+        val isAuthError = processedError is ProcessedError.AuthError
         dialog = AlertDialog.Builder(context).apply {
             setTitle(processedError.titleRes)
             setMessage(processedError.messageRes)
             setPositiveButton(android.R.string.ok) { dialog, _ ->
-                logoutUseCase()
                 dialog.dismiss()
-                context.startActivity(LoginActivity.createIntent(context))
-                (context as? Activity)?.finish()
+                if (isAuthError) {
+                    logoutUseCase()
+                    context.startActivity(LoginActivity.createIntent(context))
+                    (context as? Activity)?.finish()
+                }
             }
-            setCancelable(isCancelable)
+            setCancelable(!isAuthError)
         }.show()
     }
 }

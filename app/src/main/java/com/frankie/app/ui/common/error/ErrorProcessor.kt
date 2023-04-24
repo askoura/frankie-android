@@ -14,6 +14,7 @@ import javax.net.ssl.SSLException
 
 interface ErrorProcessor {
     suspend fun processError(throwable: Throwable)
+    suspend fun processLoginError(throwable: Throwable)
     val errors: SharedFlow<ProcessedError>
 }
 
@@ -36,11 +37,20 @@ class ErrorProcessorImpl : ErrorProcessor {
             is SSLException -> {
                 ProcessedError.GeneralError
             }
+
             else -> {
                 ProcessedError.GeneralError
             }
         }
         _errors.emit(processedError)
+    }
+
+    override suspend fun processLoginError(throwable: Throwable) {
+        return if (throwable is HttpException && throwable.code() in listOf(401, 404)) {
+            _errors.emit(ProcessedError.LoginError)
+        } else {
+            processError(throwable)
+        }
     }
 
     // TODO proper error handling per code
@@ -61,4 +71,5 @@ class ErrorProcessorImpl : ErrorProcessor {
 sealed class ProcessedError(val titleRes: Int, val messageRes: Int) {
     object AuthError : ProcessedError(R.string.error_auth_title, R.string.error_auth_description)
     object GeneralError : ProcessedError(R.string.error_general_title, R.string.error_general_description)
+    object LoginError : ProcessedError(R.string.error_login_title, R.string.error_login_description)
 }
