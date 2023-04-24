@@ -14,7 +14,7 @@ class SharedPrefsManagerImpl(context: Context) : SharedPrefsManager {
     private val editor: SharedPreferences.Editor = preferences.edit()
 
     override val isActiveTokenAvailable: Boolean
-        get() = activeToken.isNullOrEmpty()
+        get() = !activeToken.isNullOrEmpty() && !refreshToken.isNullOrEmpty()
 
     override var refreshToken: String?
         get() = getString(KEY_REFRESH_TOKEN)
