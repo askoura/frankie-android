@@ -18,7 +18,6 @@ class SurveyActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySurveyBinding.inflate(layoutInflater)
-        emNavProcessor = EMNavProcessor(this)
         setContentView(binding.root)
         binding.webview.loadSurvey("1")
     }

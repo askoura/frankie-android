@@ -5,9 +5,10 @@ import android.app.Activity
 import android.content.Context
 import android.util.Base64
 import android.webkit.*
+import com.fasterxml.jackson.databind.node.ObjectNode
+import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.frankie.app.db.FrankieDb
 import com.frankie.app.db.model.Response
-import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.frankie.expressionmanager.ext.ScriptUtils
 import com.frankie.expressionmanager.model.*
 import com.frankie.expressionmanager.usecase.*
@@ -28,7 +29,7 @@ class EMNavProcessor constructor(
         webView.settings.javaScriptEnabled = true
         webView.settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
         webView.settings.domStorageEnabled = true
-        loadJavaScript(ScriptUtils().initialScript + "\n" + ScriptUtils().commonScript)
+        loadJavaScript(ScriptUtils().engineScript)
     }
 
     private fun loadJavaScript(input: String) {
@@ -53,33 +54,25 @@ class EMNavProcessor constructor(
         )
     }
 
-    fun navigate(useCaseInput: ApiUseCaseInput, navListener: NavigationListener) {
-        val navigationDirection = useCaseInput.navigationDirection
-
-        if (navigationDirection == NavigationDirection.Start) {
-            navigateStart(useCaseInput, navListener)
-        } else {
-            navigateElse(useCaseInput, navListener)
-        }
-
-    }
-
-    private fun navigateStart(useCaseInput: ApiUseCaseInput, navListener: NavigationListener) {
+    fun start(surveyLang: SurveyLang, navListener: NavigationListener) {
         val navigationUseCaseInput = NavigationUseCaseInput(
-            values = useCaseInput.values,
             navigationInfo = NavigationInfo(
-                navigationDirection = useCaseInput.navigationDirection,
+                navigationDirection = NavigationDirection.Start,
                 navigationMode = NavigationMode.GROUP_BY_GROUP,
                 navigationIndex = null
             ),
             defaultLang = SurveyLang.EN,
-            lang = useCaseInput.lang?.toSurveyLang() ?: SurveyLang.EN,
+            lang = surveyLang,
         )
         navigationUseCase(
             navigationUseCaseInput,
             onSuccess = { navigationJsonOutput ->
-                val responseId = Random().nextInt()
-                saveResponse(responseId, useCaseInput.lang?.toSurveyLang() ?: SurveyLang.EN, navigationJsonOutput)
+                val responseId = UUID.randomUUID()
+                saveResponse(
+                    responseId,
+                    surveyLang,
+                    navigationJsonOutput
+                )
                 val result = navigationJsonOutput
                     .with(
                         responseId,
@@ -92,11 +85,11 @@ class EMNavProcessor constructor(
         )
     }
 
-    private fun navigateElse(useCaseInput: ApiUseCaseInput, navListener: NavigationListener) {
+    fun navigate(useCaseInput: NavigateRequest, navListener: NavigationListener) {
         var response: Response
         val responseId = useCaseInput.responseId!!
         runBlocking {
-            response = frankieDb.responseDao().get(responseId)
+            response = frankieDb.responseDao().get(responseId.toString())
         }
         val lang = useCaseInput.lang?.toSurveyLang() ?: response.lang
         val navigationUseCaseInput = NavigationUseCaseInput(
@@ -104,7 +97,7 @@ class EMNavProcessor constructor(
                 putAll(useCaseInput.values)
             },
             navigationInfo = NavigationInfo(
-                navigationDirection = useCaseInput.navigationDirection,
+                navigationDirection = useCaseInput.navigationDirection!!,
                 navigationMode = NavigationMode.GROUP_BY_GROUP,
                 navigationIndex = response.navigationIndex
             ),
@@ -118,7 +111,11 @@ class EMNavProcessor constructor(
                     .with(
                         responseId,
                         lang,
-                        mutableListOf(SurveyLang.EN, SurveyLang.DE, SurveyLang.AR).apply { remove(lang) }
+                        mutableListOf(SurveyLang.EN, SurveyLang.DE, SurveyLang.AR).apply {
+                            remove(
+                                lang
+                            )
+                        }
                     )
                 updateResponse(response, lang, navigationJsonOutput)
                 navListener.onSuccess(result)
@@ -139,6 +136,7 @@ class EMNavProcessor constructor(
                 }
             },
             getProcessedFile(),
+            true,
             navigationUseCaseInput
         )
         val script = navigationUseCaseWrapperImpl.getNavigationScript()
@@ -160,18 +158,22 @@ class EMNavProcessor constructor(
     }
 
     private fun saveResponse(
-        responseId: Int,
+        responseId: UUID,
         surveyLang: SurveyLang,
         result: NavigationJsonOutput
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             frankieDb.responseDao().insert(
-                Response(responseId, result.navigationIndex, surveyLang, mapOf())
+                Response(responseId.toString(), result.navigationIndex, surveyLang, mapOf())
             )
         }
     }
 
-    private fun updateResponse(response: Response, surveyLang: SurveyLang, result: NavigationJsonOutput) {
+    private fun updateResponse(
+        response: Response,
+        surveyLang: SurveyLang,
+        result: NavigationJsonOutput
+    ) {
         CoroutineScope(Dispatchers.IO).launch {
             frankieDb.responseDao().update(
                 values = response.values.toMutableMap().apply {
@@ -191,3 +193,17 @@ interface NavigationListener {
     fun onSuccess(apiNavigationOutput: ApiNavigationOutput)
     fun onError(error: Throwable)
 }
+
+fun NavigationJsonOutput.with(responseId: UUID, lang: SurveyLang, additionalLang: List<SurveyLang>)
+          : ApiNavigationOutput {
+    return ApiNavigationOutput(survey, state, navigationIndex, responseId, lang, additionalLang)
+}
+
+data class ApiNavigationOutput(
+    val survey: ObjectNode,
+    val state: ObjectNode,
+    val navigationIndex: NavigationIndex,
+    val responseId: UUID,
+    val lang: SurveyLang,
+    val additionalLang: List<SurveyLang>?
+)
