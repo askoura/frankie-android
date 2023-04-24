@@ -1,11 +1,13 @@
 package com.frankie.app.ui.main.ui.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.frankie.app.SurveyActivity
 import com.frankie.app.databinding.FragmentMainBinding
 import com.frankie.app.ui.common.error.ErrorDisplayManager
 import com.frankie.app.ui.login.LoginActivity
@@ -36,7 +38,7 @@ class MainFragment : Fragment() {
             activity?.finish()
         }
         binding.btnSurveyUsers.setOnClickListener {
-
+            startActivity(Intent(binding.root.context, SurveyActivity::class.java))
         }
 
         lifecycleScope.launch {
