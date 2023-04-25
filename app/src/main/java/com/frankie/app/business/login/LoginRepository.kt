@@ -12,24 +12,28 @@ interface LoginRepository {
     suspend fun refreshActiveToken(refreshToken: String, activeToken: String): Result<LoginResponse>
 }
 
-class LoginRepositoryImpl(private val service: LoginService, private val tokenManager: TokenManager) : LoginRepository {
+class LoginRepositoryImpl(
+    private val service: LoginService,
+    private val tokenManager: TokenManager
+) : LoginRepository {
 
     override suspend fun login(loginInput: LoginInput): Result<LoginResponse> {
         val result = service.login(loginInput).getResult()
         if (result.isSuccess) {
             val loginResponse = result.getOrThrow()
-            tokenManager.saveActiveToken(loginResponse.activeToken)
-            tokenManager.saveRefreshToken(loginResponse.refreshToken)
+            tokenManager.saveSession(loginResponse)
         }
         return result
     }
 
-    override suspend fun refreshActiveToken(refreshToken: String, activeToken: String): Result<LoginResponse> {
+    override suspend fun refreshActiveToken(
+        refreshToken: String,
+        activeToken: String
+    ): Result<LoginResponse> {
         val result = service.refreshActiveToken(RefreshInput(refreshToken, activeToken)).getResult()
         if (result.isSuccess) {
             val loginResponse = result.getOrThrow()
-            tokenManager.saveActiveToken(loginResponse.activeToken)
-            tokenManager.saveRefreshToken(loginResponse.refreshToken)
+            tokenManager.saveSession(loginResponse)
         }
         return result
     }

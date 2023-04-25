@@ -7,6 +7,7 @@ interface SharedPrefsManager {
     val isActiveTokenAvailable: Boolean
     var activeToken: String?
     var refreshToken: String?
+    var subdomain: String?
 }
 
 class SharedPrefsManagerImpl(context: Context) : SharedPrefsManager {
@@ -19,6 +20,10 @@ class SharedPrefsManagerImpl(context: Context) : SharedPrefsManager {
     override var refreshToken: String?
         get() = getString(KEY_REFRESH_TOKEN)
         set(value) = saveString(KEY_REFRESH_TOKEN, value)
+
+    override var subdomain: String?
+        get() = getString(KEY_SUB_DOMAIN)
+        set(value) = saveString(KEY_SUB_DOMAIN, value)
 
     override var activeToken: String?
         get() = getString(KEY_ACTIVE_TOKEN)
@@ -37,5 +42,6 @@ class SharedPrefsManagerImpl(context: Context) : SharedPrefsManager {
         const val PREFS_NAME = "frankie_prefs"
         const val KEY_ACTIVE_TOKEN = "active_token"
         const val KEY_REFRESH_TOKEN = "refresh_token"
+        const val KEY_SUB_DOMAIN = "subdomain"
     }
 }
