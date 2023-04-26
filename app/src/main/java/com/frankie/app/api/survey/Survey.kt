@@ -1,7 +1,9 @@
 package com.frankie.app.api.survey
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class Survey(
         @JsonProperty("id") val id: String,
         @JsonProperty("creationDate") val creationDate: String,
