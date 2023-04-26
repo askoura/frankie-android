@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.frankie.app.R
 import com.frankie.app.databinding.ActivityLoginBinding
 import com.frankie.app.ui.common.error.ErrorDisplayManager
 import com.frankie.app.ui.main.MainActivity
@@ -41,6 +42,17 @@ class LoginActivity : AppCompatActivity() {
                 if (state.isLoggedIn) {
                     startActivity(MainActivity.createIntent(this@LoginActivity))
                     finish()
+                }
+
+                if (state.emailValidationError) {
+                    binding.usernameLayout.error = binding.root.context.getString(R.string.validation_email_error)
+                } else {
+                    binding.usernameLayout.error = null
+                }
+                if (state.pswValidationError) {
+                    binding.passwordLayout.error = binding.root.context.getString(R.string.validation_psw_error)
+                } else {
+                    binding.passwordLayout.error = null
                 }
             }
         }
