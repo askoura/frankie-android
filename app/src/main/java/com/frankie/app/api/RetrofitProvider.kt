@@ -16,16 +16,21 @@ object RetrofitProvider {
         if (BuildConfig.DEBUG) {
             val httpLoggingInterceptor = HttpLoggingInterceptor()
             httpLoggingInterceptor.level =
-                    HttpLoggingInterceptor.Level.BODY
+                HttpLoggingInterceptor.Level.BODY
             httpClient.networkInterceptors().add(httpLoggingInterceptor)
         }
         if (tokenManager != null && refreshTokenUseCase != null) {
             httpClient.addInterceptor { chain ->
                 val original = chain.request()
+
+                val newUrl = original.url.newBuilder()
+                    .host((tokenManager.getSubDomain()?.let { "$it." } ?: "") + BACKEND_HOST)
+                    .build()
                 val request = original.newBuilder()
-                        .header("Authorization", "Bearer ${tokenManager.getActiveToken()}")
-                        .method(original.method, original.body)
-                        .build()
+                    .url(newUrl)
+                    .header("Authorization", "Bearer ${tokenManager.getActiveToken()}")
+                    .method(original.method, original.body)
+                    .build()
                 val response = chain.proceed(request)
 
                 if (response.code != 401) {
@@ -39,9 +44,9 @@ object RetrofitProvider {
                 }
                 if (newTokenResult.isSuccess) {
                     val newRequest = original.newBuilder()
-                            .header("Authorization", "Bearer ${newTokenResult.getOrNull()}")
-                            .method(original.method, original.body)
-                            .build()
+                        .header("Authorization", "Bearer ${newTokenResult.getOrNull()}")
+                        .method(original.method, original.body)
+                        .build()
                     chain.proceed(newRequest)
                 } else {
                     response
@@ -56,11 +61,16 @@ object RetrofitProvider {
         httpClient.writeTimeout(1, TimeUnit.MINUTES)
 
         val client = httpClient
-                .build()
+            .build()
         return Retrofit.Builder()
-                .baseUrl("http://192.168.1.118:8080/")
-                .addConverterFactory(JacksonConverterFactory.create())
-                .client(client)
-                .build()
+            .baseUrl("$SCHEME$BACKEND_HOST:$BACKEND_PORT")
+            .addConverterFactory(JacksonConverterFactory.create())
+            .client(client)
+            .build()
     }
+
+    private const val SCHEME = "http://"
+    private const val BACKEND_HOST = "frankiesurveys.com"
+    private const val BACKEND_PORT = "8080"
+
 }
