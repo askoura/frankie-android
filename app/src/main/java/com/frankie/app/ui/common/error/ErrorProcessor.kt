@@ -25,6 +25,7 @@ class ErrorProcessorImpl : ErrorProcessor {
 
     // TODO: check if no internet connection
     override suspend fun processError(throwable: Throwable) {
+        throwable.printStackTrace()
         val processedError = when (throwable) {
             is HttpException -> {
                 processHttpException(throwable)
@@ -47,6 +48,7 @@ class ErrorProcessorImpl : ErrorProcessor {
 
     override suspend fun processLoginError(throwable: Throwable) {
         return if (throwable is HttpException && throwable.code() in listOf(401, 404)) {
+            throwable.printStackTrace()
             _errors.emit(ProcessedError.LoginError)
         } else {
             processError(throwable)
