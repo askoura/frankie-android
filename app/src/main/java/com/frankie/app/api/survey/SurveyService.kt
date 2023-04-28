@@ -6,7 +6,7 @@ import retrofit2.http.Path
 
 interface SurveyService {
 
-    @GET("survey/all")
+    @GET("survey/offline")
     suspend fun getSurveyList(): List<Survey>
 
     @GET("survey/{surveyId}/permission/all")
