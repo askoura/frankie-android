@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.frankie.app.SurveyActivity
 import com.frankie.app.databinding.FragmentMainBinding
 import com.frankie.app.ui.common.error.ErrorDisplayManager
@@ -21,6 +22,7 @@ class MainFragment : Fragment() {
     private val viewModel: MainViewModel by lazy { getViewModel() }
     private val errorDisplayManager: ErrorDisplayManager by inject { parametersOf(requireActivity()) }
     private lateinit var binding: FragmentMainBinding
+    private val adapter: SurveyListAdapter by lazy { SurveyListAdapter() }
 
     companion object {
         fun newInstance() = MainFragment()
@@ -29,6 +31,10 @@ class MainFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
         binding = FragmentMainBinding.inflate(inflater, container, false)
+
+        binding.recycler.adapter = adapter
+        binding.recycler.layoutManager = LinearLayoutManager(binding.root.context)
+
         binding.btnAllSurveys.setOnClickListener {
             viewModel.fetchSurveyList()
         }
@@ -43,7 +49,7 @@ class MainFragment : Fragment() {
 
         lifecycleScope.launch {
             viewModel.state.collect { state ->
-                binding.message.text = state.surveyList.toString()
+                adapter.submitList(state.surveyList)
             }
         }
 

@@ -2,8 +2,8 @@ package com.frankie.app.ui.main.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.frankie.app.api.survey.Survey
 import com.frankie.app.business.login.LogoutUseCase
+import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.business.survey.SurveyRepository
 import com.frankie.app.ui.common.error.ErrorProcessor
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,7 +30,7 @@ class MainViewModel(private val surveyRepository: SurveyRepository, private val 
     }
 
     data class State(
-            val surveyList: List<Survey> = emptyList()
+            val surveyList: List<SurveyData> = emptyList()
     )
 
 }
