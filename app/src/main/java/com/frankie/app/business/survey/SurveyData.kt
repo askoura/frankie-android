@@ -1,7 +1,9 @@
 package com.frankie.app.business.survey
 
 import com.frankie.app.api.survey.Language
+import com.frankie.app.api.survey.PublishInfo
 import com.frankie.app.api.survey.Survey
+import com.frankie.app.api.survey.SurveyDesign
 
 data class SurveyData(
         val id: String,
@@ -13,10 +15,12 @@ data class SurveyData(
         val status: String,
         val usage: String,
         val quota: Int,
-        val navigationMode: String
+        val navigationMode: String,
+        val publishInfo: PublishInfo,
+        val newVersionAvailable: Boolean
 ) {
     companion object {
-        fun fromSurvey(survey: Survey): SurveyData {
+        fun fromSurveyAndDesign(survey: Survey, design: SurveyDesign, newVersionAvailable: Boolean): SurveyData {
             return SurveyData(
                     survey.id,
                     survey.creationDate,
@@ -27,7 +31,9 @@ data class SurveyData(
                     survey.status,
                     survey.usage,
                     survey.quota,
-                    survey.navigationMode
+                    survey.navigationMode,
+                    design.publishInfo,
+                    newVersionAvailable
             )
         }
     }

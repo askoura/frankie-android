@@ -1,7 +1,9 @@
 package com.frankie.app.api.survey
 
 import com.frankie.app.api.common.User
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface SurveyService {
@@ -11,4 +13,8 @@ interface SurveyService {
 
     @GET("survey/{surveyId}/permission/all")
     suspend fun getSurveyPermissionList(@Path("surveyId") surveyId: String): List<User>
+
+    @POST("survey/{surveyId}/offline/design")
+    suspend fun getSurveyDesign(@Path("surveyId") surveyId: String, @Body publishInfo: PublishInfo): SurveyDesign
+
 }

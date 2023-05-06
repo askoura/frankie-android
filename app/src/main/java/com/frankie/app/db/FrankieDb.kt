@@ -4,19 +4,25 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.frankie.app.db.model.Response
+import com.frankie.app.db.survey.SurveyDataDao
+import com.frankie.app.db.survey.SurveyDataEntity
+import com.frankie.app.db.survey.SurveyTypeConverters
 
 
 @Database(
-    entities = [
-        Response::class
-    ],
-    version = 1,
-    exportSchema = false
+        entities = [
+            Response::class,
+            SurveyDataEntity::class
+        ],
+        version = 1,
+        exportSchema = false
 )
+@TypeConverters(SurveyTypeConverters::class)
 abstract class FrankieDb : RoomDatabase() {
     abstract fun responseDao(): ResponseDao
-
+    abstract fun surveyDataDao(): SurveyDataDao
 
     companion object {
 
@@ -26,10 +32,11 @@ abstract class FrankieDb : RoomDatabase() {
         fun getDatabase(context: Context): FrankieDb {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    FrankieDb::class.java,
-                    "food_item_database"
-                ).build()
+                        context.applicationContext,
+                        FrankieDb::class.java,
+                        "frankie_db"
+                )
+                        .build()
 
                 INSTANCE = instance
 
@@ -39,3 +46,4 @@ abstract class FrankieDb : RoomDatabase() {
         }
     }
 }
+

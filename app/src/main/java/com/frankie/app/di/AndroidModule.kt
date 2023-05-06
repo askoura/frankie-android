@@ -5,6 +5,7 @@ import com.frankie.app.api.TokenManager
 import com.frankie.app.api.TokenManagerImpl
 import com.frankie.app.business.settings.SharedPrefsManager
 import com.frankie.app.business.settings.SharedPrefsManagerImpl
+import com.frankie.app.db.FrankieDb
 import com.frankie.app.ui.common.error.ErrorDisplayManager
 import com.frankie.app.ui.common.error.ErrorDisplayManagerImpl
 import com.frankie.app.ui.common.error.ErrorProcessor
@@ -17,6 +18,8 @@ val androidModule = module {
     single(named("appContext")) { androidContext() }
     single<SharedPrefsManager> { SharedPrefsManagerImpl(get()) }
     single<TokenManager> { TokenManagerImpl(get()) }
+    single { FrankieDb.getDatabase(get(named("appContext"))) }
+    single { get<FrankieDb>().surveyDataDao() }
     factory<ErrorProcessor> { ErrorProcessorImpl() }
     factory<ErrorDisplayManager> { (context: Context) -> ErrorDisplayManagerImpl(context, get()) }
 }

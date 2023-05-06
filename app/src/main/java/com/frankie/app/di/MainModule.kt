@@ -10,6 +10,6 @@ import org.koin.dsl.module
 
 val mainModule = module {
     single<SurveyService> { provideRetrofit(get(), get()).create(SurveyService::class.java) }
-    single<SurveyRepository> { SurveyRepositoryImpl(get()) }
+    single<SurveyRepository> { SurveyRepositoryImpl(get(), get()) }
     viewModel { MainViewModel(get(), get(), get()) }
 }
