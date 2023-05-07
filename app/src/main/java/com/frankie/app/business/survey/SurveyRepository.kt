@@ -21,12 +21,14 @@ interface SurveyRepository {
 }
 
 class SurveyRepositoryImpl(private val service: SurveyService, private val surveyDataDao: SurveyDataDao) : SurveyRepository {
-    // TODO load from DB and check if new version available
     override fun getSurveyList(): Flow<Result<List<SurveyData>>> {
         return flow {
             val surveyList = service.getSurveyList().map { survey ->
                 val design = service.getSurveyDesign(survey.id, PublishInfo())
-                SurveyData.fromSurveyAndDesign(survey, design, false)
+                val savedSurvey = surveyDataDao.getSurveyDataById(survey.id)
+                val newVersionAvailable = savedSurvey?.publishInfoEntity?.toPublishInfo()?.let { it != design.publishInfo }
+                        ?: false
+                SurveyData.fromSurveyAndDesign(survey, design, newVersionAvailable)
             }
             surveyDataDao.insertAll(surveyList.map { it.toSurveyDataEntity() })
             emit(Result.success(surveyList))

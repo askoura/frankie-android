@@ -25,6 +25,6 @@ interface SurveyDataDao {
     suspend fun getAllSurveyData(): List<SurveyDataEntity>
 
     @Query("SELECT * FROM survey_data_table WHERE id = :surveyDataId")
-    suspend fun getSurveyDataById(surveyDataId: String): SurveyDataEntity
+    suspend fun getSurveyDataById(surveyDataId: String): SurveyDataEntity?
 
 }
