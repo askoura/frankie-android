@@ -1,10 +1,10 @@
 package com.frankie.app.di
 
 import android.content.Context
-import com.frankie.app.api.TokenManager
-import com.frankie.app.api.TokenManagerImpl
 import com.frankie.app.business.settings.SharedPrefsManager
 import com.frankie.app.business.settings.SharedPrefsManagerImpl
+import com.frankie.app.business.survey.TokenManager
+import com.frankie.app.business.survey.TokenManagerImpl
 import com.frankie.app.db.FrankieDb
 import com.frankie.app.ui.common.error.ErrorDisplayManager
 import com.frankie.app.ui.common.error.ErrorDisplayManagerImpl

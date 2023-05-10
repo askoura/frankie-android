@@ -1,6 +1,6 @@
 package com.frankie.app.business.login
 
-import com.frankie.app.api.TokenManager
+import com.frankie.app.business.survey.TokenManager
 
 interface LogoutUseCase {
     operator fun invoke()

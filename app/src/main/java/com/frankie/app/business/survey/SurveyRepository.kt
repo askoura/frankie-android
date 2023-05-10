@@ -3,6 +3,7 @@ package com.frankie.app.business.survey
 import com.frankie.app.api.common.User
 import com.frankie.app.api.survey.Language
 import com.frankie.app.api.survey.PublishInfo
+import com.frankie.app.api.survey.SurveyDesign
 import com.frankie.app.api.survey.SurveyService
 import com.frankie.app.db.survey.LanguageEntity
 import com.frankie.app.db.survey.LanguagesEntity
@@ -18,6 +19,14 @@ import kotlinx.coroutines.flow.flowOn
 interface SurveyRepository {
     fun getSurveyList(): Flow<Result<List<SurveyData>>>
     fun getSurveyPermissionList(surveyId: String): Flow<Result<List<User>>>
+    fun getSurveyFile(surveyId: String, resourceId: String): Flow<Result<DataStream>>
+
+    suspend fun surveyDesign(surveyData: SurveyData): SurveyDesign
+
+    sealed class DataStream {
+        class Chunk(val bytes: ByteArray) : DataStream()
+        object End : DataStream()
+    }
 }
 
 class SurveyRepositoryImpl(private val service: SurveyService, private val surveyDataDao: SurveyDataDao) : SurveyRepository {
@@ -28,13 +37,19 @@ class SurveyRepositoryImpl(private val service: SurveyService, private val surve
                 val savedSurvey = surveyDataDao.getSurveyDataById(survey.id)
                 val newVersionAvailable = savedSurvey?.publishInfoEntity?.toPublishInfo()?.let { it != design.publishInfo }
                         ?: false
-                SurveyData.fromSurveyAndDesign(survey, design, newVersionAvailable)
+                SurveyData.fromSurveyAndDesign(survey,
+                        savedSurvey?.publishInfoEntity?.toPublishInfo() ?: PublishInfo(),
+                        newVersionAvailable)
             }
             surveyDataDao.insertAll(surveyList.map { it.toSurveyDataEntity() })
             emit(Result.success(surveyList))
         }.catch {
             emit(Result.failure(it))
         }.flowOn(Dispatchers.IO)
+    }
+
+    override suspend fun surveyDesign(surveyData: SurveyData): SurveyDesign {
+        return service.getSurveyDesign(surveyData.id, surveyData.publishInfo)
     }
 
     override fun getSurveyPermissionList(surveyId: String): Flow<Result<List<User>>> {
@@ -44,6 +59,25 @@ class SurveyRepositoryImpl(private val service: SurveyService, private val surve
             emit(Result.failure(it))
         }.flowOn(Dispatchers.IO)
     }
+
+    override fun getSurveyFile(surveyId: String, resourceId: String): Flow<Result<SurveyRepository.DataStream>> {
+        return flow {
+            val responseBody = service.getSurveyFile(surveyId, resourceId)
+            responseBody.byteStream().use { inputStream ->
+                val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+                var bytes = inputStream.read(buffer)
+                while (bytes >= 0) {
+                    emit(Result.success(SurveyRepository.DataStream.Chunk(buffer.copyOfRange(0, bytes))))
+                    bytes = inputStream.read(buffer)
+                }
+                emit(Result.success(SurveyRepository.DataStream.End))
+            }
+        }.catch {
+            emit(Result.failure(it))
+        }.flowOn(Dispatchers.IO)
+    }
+
+
 }
 
 private fun SurveyData.toSurveyDataEntity(): SurveyDataEntity {

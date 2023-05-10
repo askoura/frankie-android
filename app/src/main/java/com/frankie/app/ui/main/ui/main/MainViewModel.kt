@@ -5,12 +5,16 @@ import androidx.lifecycle.viewModelScope
 import com.frankie.app.business.login.LogoutUseCase
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.business.survey.SurveyRepository
+import com.frankie.app.storage.DownloadManager
 import com.frankie.app.ui.common.error.ErrorProcessor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class MainViewModel(private val surveyRepository: SurveyRepository, private val logoutUseCase: LogoutUseCase, errorProcessor: ErrorProcessor) : ViewModel(), ErrorProcessor by errorProcessor {
+class MainViewModel(private val surveyRepository: SurveyRepository,
+                    private val logoutUseCase: LogoutUseCase,
+                    private val downloadManager: DownloadManager,
+                    errorProcessor: ErrorProcessor) : ViewModel(), ErrorProcessor by errorProcessor {
     private val _state = MutableStateFlow(State())
     val state = _state.asStateFlow()
     fun fetchSurveyList() {
@@ -19,6 +23,16 @@ class MainViewModel(private val surveyRepository: SurveyRepository, private val 
                 if (result.isSuccess) {
                     _state.value = _state.value.copy(surveyList = result.getOrThrow())
                 } else {
+                    processError(result.exceptionOrNull()!!)
+                }
+            }
+        }
+    }
+
+    fun surveyClicked(surveyData: SurveyData) {
+        viewModelScope.launch {
+            downloadManager.downloadSurveyFiles(surveyData).collect { result ->
+                if (result.isFailure) {
                     processError(result.exceptionOrNull()!!)
                 }
             }

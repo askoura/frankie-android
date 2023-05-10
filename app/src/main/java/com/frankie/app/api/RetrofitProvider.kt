@@ -2,6 +2,7 @@ package com.frankie.app.api
 
 import com.frankie.app.BuildConfig
 import com.frankie.app.business.login.RefreshTokenUseCase
+import com.frankie.app.business.survey.TokenManager
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

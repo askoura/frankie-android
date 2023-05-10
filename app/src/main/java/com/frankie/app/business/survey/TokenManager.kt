@@ -1,4 +1,4 @@
-package com.frankie.app.api
+package com.frankie.app.business.survey
 
 import com.frankie.app.api.login.LoginResponse
 import com.frankie.app.business.settings.SharedPrefsManager

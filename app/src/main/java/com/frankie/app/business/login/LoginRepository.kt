@@ -1,11 +1,11 @@
 package com.frankie.app.business.login
 
-import com.frankie.app.api.TokenManager
 import com.frankie.app.api.login.LoginInput
 import com.frankie.app.api.login.LoginResponse
 import com.frankie.app.api.login.LoginService
 import com.frankie.app.api.login.RefreshInput
 import com.frankie.app.business.getResult
+import com.frankie.app.business.survey.TokenManager
 
 interface LoginRepository {
     suspend fun login(loginInput: LoginInput): Result<LoginResponse>

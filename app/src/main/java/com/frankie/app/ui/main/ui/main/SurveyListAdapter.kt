@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.frankie.app.business.survey.SurveyData
 
-class SurveyListAdapter : ListAdapter<SurveyData, SurveyListAdapter.ViewHolder>(SurveyDiffCallBack()) {
+class SurveyListAdapter(val onItemClicked: (SurveyData) -> Unit) : ListAdapter<SurveyData, SurveyListAdapter.ViewHolder>(SurveyDiffCallBack()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = SurveyListItemView(parent.context)
@@ -26,6 +26,9 @@ class SurveyListAdapter : ListAdapter<SurveyData, SurveyListAdapter.ViewHolder>(
 
         fun bind(surveyData: SurveyData) {
             surveyListItemView.bind(surveyData)
+            surveyListItemView.setOnClickListener {
+                onItemClicked(surveyData)
+            }
         }
     }
 

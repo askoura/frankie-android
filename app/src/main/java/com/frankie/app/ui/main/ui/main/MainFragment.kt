@@ -22,7 +22,7 @@ class MainFragment : Fragment() {
     private val viewModel: MainViewModel by lazy { getViewModel() }
     private val errorDisplayManager: ErrorDisplayManager by inject { parametersOf(requireActivity()) }
     private lateinit var binding: FragmentMainBinding
-    private val adapter: SurveyListAdapter by lazy { SurveyListAdapter() }
+    private lateinit var adapter: SurveyListAdapter
 
     companion object {
         fun newInstance() = MainFragment()
@@ -32,6 +32,9 @@ class MainFragment : Fragment() {
                               savedInstanceState: Bundle?): View {
         binding = FragmentMainBinding.inflate(inflater, container, false)
 
+        adapter = SurveyListAdapter(onItemClicked = { surveyData ->
+            viewModel.surveyClicked(surveyData)
+        })
         binding.recycler.adapter = adapter
         binding.recycler.layoutManager = LinearLayoutManager(binding.root.context)
 
@@ -58,6 +61,7 @@ class MainFragment : Fragment() {
                 errorDisplayManager.displayError(error)
             }
         }
+
         return binding.root
     }
 
