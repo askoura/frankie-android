@@ -11,7 +11,6 @@ import java.util.*
 
 class SurveyActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySurveyBinding
-    private lateinit var emNavProcessor: EMNavProcessor
     var backPressedTime: Long = 0
 
     @SuppressLint("SetJavaScriptEnabled")
