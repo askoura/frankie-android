@@ -1,0 +1,40 @@
+._wrapper_13l38_1 {
+  width: 400px;
+  background: #eff3fd;
+  border: 1px solid #bdc6de;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 13px;
+  max-width: 407px;
+  padding: 5px;
+}
+
+._content_13l38_11 {
+  background: #ffffff;
+  border-radius: 10px;
+  text-align: center;
+  padding: 60px 0;
+}
+
+._form_13l38_18 {
+  max-width: 250px;
+  margin: 40px auto;
+}
+
+._formGroup_13l38_23 {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+._errorText_13l38_29 {
+  color: #eb5757 !important;
+}
+
+._successText_13l38_33 {
+  color: #fff;
+  background: #27ae60;
+  border-radius: 5px;
+  max-width: 280px;
+  padding: 10px;
+  margin: 20px auto 0;
+}
