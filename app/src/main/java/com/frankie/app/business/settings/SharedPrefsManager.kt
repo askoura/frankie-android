@@ -8,6 +8,7 @@ interface SharedPrefsManager {
     var activeToken: String?
     var refreshToken: String?
     var subdomain: String?
+    var userId: String?
 }
 
 class SharedPrefsManagerImpl(context: Context) : SharedPrefsManager {
@@ -29,6 +30,10 @@ class SharedPrefsManagerImpl(context: Context) : SharedPrefsManager {
         get() = getString(KEY_ACTIVE_TOKEN)
         set(value) = saveString(KEY_ACTIVE_TOKEN, value)
 
+    override var userId: String?
+        get() = getString(KEY_USER_ID)
+        set(value) = saveString(KEY_USER_ID, value)
+
     private fun saveString(key: String, value: String?) {
         editor.putString(key, value)
         editor.apply()
@@ -43,5 +48,6 @@ class SharedPrefsManagerImpl(context: Context) : SharedPrefsManager {
         const val KEY_ACTIVE_TOKEN = "active_token"
         const val KEY_REFRESH_TOKEN = "refresh_token"
         const val KEY_SUB_DOMAIN = "subdomain"
+        const val KEY_USER_ID = "user_id"
     }
 }

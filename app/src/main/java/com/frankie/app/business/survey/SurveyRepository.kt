@@ -5,6 +5,8 @@ import com.frankie.app.api.survey.Language
 import com.frankie.app.api.survey.PublishInfo
 import com.frankie.app.api.survey.SurveyDesign
 import com.frankie.app.api.survey.SurveyService
+import com.frankie.app.db.permission.PermissionDao
+import com.frankie.app.db.permission.PermissionEntity
 import com.frankie.app.db.survey.LanguageEntity
 import com.frankie.app.db.survey.LanguagesEntity
 import com.frankie.app.db.survey.PublishInfoEntity
@@ -29,7 +31,10 @@ interface SurveyRepository {
     }
 }
 
-class SurveyRepositoryImpl(private val service: SurveyService, private val surveyDataDao: SurveyDataDao) : SurveyRepository {
+class SurveyRepositoryImpl(private val service: SurveyService,
+                           private val surveyDataDao: SurveyDataDao,
+                           private val permissionDao: PermissionDao,
+                           private val tokenManager: TokenManager) : SurveyRepository {
     override fun getSurveyList(): Flow<Result<List<SurveyData>>> {
         return flow {
             val surveyList = service.getSurveyList().map { survey ->
@@ -41,11 +46,24 @@ class SurveyRepositoryImpl(private val service: SurveyService, private val surve
                         savedSurvey?.publishInfoEntity?.toPublishInfo() ?: PublishInfo(),
                         newVersionAvailable)
             }
-            surveyDataDao.insertAll(surveyList.map { it.toSurveyDataEntity() })
+            saveSurveysToDB(surveyList)
+            savePermissionsToDB(surveyList)
+
             emit(Result.success(surveyList))
         }.catch {
             emit(Result.failure(it))
         }.flowOn(Dispatchers.IO)
+    }
+
+    private suspend fun saveSurveysToDB(surveyList: List<SurveyData>) {
+        surveyDataDao.insertAll(surveyList.map { it.toSurveyDataEntity() })
+    }
+
+    private suspend fun savePermissionsToDB(surveyList: List<SurveyData>) {
+        permissionDao.insertMultiple(surveyList.map {
+            PermissionEntity(userId = tokenManager.getUserIdOrThrow(),
+                    surveyId = it.id)
+        })
     }
 
     override suspend fun surveyDesign(surveyData: SurveyData): SurveyDesign {

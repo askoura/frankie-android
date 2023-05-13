@@ -20,6 +20,7 @@ val androidModule = module {
     single<TokenManager> { TokenManagerImpl(get()) }
     single { FrankieDb.getDatabase(get(named("appContext"))) }
     single { get<FrankieDb>().surveyDataDao() }
+    single { get<FrankieDb>().permissionDao() }
     factory<ErrorProcessor> { ErrorProcessorImpl() }
     factory<ErrorDisplayManager> { (context: Context) -> ErrorDisplayManagerImpl(context, get()) }
 }

@@ -30,8 +30,7 @@ class DownloadManagerImpl(private val appContext: Context, private val surveyRep
             design.files.forEach { file ->
                 val flow = surveyRepository.getSurveyFile(surveyData.id, file.name)
                 saveFile(flow, getTargetFile(appContext, file.name, surveyData.id, Subfolder.FOLDER_RESOURCES)).collect {
-                    if (it.isSuccess) emit(Result.success(Unit))
-                    else emit(Result.failure<Unit>(it.exceptionOrNull()!!))
+                    if (it.isFailure) emit(Result.failure<Unit>(it.exceptionOrNull()!!))
                 }
             }
 
@@ -86,10 +85,6 @@ class DownloadManagerImpl(private val appContext: Context, private val surveyRep
                 }
             }
         }.flowOn(Dispatchers.IO)
-    }
-
-    private fun processError() {
-        // TODO
     }
 
     private fun getTargetFile(context: Context, fileName: String, surveyId: String, subfolder: Subfolder): File {

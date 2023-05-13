@@ -13,7 +13,7 @@ import org.koin.dsl.module
 
 val mainModule = module {
     single<SurveyService> { provideRetrofit(get(), get()).create(SurveyService::class.java) }
-    single<SurveyRepository> { SurveyRepositoryImpl(get(), get()) }
+    single<SurveyRepository> { SurveyRepositoryImpl(get(), get(), get(), get()) }
     single<DownloadManager> { DownloadManagerImpl(get(named("appContext")), get()) }
     viewModel { MainViewModel(get(), get(), get(), get()) }
 }
