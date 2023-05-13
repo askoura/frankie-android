@@ -1,4 +1,4 @@
-package com.frankie.app.api.login
+package com.frankie.app.api.auth
 
 import retrofit2.Response
 import retrofit2.http.Body

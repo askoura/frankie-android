@@ -1,11 +1,11 @@
 package com.frankie.app.business.login
 
-import com.frankie.app.api.login.LoginInput
-import com.frankie.app.api.login.LoginResponse
-import com.frankie.app.api.login.LoginService
-import com.frankie.app.api.login.RefreshInput
+import com.frankie.app.api.auth.LoginInput
+import com.frankie.app.api.auth.LoginResponse
+import com.frankie.app.api.auth.LoginService
+import com.frankie.app.api.auth.RefreshInput
 import com.frankie.app.business.getResult
-import com.frankie.app.business.survey.TokenManager
+import com.frankie.app.business.survey.SessionManager
 
 interface LoginRepository {
     suspend fun login(loginInput: LoginInput): Result<LoginResponse>
@@ -13,15 +13,15 @@ interface LoginRepository {
 }
 
 class LoginRepositoryImpl(
-    private val service: LoginService,
-    private val tokenManager: TokenManager
+        private val service: LoginService,
+        private val sessionManager: SessionManager
 ) : LoginRepository {
 
     override suspend fun login(loginInput: LoginInput): Result<LoginResponse> {
         val result = service.login(loginInput).getResult()
         if (result.isSuccess) {
             val loginResponse = result.getOrThrow()
-            tokenManager.saveSession(loginResponse)
+            sessionManager.saveSession(loginResponse)
         }
         return result
     }
@@ -33,7 +33,7 @@ class LoginRepositoryImpl(
         val result = service.refreshActiveToken(RefreshInput(refreshToken, activeToken)).getResult()
         if (result.isSuccess) {
             val loginResponse = result.getOrThrow()
-            tokenManager.saveSession(loginResponse)
+            sessionManager.saveSession(loginResponse)
         }
         return result
     }

@@ -1,9 +1,9 @@
 package com.frankie.app.business.survey
 
-import com.frankie.app.api.login.LoginResponse
+import com.frankie.app.api.auth.LoginResponse
 import com.frankie.app.business.settings.SharedPrefsManager
 
-interface TokenManager {
+interface SessionManager {
     fun getActiveToken(): String?
     fun getRefreshToken(): String?
     fun getSubDomain(): String?
@@ -12,7 +12,7 @@ interface TokenManager {
     fun clearTokens()
 }
 
-class TokenManagerImpl(private val sharedPrefsManager: SharedPrefsManager) : TokenManager {
+class SessionManagerImpl(private val sharedPrefsManager: SharedPrefsManager) : SessionManager {
 
     override fun getActiveToken(): String? = sharedPrefsManager.activeToken
 
@@ -29,6 +29,7 @@ class TokenManagerImpl(private val sharedPrefsManager: SharedPrefsManager) : Tok
     }
 
     override fun clearTokens() {
+        sharedPrefsManager.userId = null
         sharedPrefsManager.activeToken = null
         sharedPrefsManager.refreshToken = null
     }

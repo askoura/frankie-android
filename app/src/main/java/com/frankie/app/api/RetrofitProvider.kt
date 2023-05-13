@@ -2,7 +2,7 @@ package com.frankie.app.api
 
 import com.frankie.app.BuildConfig
 import com.frankie.app.business.login.RefreshTokenUseCase
-import com.frankie.app.business.survey.TokenManager
+import com.frankie.app.business.survey.SessionManager
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -18,11 +18,11 @@ object RetrofitProvider {
             .client(getHttpClientBuilder().build())
             .build()
 
-    fun provideRetrofit(tokenManager: TokenManager, refreshTokenUseCase: RefreshTokenUseCase): Retrofit {
+    fun provideRetrofit(sessionManager: SessionManager, refreshTokenUseCase: RefreshTokenUseCase): Retrofit {
         val httpClient = getHttpClientBuilder().addInterceptor { chain ->
             val original = chain.request()
             val request = original.newBuilder()
-                    .header("Authorization", "Bearer ${tokenManager.getActiveToken()}")
+                    .header("Authorization", "Bearer ${sessionManager.getActiveToken()}")
                     .method(original.method, original.body)
                     .build()
 
@@ -30,8 +30,8 @@ object RetrofitProvider {
             if (response.code != 401) {
                 return@addInterceptor response
             }
-            val refreshToken = tokenManager.getRefreshToken() ?: return@addInterceptor response
-            val activeToken = tokenManager.getActiveToken() ?: return@addInterceptor response
+            val refreshToken = sessionManager.getRefreshToken() ?: return@addInterceptor response
+            val activeToken = sessionManager.getActiveToken() ?: return@addInterceptor response
 
             val newTokenResult = runBlocking {
                 refreshTokenUseCase(refreshToken, activeToken)
@@ -48,7 +48,7 @@ object RetrofitProvider {
         }.build()
 
         return getRetrofit(httpClient,
-                (tokenManager.getSubDomain()?.let { "$it." } ?: "") + BACKEND_HOST)
+                (sessionManager.getSubDomain()?.let { "$it." } ?: "") + BACKEND_HOST)
     }
 
     private fun getRetrofit(httpClient: OkHttpClient, backendHost: String) = Retrofit.Builder()

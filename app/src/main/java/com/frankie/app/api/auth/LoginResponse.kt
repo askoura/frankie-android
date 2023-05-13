@@ -1,4 +1,4 @@
-package com.frankie.app.api.login
+package com.frankie.app.api.auth
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty

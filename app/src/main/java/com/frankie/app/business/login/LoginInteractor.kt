@@ -1,7 +1,7 @@
 package com.frankie.app.business.login
 
-import com.frankie.app.api.login.LoginInput
-import com.frankie.app.api.login.LoginResponse
+import com.frankie.app.api.auth.LoginInput
+import com.frankie.app.api.auth.LoginResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch

@@ -1,7 +1,7 @@
 package com.frankie.app.di
 
 import com.frankie.app.api.RetrofitProvider.provideRetrofitPreAuth
-import com.frankie.app.api.login.LoginService
+import com.frankie.app.api.auth.LoginService
 import com.frankie.app.business.login.LoginInteractor
 import com.frankie.app.business.login.LoginInteractorImpl
 import com.frankie.app.business.login.LoginRepository

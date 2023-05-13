@@ -34,7 +34,7 @@ interface SurveyRepository {
 class SurveyRepositoryImpl(private val service: SurveyService,
                            private val surveyDataDao: SurveyDataDao,
                            private val permissionDao: PermissionDao,
-                           private val tokenManager: TokenManager) : SurveyRepository {
+                           private val sessionManager: SessionManager) : SurveyRepository {
     override fun getSurveyList(): Flow<Result<List<SurveyData>>> {
         return flow {
             val surveyList = service.getSurveyList().map { survey ->
@@ -61,7 +61,7 @@ class SurveyRepositoryImpl(private val service: SurveyService,
 
     private suspend fun savePermissionsToDB(surveyList: List<SurveyData>) {
         permissionDao.insertMultiple(surveyList.map {
-            PermissionEntity(userId = tokenManager.getUserIdOrThrow(),
+            PermissionEntity(userId = sessionManager.getUserIdOrThrow(),
                     surveyId = it.id)
         })
     }

@@ -1,4 +1,4 @@
-package com.frankie.app.api.login
+package com.frankie.app.api.auth
 
 data class LoginInput(
         val email: String,

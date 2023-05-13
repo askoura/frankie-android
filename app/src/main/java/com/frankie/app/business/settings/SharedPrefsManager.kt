@@ -39,7 +39,7 @@ class SharedPrefsManagerImpl(context: Context) : SharedPrefsManager {
         editor.apply()
     }
 
-    private fun getString(key: String, defaultValue: String? = ""): String? {
+    private fun getString(key: String, defaultValue: String? = null): String? {
         return preferences.getString(key, defaultValue)
     }
 
