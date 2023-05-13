@@ -7,11 +7,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileOutputStream
 
 interface DownloadManager {
     suspend fun downloadSurveyFiles(surveyData: SurveyData): Flow<Result<Unit>>
@@ -26,9 +26,10 @@ class DownloadManagerImpl(private val appContext: Context, private val surveyRep
     override suspend fun downloadSurveyFiles(surveyData: SurveyData): Flow<Result<Unit>> {
         return flow {
             val design = surveyRepository.surveyDesign(surveyData)
+            saveValidationJsonOutput(surveyData.id, design.validationJsonOutput).collect()
             design.files.forEach { file ->
                 val flow = surveyRepository.getSurveyFile(surveyData.id, file.name)
-                saveFile(flow, getTargetFile(appContext, file.name, "${surveyData.id}/${Subfolder.FOLDER_RESOURCES}")).collect {
+                saveFile(flow, getTargetFile(appContext, file.name, surveyData.id, Subfolder.FOLDER_RESOURCES)).collect {
                     if (it.isSuccess) emit(Result.success(Unit))
                     else emit(Result.failure<Unit>(it.exceptionOrNull()!!))
                 }
@@ -41,9 +42,19 @@ class DownloadManagerImpl(private val appContext: Context, private val surveyRep
 
     }
 
-    suspend fun saveFile(flow: Flow<Result<SurveyRepository.DataStream>>, file: File): Flow<Result<Unit>> {
+    private suspend fun saveValidationJsonOutput(surveyId: String, validationOutput: String): Flow<Result<Unit>> {
         return flow {
-            FileOutputStream(file).use { outputStream ->
+            val file = getTargetFile(appContext, "validation_json.json", surveyId, Subfolder.FOLDER_DESIGN)
+            file.outputStream().use { outputStream ->
+                outputStream.write(validationOutput.toByteArray())
+            }
+            emit(Result.success(Unit))
+        }.flowOn(Dispatchers.IO)
+    }
+
+    private suspend fun saveFile(flow: Flow<Result<SurveyRepository.DataStream>>, file: File): Flow<Result<Unit>> {
+        return flow {
+            file.outputStream().use { outputStream ->
                 flow.collect { result ->
                     if (result.isFailure) {
                         emit(Result.failure(result.exceptionOrNull()!!))
@@ -81,8 +92,8 @@ class DownloadManagerImpl(private val appContext: Context, private val surveyRep
         // TODO
     }
 
-    private fun getTargetFile(context: Context, fileName: String, path: String): File {
-        val folder = File(context.filesDir, path)
+    private fun getTargetFile(context: Context, fileName: String, surveyId: String, subfolder: Subfolder): File {
+        val folder = File(context.filesDir, "${surveyId}/$subfolder")
         if (!folder.exists()) {
             folder.mkdirs()
 
@@ -91,9 +102,9 @@ class DownloadManagerImpl(private val appContext: Context, private val surveyRep
     }
 
     private enum class Subfolder(private val folderName: String) {
-        FOLDER_RESOURCES("Resources"),
-        FOLDER_DESIGN("Design"),
-        FOLDER_RESPONSES("Responses");
+        FOLDER_RESOURCES("resources"),
+        FOLDER_DESIGN("design"),
+        FOLDER_RESPONSES("responses");
 
         override fun toString(): String {
             return folderName
