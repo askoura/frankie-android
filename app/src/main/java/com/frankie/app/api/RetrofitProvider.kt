@@ -3,6 +3,7 @@ package com.frankie.app.api
 import com.frankie.app.BuildConfig
 import com.frankie.app.business.login.RefreshTokenUseCase
 import com.frankie.app.business.survey.SessionManager
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -13,10 +14,14 @@ import java.util.concurrent.TimeUnit
 object RetrofitProvider {
 
     fun provideRetrofitPreAuth(): Retrofit = Retrofit.Builder()
-            .baseUrl("$SCHEME$BACKEND_HOST:$BACKEND_PORT")
+            .baseUrl(getBaseUrl())
             .addConverterFactory(JacksonConverterFactory.create())
             .client(getHttpClientBuilder().build())
             .build()
+
+    fun provideRetrofitRefreshToken(sessionManager: SessionManager): Retrofit =
+            getRetrofit(getHttpClientBuilder().build(),
+                    getBaseUrl(sessionManager.getSubDomain()))
 
     fun provideRetrofit(sessionManager: SessionManager, refreshTokenUseCase: RefreshTokenUseCase): Retrofit {
         val httpClient = getHttpClientBuilder().addInterceptor { chain ->
@@ -34,7 +39,7 @@ object RetrofitProvider {
             val activeToken = sessionManager.getActiveToken() ?: return@addInterceptor response
 
             val newTokenResult = runBlocking {
-                refreshTokenUseCase(refreshToken, activeToken)
+                refreshTokenUseCase(refreshToken, activeToken).first()
             }
             if (newTokenResult.isSuccess) {
                 val newRequest = original.newBuilder()
@@ -47,12 +52,19 @@ object RetrofitProvider {
             }
         }.build()
 
-        return getRetrofit(httpClient,
-                (sessionManager.getSubDomain()?.let { "$it." } ?: "") + BACKEND_HOST)
+        return getRetrofit(httpClient, getBaseUrl(sessionManager.getSubDomain()))
     }
 
-    private fun getRetrofit(httpClient: OkHttpClient, backendHost: String) = Retrofit.Builder()
-            .baseUrl("$SCHEME$backendHost:$BACKEND_PORT")
+    private fun getBaseUrl(subdomain: String? = null): String {
+        return if (subdomain == null) {
+            "$SCHEME$BACKEND_HOST:$BACKEND_PORT"
+        } else {
+            "$SCHEME$subdomain.$BACKEND_HOST:$BACKEND_PORT"
+        }
+    }
+
+    private fun getRetrofit(httpClient: OkHttpClient, baseUrl: String) = Retrofit.Builder()
+            .baseUrl(baseUrl)
             .addConverterFactory(JacksonConverterFactory.create())
             .client(httpClient)
             .build()

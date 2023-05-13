@@ -3,13 +3,11 @@ package com.frankie.app.business.login
 import com.frankie.app.api.auth.LoginInput
 import com.frankie.app.api.auth.LoginResponse
 import com.frankie.app.api.auth.LoginService
-import com.frankie.app.api.auth.RefreshInput
 import com.frankie.app.business.getResult
 import com.frankie.app.business.survey.SessionManager
 
 interface LoginRepository {
     suspend fun login(loginInput: LoginInput): Result<LoginResponse>
-    suspend fun refreshActiveToken(refreshToken: String, activeToken: String): Result<LoginResponse>
 }
 
 class LoginRepositoryImpl(
@@ -25,18 +23,4 @@ class LoginRepositoryImpl(
         }
         return result
     }
-
-    override suspend fun refreshActiveToken(
-        refreshToken: String,
-        activeToken: String
-    ): Result<LoginResponse> {
-        val result = service.refreshActiveToken(RefreshInput(refreshToken, activeToken)).getResult()
-        if (result.isSuccess) {
-            val loginResponse = result.getOrThrow()
-            sessionManager.saveSession(loginResponse)
-        }
-        return result
-    }
-
-
 }
