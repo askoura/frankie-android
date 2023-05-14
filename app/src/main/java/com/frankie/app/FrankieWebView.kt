@@ -9,6 +9,7 @@ import androidx.webkit.*
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.frankie.app.ui.common.FileUtils
 import com.frankie.expressionmanager.ext.ScriptUtils
 import com.frankie.expressionmanager.model.*
 import com.frankie.expressionmanager.usecase.ValidationJsonOutput
@@ -100,9 +101,9 @@ class FrankieWebView
 
     private fun getRuntimeJs(): WebResourceResponse {
         val script = jacksonKtMapper.readValue(
-            context.assets.open("processed_1.json").bufferedReader().use {
-                it.readText()
-            }, jacksonTypeRef<ValidationJsonOutput>()
+                FileUtils.getValidationJsonFile(context, surveyId).bufferedReader().use {
+                    it.readText()
+                }, jacksonTypeRef<ValidationJsonOutput>()
         ).script
         return WebResourceResponse(
             "text/javascript",

@@ -1,6 +1,8 @@
 package com.frankie.app
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.webkit.*
 import android.widget.Toast
@@ -19,7 +21,9 @@ class SurveyActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySurveyBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.webview.loadSurvey("1")
+        val surveyId = intent.getStringExtra(SURVEY_ID)
+                ?: throw IllegalArgumentException("Survey ID is required")
+        binding.webview.loadSurvey(surveyId)
     }
 
     @Deprecated("Use Fancy new method")
@@ -35,5 +39,13 @@ class SurveyActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    companion object {
+        private const val SURVEY_ID = "survey_id"
+        fun createIntent(context: Context, surveyId: String): Intent =
+                Intent(context, SurveyActivity::class.java).apply {
+                    putExtra(SURVEY_ID, surveyId)
+                }
     }
 }
