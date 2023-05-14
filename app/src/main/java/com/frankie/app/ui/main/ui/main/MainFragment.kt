@@ -1,5 +1,6 @@
 package com.frankie.app.ui.main.ui.main
 
+import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,6 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.frankie.app.R
 import com.frankie.app.SurveyActivity
 import com.frankie.app.databinding.FragmentMainBinding
 import com.frankie.app.ui.common.error.ErrorDisplayManager
@@ -27,6 +29,8 @@ class MainFragment : Fragment() {
     companion object {
         fun newInstance() = MainFragment()
     }
+
+    private var progressDialog: ProgressDialog? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -53,6 +57,7 @@ class MainFragment : Fragment() {
         lifecycleScope.launch {
             viewModel.state.collect { state ->
                 adapter.submitList(state.surveyList)
+                showProgressDialog(state.isLoading)
             }
         }
 
@@ -63,6 +68,19 @@ class MainFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    // TODO find better way to show progress
+    private fun showProgressDialog(show: Boolean) {
+        if (progressDialog != null && progressDialog!!.isShowing) {
+            progressDialog?.dismiss()
+        }
+        if (show) {
+            progressDialog = ProgressDialog.show(binding.root.context,
+                    getString(R.string.progress_dialog_title),
+                    getString(R.string.progress_dialog_description),
+                    true)
+        }
     }
 
     override fun onResume() {

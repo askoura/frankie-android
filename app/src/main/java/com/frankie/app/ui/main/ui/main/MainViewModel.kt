@@ -9,6 +9,7 @@ import com.frankie.app.storage.DownloadManager
 import com.frankie.app.ui.common.error.ErrorProcessor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val surveyRepository: SurveyRepository,
@@ -19,10 +20,12 @@ class MainViewModel(private val surveyRepository: SurveyRepository,
     val state = _state.asStateFlow()
     fun fetchSurveyList() {
         viewModelScope.launch {
+            _state.update { _state.value.copy(isLoading = true) }
             surveyRepository.getSurveyList().collect { result ->
                 if (result.isSuccess) {
-                    _state.value = _state.value.copy(surveyList = result.getOrThrow())
+                    _state.update { _state.value.copy(isLoading = false, surveyList = result.getOrThrow()) }
                 } else {
+                    _state.update { _state.value.copy(isLoading = false) }
                     processError(result.exceptionOrNull()!!)
                 }
             }
@@ -31,6 +34,7 @@ class MainViewModel(private val surveyRepository: SurveyRepository,
 
     fun surveyClicked(surveyData: SurveyData) {
         viewModelScope.launch {
+            _state.update { _state.value.copy(isLoading = true) }
             downloadManager.downloadSurveyFiles(surveyData).collect { result ->
                 if (result.isFailure) {
                     processError(result.exceptionOrNull()!!)
@@ -44,6 +48,7 @@ class MainViewModel(private val surveyRepository: SurveyRepository,
     }
 
     data class State(
+            val isLoading: Boolean = false,
             val surveyList: List<SurveyData> = emptyList()
     )
 
