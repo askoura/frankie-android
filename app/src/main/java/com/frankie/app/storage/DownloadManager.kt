@@ -14,7 +14,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 interface DownloadManager {
-    suspend fun downloadSurveyFiles(surveyData: SurveyData): Flow<Result<Unit>>
+    suspend fun downloadSurveyFiles(surveyData: SurveyData): Flow<Result<SurveyData>>
 }
 
 class DownloadManagerImpl(private val appContext: Context, private val surveyRepository: SurveyRepository) : DownloadManager {
@@ -23,22 +23,23 @@ class DownloadManagerImpl(private val appContext: Context, private val surveyRep
     private val _downloadProgress = MutableStateFlow<Map<Long, Int>>(emptyMap())
 //    private val downloadProgress = _downloadProgress.asStateFlow()
 
-    override suspend fun downloadSurveyFiles(surveyData: SurveyData): Flow<Result<Unit>> {
+    override suspend fun downloadSurveyFiles(surveyData: SurveyData): Flow<Result<SurveyData>> {
         return flow {
             val design = surveyRepository.surveyDesign(surveyData)
             saveValidationJsonOutput(surveyData.id, design.validationJsonOutput).collect()
             design.files.forEach { file ->
                 val flow = surveyRepository.getSurveyFile(surveyData.id, file.name)
                 saveFile(flow, getTargetFile(appContext, file.name, surveyData.id, Subfolder.FOLDER_RESOURCES)).collect {
-                    if (it.isFailure) emit(Result.failure<Unit>(it.exceptionOrNull()!!))
+                    if (it.isFailure) emit(Result.failure(it.exceptionOrNull()!!))
                 }
             }
+            val updatedSurveyData = surveyData.copy(newVersionAvailable = false, publishInfo = design.publishInfo)
+            surveyRepository.saveSurveyToDB(updatedSurveyData)
 
-            emit(Result.success(Unit))
+            emit(Result.success(updatedSurveyData))
         }.catch {
             emit(Result.failure(it))
         }.flowOn(Dispatchers.IO)
-
     }
 
     private suspend fun saveValidationJsonOutput(surveyId: String, validationOutput: String): Flow<Result<Unit>> {

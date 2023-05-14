@@ -37,7 +37,10 @@ class MainViewModel(private val surveyRepository: SurveyRepository,
             _state.update { _state.value.copy(isLoading = true) }
             downloadManager.downloadSurveyFiles(surveyData).collect { result ->
                 _state.update { _state.value.copy(isLoading = false) }
-                if (result.isFailure) {
+                if (result.isSuccess) {
+                    val newList = _state.value.surveyList.map { if (it.id == surveyData.id) result.getOrDefault(it) else it }
+                    _state.update { _state.value.copy(isLoading = false, surveyList = newList) }
+                } else {
                     processError(result.exceptionOrNull()!!)
                 }
             }

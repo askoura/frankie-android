@@ -22,6 +22,8 @@ interface SurveyRepository {
     fun getSurveyPermissionList(surveyId: String): Flow<Result<List<User>>>
     fun getSurveyFile(surveyId: String, resourceId: String): Flow<Result<DataStream>>
 
+    suspend fun saveSurveyToDB(surveyData: SurveyData)
+
     suspend fun surveyDesign(surveyData: SurveyData): SurveyDesign
 
     sealed class DataStream {
@@ -52,6 +54,10 @@ class SurveyRepositoryImpl(private val service: SurveyService,
         }.catch {
             emit(Result.failure(it))
         }.flowOn(Dispatchers.IO)
+    }
+
+    override suspend fun saveSurveyToDB(surveyData: SurveyData) {
+        surveyDataDao.insert(surveyData.toSurveyDataEntity())
     }
 
     private suspend fun saveSurveysToDB(surveyList: List<SurveyData>) {
