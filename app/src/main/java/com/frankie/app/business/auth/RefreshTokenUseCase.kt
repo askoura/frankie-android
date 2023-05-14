@@ -1,4 +1,4 @@
-package com.frankie.app.business.login
+package com.frankie.app.business.auth
 
 import com.frankie.app.api.auth.RefreshInput
 import com.frankie.app.api.auth.RefreshTokenService

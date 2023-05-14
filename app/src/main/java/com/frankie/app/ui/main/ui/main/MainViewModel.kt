@@ -2,7 +2,7 @@ package com.frankie.app.ui.main.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.frankie.app.business.login.LogoutUseCase
+import com.frankie.app.business.auth.LogoutUseCase
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.business.survey.SurveyRepository
 import com.frankie.app.storage.DownloadManager

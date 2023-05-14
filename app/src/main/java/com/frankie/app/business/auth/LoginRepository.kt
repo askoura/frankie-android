@@ -1,4 +1,4 @@
-package com.frankie.app.business.login
+package com.frankie.app.business.auth
 
 import com.frankie.app.api.auth.LoginInput
 import com.frankie.app.api.auth.LoginResponse

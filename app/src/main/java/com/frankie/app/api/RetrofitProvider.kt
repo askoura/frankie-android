@@ -1,7 +1,7 @@
 package com.frankie.app.api
 
 import com.frankie.app.BuildConfig
-import com.frankie.app.business.login.RefreshTokenUseCase
+import com.frankie.app.business.auth.RefreshTokenUseCase
 import com.frankie.app.business.survey.SessionManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking

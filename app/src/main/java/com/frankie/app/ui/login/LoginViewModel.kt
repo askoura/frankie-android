@@ -2,7 +2,7 @@ package com.frankie.app.ui.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.frankie.app.business.login.LoginInteractor
+import com.frankie.app.business.auth.LoginInteractor
 import com.frankie.app.ui.common.InputUtils
 import com.frankie.app.ui.common.error.ErrorProcessor
 import kotlinx.coroutines.flow.MutableStateFlow

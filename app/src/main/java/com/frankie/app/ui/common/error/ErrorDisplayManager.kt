@@ -3,7 +3,7 @@ package com.frankie.app.ui.common.error
 import android.app.Activity
 import android.content.Context
 import androidx.appcompat.app.AlertDialog
-import com.frankie.app.business.login.LogoutUseCase
+import com.frankie.app.business.auth.LogoutUseCase
 import com.frankie.app.ui.login.LoginActivity
 
 interface ErrorDisplayManager {
