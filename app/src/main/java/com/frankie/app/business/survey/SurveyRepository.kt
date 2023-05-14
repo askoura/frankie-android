@@ -6,7 +6,6 @@ import com.frankie.app.api.survey.PublishInfo
 import com.frankie.app.api.survey.SurveyDesign
 import com.frankie.app.api.survey.SurveyService
 import com.frankie.app.db.permission.PermissionDao
-import com.frankie.app.db.permission.PermissionEntity
 import com.frankie.app.db.survey.LanguageEntity
 import com.frankie.app.db.survey.LanguagesEntity
 import com.frankie.app.db.survey.PublishInfoEntity
@@ -60,10 +59,7 @@ class SurveyRepositoryImpl(private val service: SurveyService,
     }
 
     private suspend fun savePermissionsToDB(surveyList: List<SurveyData>) {
-        permissionDao.insertMultiple(surveyList.map {
-            PermissionEntity(userId = sessionManager.getUserIdOrThrow(),
-                    surveyId = it.id)
-        })
+        permissionDao.updateUserPermissions(sessionManager.getUserIdOrThrow(), surveyList.map { it.id })
     }
 
     override suspend fun surveyDesign(surveyData: SurveyData): SurveyDesign {

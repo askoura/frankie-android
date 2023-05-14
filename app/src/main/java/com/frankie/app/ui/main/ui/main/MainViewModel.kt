@@ -36,6 +36,7 @@ class MainViewModel(private val surveyRepository: SurveyRepository,
         viewModelScope.launch {
             _state.update { _state.value.copy(isLoading = true) }
             downloadManager.downloadSurveyFiles(surveyData).collect { result ->
+                _state.update { _state.value.copy(isLoading = false) }
                 if (result.isFailure) {
                     processError(result.exceptionOrNull()!!)
                 }

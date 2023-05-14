@@ -27,4 +27,14 @@ interface PermissionDao {
 
     @Delete
     suspend fun deletePermission(permission: PermissionEntity)
+
+    @Query("DELETE FROM permissions WHERE userId = :userId and surveyId NOT IN (:surveyIdList)")
+    suspend fun deletePermissionsForUserNotInList(userId: String, surveyIdList: List<String>)
+
+    @Transaction
+    suspend fun updateUserPermissions(userId: String, surveyIdList: List<String>) {
+        deletePermissionsForUserNotInList(userId, surveyIdList)
+        val permissions = surveyIdList.map { PermissionEntity(userId = userId, surveyId = it) }
+        insertMultiple(permissions)
+    }
 }
