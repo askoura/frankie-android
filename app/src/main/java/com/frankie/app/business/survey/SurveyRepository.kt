@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.flowOn
 
 interface SurveyRepository {
     fun getSurveyList(): Flow<Result<List<SurveyData>>>
-    fun getSurveyPermissionList(surveyId: String): Flow<Result<List<User>>>
     fun getSurveyFile(surveyId: String, resourceId: String): Flow<Result<DataStream>>
 
     suspend fun saveSurveyToDB(surveyData: SurveyData)
@@ -70,14 +69,6 @@ class SurveyRepositoryImpl(private val service: SurveyService,
 
     override suspend fun surveyDesign(surveyData: SurveyData): SurveyDesign {
         return service.getSurveyDesign(surveyData.id, surveyData.publishInfo)
-    }
-
-    override fun getSurveyPermissionList(surveyId: String): Flow<Result<List<User>>> {
-        return flow {
-            emit(Result.success(service.getSurveyPermissionList(surveyId)))
-        }.catch {
-            emit(Result.failure(it))
-        }.flowOn(Dispatchers.IO)
     }
 
     override fun getSurveyFile(surveyId: String, resourceId: String): Flow<Result<SurveyRepository.DataStream>> {
