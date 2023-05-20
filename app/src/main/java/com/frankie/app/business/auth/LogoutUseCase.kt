@@ -1,13 +1,18 @@
 package com.frankie.app.business.auth
 
-import com.frankie.app.business.survey.SessionManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+
+import kotlinx.coroutines.launch
 
 interface LogoutUseCase {
     operator fun invoke()
 }
 
-class LogoutUseCaseImpl(private val sessionManager: SessionManager) : LogoutUseCase {
+class LogoutUseCaseImpl(private val loginRepositoryImpl: LoginRepositoryImpl) : LogoutUseCase {
     override fun invoke() {
-        sessionManager.clearTokens()
+        CoroutineScope(Dispatchers.IO).launch {
+            loginRepositoryImpl.logout()
+        }
     }
 }

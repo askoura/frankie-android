@@ -8,6 +8,7 @@ import com.frankie.app.business.survey.SessionManager
 
 interface LoginRepository {
     suspend fun login(loginInput: LoginInput): Result<LoginResponse>
+    suspend fun logout(): Result<Unit>
 }
 
 class LoginRepositoryImpl(
@@ -22,5 +23,12 @@ class LoginRepositoryImpl(
             sessionManager.saveSession(loginResponse)
         }
         return result
+    }
+
+    override suspend fun logout(): Result<Unit> {
+        service.logout().getResult()
+        sessionManager.clearTokens()
+
+        return Result.success(Unit)
     }
 }
