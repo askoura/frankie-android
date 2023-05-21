@@ -205,5 +205,13 @@ data class ApiNavigationOutput(
     val navigationIndex: NavigationIndex,
     val responseId: UUID,
     val lang: SurveyLang,
-    val additionalLang: List<SurveyLang>?
+    val additionalLang: List<SurveyLang>?,
+    val navProps: NavProps = NavProps()
+)
+
+data class NavProps(
+    val allowIncomplete: Boolean = true,
+    val allowJump: Boolean = true,
+    val allowPrevious: Boolean = true,
+    val saveTimings: Boolean = true
 )

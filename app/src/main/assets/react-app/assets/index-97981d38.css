@@ -1,0 +1,20 @@
+._mainContainer_1k8r6_1 {
+  margin: auto;
+  max-width: 800px;
+  min-width: 300px;
+}
+
+._createUserCard_1k8r6_7 {
+  padding: 25px;
+}
+
+._blockItem_1k8r6_11 {
+  flex: 1;
+  display: flex;
+  gap: 15px;
+  flex-direction: column;
+}
+
+._errorText_1k8r6_18 {
+  color: #eb5757 !important;
+}

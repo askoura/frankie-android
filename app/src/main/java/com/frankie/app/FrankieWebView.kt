@@ -13,6 +13,7 @@ import com.frankie.app.ui.common.FileUtils
 import com.frankie.expressionmanager.ext.ScriptUtils
 import com.frankie.expressionmanager.model.*
 import com.frankie.expressionmanager.usecase.ValidationJsonOutput
+import java.sql.Blob
 import java.util.*
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -66,8 +67,8 @@ class FrankieWebView
         }
 
         @JavascriptInterface
-        fun uploadSignature(base64: String) {
-            Log.v(TAG, base64)
+        fun uploadDataUrl(key: String, dataUrl: String, fileName: String) {
+            Log.v(TAG, dataUrl.toString())
 
         }
 
@@ -83,6 +84,12 @@ class FrankieWebView
                     // TODO("Report Error to MainActivity")
                 }
             })
+        }
+
+        @JavascriptInterface
+        fun getParam(key: String):String {
+            Log.v("blah", "getParam($key)")
+            return  ""
         }
     }
 
@@ -108,6 +115,9 @@ class FrankieWebView
         return WebResourceResponse(
             "text/javascript",
             "utf-8",
+            200,
+            "OK",
+            mutableMapOf("Access-Control-Allow-Origin" to "*"),
             (script + "\n" + ScriptUtils().commonScript).byteInputStream()
         )
     }
