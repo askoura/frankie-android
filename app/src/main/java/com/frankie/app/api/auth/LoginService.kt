@@ -11,7 +11,7 @@ interface LoginService {
         @Body loginRequest: LoginInput
     ): Response<LoginResponse>
 
-    @GET("user/logout")
+    @GET("logout")
     suspend fun logout(): Response<Unit>
 
 }

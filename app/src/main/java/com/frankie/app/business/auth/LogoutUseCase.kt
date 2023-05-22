@@ -9,10 +9,10 @@ interface LogoutUseCase {
     operator fun invoke()
 }
 
-class LogoutUseCaseImpl(private val loginRepositoryImpl: LoginRepositoryImpl) : LogoutUseCase {
+class LogoutUseCaseImpl(private val loginRepository: LoginRepository) : LogoutUseCase {
     override fun invoke() {
         CoroutineScope(Dispatchers.IO).launch {
-            loginRepositoryImpl.logout()
+            loginRepository.logout()
         }
     }
 }
