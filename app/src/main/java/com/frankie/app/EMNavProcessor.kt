@@ -6,6 +6,7 @@ import android.content.Context
 import android.util.Base64
 import android.webkit.*
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.frankie.app.business.settings.SharedPrefsManagerImpl
 import com.frankie.app.db.FrankieDb
 import com.frankie.app.db.model.Response
 import com.frankie.app.ui.common.FileUtils
@@ -150,8 +151,9 @@ class EMNavProcessor constructor(
         result: NavigationJsonOutput
     ) {
         CoroutineScope(Dispatchers.IO).launch {
+            val userId = SharedPrefsManagerImpl(getActivity()).userId!!
             frankieDb.responseDao().insert(
-                Response(responseId.toString(), result.navigationIndex, surveyLang, mapOf())
+                Response(responseId.toString(), result.navigationIndex, surveyLang, userId, mapOf())
             )
         }
     }

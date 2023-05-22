@@ -21,6 +21,8 @@ data class Response(
 
     val lang: SurveyLang,
 
+    val userId: String,
+
     @ColumnInfo(name = "response_values")
     val values: Map<String, Any>
 )
