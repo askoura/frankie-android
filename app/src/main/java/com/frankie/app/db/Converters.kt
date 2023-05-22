@@ -1,8 +1,10 @@
 package com.frankie.app.db
 
 import androidx.room.TypeConverter
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.frankie.expressionmanager.model.NavigationIndex
+import com.frankie.expressionmanager.model.ResponseEvent
 import com.frankie.expressionmanager.model.SurveyLang
 import com.frankie.expressionmanager.model.jacksonKtMapper
 
@@ -28,6 +30,19 @@ class NavigationIndexConverter {
     @TypeConverter
     fun toString(navigationIndex: NavigationIndex): String {
         return jacksonKtMapper.writeValueAsString(navigationIndex)
+    }
+}
+
+class ResponseEventListConverter {
+    private val mapper = jacksonKtMapper.registerModule(JavaTimeModule())
+    @TypeConverter
+    fun fromString(value: String): List<ResponseEvent> {
+        return mapper.readValue(value, jacksonTypeRef<List<ResponseEvent>>())
+    }
+
+    @TypeConverter
+    fun toString(list: List<ResponseEvent>): String {
+        return mapper.writeValueAsString(list)
     }
 }
 

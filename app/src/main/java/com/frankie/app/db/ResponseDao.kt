@@ -7,8 +7,8 @@ import androidx.room.Query
 import androidx.room.TypeConverters
 import com.frankie.app.db.model.Response
 import com.frankie.expressionmanager.model.NavigationIndex
+import com.frankie.expressionmanager.model.ResponseEvent
 import com.frankie.expressionmanager.model.SurveyLang
-import java.util.UUID
 
 
 @Dao
@@ -21,17 +21,19 @@ interface ResponseDao {
     suspend fun insert(response: Response)
 
     @Query(
-        "UPDATE response SET response_values = :values, lang = :lang," +
+        "UPDATE response SET response_values = :values,events = :events, lang = :lang," +
                   " navigation_index = :navigationIndex WHERE id == :id"
     )
     @TypeConverters(
         JSONOConverter::class,
         SurveyLangConverter::class,
-        NavigationIndexConverter::class
+        NavigationIndexConverter::class,
+        ResponseEventListConverter::class
     )
     suspend fun update(
         values: Map<String, Any>,
         lang: SurveyLang,
+        events: List<ResponseEvent>,
         navigationIndex: NavigationIndex,
         id: String
     )

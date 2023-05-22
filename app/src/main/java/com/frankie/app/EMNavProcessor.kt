@@ -105,7 +105,7 @@ class EMNavProcessor constructor(
                             )
                         }
                     )
-                updateResponse(response, lang, navigationJsonOutput)
+                updateResponse(response, lang, navigationJsonOutput, useCaseInput.events)
                 navListener.onSuccess(result)
             }
         ) { navListener.onError(it) }
@@ -153,7 +153,14 @@ class EMNavProcessor constructor(
         CoroutineScope(Dispatchers.IO).launch {
             val userId = SharedPrefsManagerImpl(getActivity()).userId!!
             frankieDb.responseDao().insert(
-                Response(responseId.toString(), result.navigationIndex, surveyLang, userId, mapOf())
+                Response(
+                    responseId.toString(),
+                    result.navigationIndex,
+                    surveyLang,
+                    userId,
+                    mapOf(),
+                    listOf(result.event)
+                )
             )
         }
     }
@@ -161,7 +168,8 @@ class EMNavProcessor constructor(
     private fun updateResponse(
         response: Response,
         surveyLang: SurveyLang,
-        result: NavigationJsonOutput
+        result: NavigationJsonOutput,
+        events: List<ResponseEvent.Value>
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             frankieDb.responseDao().update(
@@ -170,7 +178,11 @@ class EMNavProcessor constructor(
                 },
                 id = response.id,
                 navigationIndex = result.navigationIndex,
-                lang = surveyLang
+                lang = surveyLang,
+                events = response.events.toMutableList().apply {
+                    addAll(events)
+                    add(result.event)
+                }
 
             )
         }

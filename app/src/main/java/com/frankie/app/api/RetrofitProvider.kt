@@ -18,6 +18,10 @@ object RetrofitProvider {
             .addConverterFactory(JacksonConverterFactory.create())
             .client(getHttpClientBuilder().build())
             .build()
+
+    fun provideRetrofitRefreshToken(): Retrofit =
+        getRetrofit(getHttpClientBuilder().build())
+
     fun provideRetrofit(sessionManager: SessionManager, refreshTokenUseCase: RefreshTokenUseCase): Retrofit {
         val httpClient = getHttpClientBuilder().addInterceptor { chain ->
             val original = chain.request()

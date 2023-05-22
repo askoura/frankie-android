@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.webkit.*
 import androidx.webkit.*
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.frankie.app.ui.common.FileUtils
@@ -56,10 +57,11 @@ class FrankieWebView
         @Suppress("unused")
         @JavascriptInterface
         fun navigate(body: String) {
-            val navigateRequest: NavigateRequest = jacksonObjectMapper().readValue(body)
+            val mapper = jacksonKtMapper.registerModule(JavaTimeModule())
+            val navigateRequest: NavigateRequest = mapper.readValue(body)
             emNavProcessor.navigate(surveyId, navigateRequest, object : NavigationListener {
                 override fun onSuccess(apiNavigationOutput: ApiNavigationOutput) {
-                    val string = jacksonKtMapper.writeValueAsString(apiNavigationOutput)
+                    val string = mapper.writeValueAsString(apiNavigationOutput)
                     loadUrl("javascript:navigateOffline($string)")
                 }
 
@@ -164,12 +166,6 @@ data class NavigateRequest(
     val responseId: UUID?,
     val lang: String? = null,
     val navigationDirection: NavigationDirection? = null,
-    val events: List<ValueEvent> = listOf(),
+    val events: List<ResponseEvent.Value> = listOf(),
     val values: Map<String, Any> = mapOf()
-)
-
-data class ValueEvent(
-    val name: String,
-    val code: String,
-    val time: String
 )
