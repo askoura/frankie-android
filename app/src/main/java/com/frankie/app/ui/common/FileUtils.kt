@@ -33,7 +33,7 @@ object FileUtils {
 
     fun getValidationJson(context: Context, surveyId: String): ValidationJsonOutput? {
         return jacksonKtMapper.readValue(
-            FileUtils.getValidationJsonFile(context, surveyId).bufferedReader().use {
+            getValidationJsonFile(context, surveyId).bufferedReader().use {
                 it.readText()
             }, jacksonTypeRef<ValidationJsonOutput>()
         )

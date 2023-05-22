@@ -11,6 +11,8 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.frankie.app.ui.common.FileUtils
 import com.frankie.expressionmanager.ext.ScriptUtils
 import com.frankie.expressionmanager.model.*
+import java.io.File
+import java.io.FileInputStream
 import java.util.*
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -28,8 +30,12 @@ class FrankieWebView
         ): WebResourceResponse? {
             val url = request?.url.toString()
             Log.v(TAG, url)
-            return if (url.endsWith("runtime.js")) {
+
+            return if (url.endsWith("/survey/$surveyId/run/runtime.js")) {
                 getRuntimeJs()
+            } else if (url.contains("/survey/$surveyId/resource/")) {
+                val filename = url.substringAfterLast("/")
+                wrapResource(FileUtils.getResourceFile(context, filename, surveyId))
             } else if (url.startsWith(CUSTOM_DOMAIN) && !url.endsWith("favicon.ico")) {
                 val data =
                     context.assets.open(url.replace(CUSTOM_DOMAIN, "$REACT_APP_BUILD_FOLDER/"))
@@ -115,6 +121,17 @@ class FrankieWebView
             "OK",
             mutableMapOf("Access-Control-Allow-Origin" to "*"),
             (script + "\n" + ScriptUtils().commonScript).byteInputStream()
+        )
+    }
+
+    private fun wrapResource(file: File): WebResourceResponse {
+        return WebResourceResponse(
+            "",
+            "utf-8",
+            200,
+            "OK",
+            mutableMapOf("Access-Control-Allow-Origin" to "*"),
+            FileInputStream(file)
         )
     }
 
