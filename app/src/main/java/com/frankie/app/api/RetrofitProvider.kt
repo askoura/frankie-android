@@ -14,15 +14,10 @@ import java.util.concurrent.TimeUnit
 object RetrofitProvider {
 
     fun provideRetrofitPreAuth(): Retrofit = Retrofit.Builder()
-            .baseUrl(getBaseUrl())
+            .baseUrl(BASE_URL)
             .addConverterFactory(JacksonConverterFactory.create())
             .client(getHttpClientBuilder().build())
             .build()
-
-    fun provideRetrofitRefreshToken(sessionManager: SessionManager): Retrofit =
-            getRetrofit(getHttpClientBuilder().build(),
-                    getBaseUrl(sessionManager.getSubDomain()))
-
     fun provideRetrofit(sessionManager: SessionManager, refreshTokenUseCase: RefreshTokenUseCase): Retrofit {
         val httpClient = getHttpClientBuilder().addInterceptor { chain ->
             val original = chain.request()
@@ -52,19 +47,11 @@ object RetrofitProvider {
             }
         }.build()
 
-        return getRetrofit(httpClient, getBaseUrl(sessionManager.getSubDomain()))
+        return getRetrofit(httpClient)
     }
 
-    private fun getBaseUrl(subdomain: String? = null): String {
-        return if (subdomain == null) {
-            "$SCHEME$BACKEND_HOST:$BACKEND_PORT"
-        } else {
-            "$SCHEME$subdomain.$BACKEND_HOST:$BACKEND_PORT"
-        }
-    }
-
-    private fun getRetrofit(httpClient: OkHttpClient, baseUrl: String) = Retrofit.Builder()
-            .baseUrl(baseUrl)
+    private fun getRetrofit(httpClient: OkHttpClient) = Retrofit.Builder()
+            .baseUrl(BASE_URL)
             .addConverterFactory(JacksonConverterFactory.create())
             .client(httpClient)
             .build()
@@ -87,5 +74,6 @@ object RetrofitProvider {
     private const val SCHEME = "http://"
     private const val BACKEND_HOST = "frankie.app"
     private const val BACKEND_PORT = "8080"
+    private const val BASE_URL = "$SCHEME$BACKEND_HOST:$BACKEND_PORT"
 
 }

@@ -8,7 +8,7 @@ import java.io.File
 
 object FileUtils {
 
-    const val VALIDATION_JSON_FILENAME = "validation.json"
+    private const val VALIDATION_JSON_FILENAME = "validation.json"
 
     private fun getTargetFile(
         context: Context,

@@ -7,7 +7,6 @@ interface SharedPrefsManager {
     val isActiveTokenAvailable: Boolean
     var activeToken: String?
     var refreshToken: String?
-    var subdomain: String?
     var userId: String?
 }
 
@@ -21,10 +20,6 @@ class SharedPrefsManagerImpl(context: Context) : SharedPrefsManager {
     override var refreshToken: String?
         get() = getString(KEY_REFRESH_TOKEN)
         set(value) = saveString(KEY_REFRESH_TOKEN, value)
-
-    override var subdomain: String?
-        get() = getString(KEY_SUB_DOMAIN)
-        set(value) = saveString(KEY_SUB_DOMAIN, value)
 
     override var activeToken: String?
         get() = getString(KEY_ACTIVE_TOKEN)

@@ -7,6 +7,8 @@ import com.frankie.app.business.auth.RefreshTokenUseCaseImpl
 import org.koin.dsl.module
 
 val refreshTokenModule = module {
-    single<RefreshTokenService> { RetrofitProvider.provideRetrofitRefreshToken(get()).create(RefreshTokenService::class.java) }
+    single<RefreshTokenService> {
+        RetrofitProvider.provideRetrofit(get(), get()).create(RefreshTokenService::class.java)
+    }
     single<RefreshTokenUseCase> { RefreshTokenUseCaseImpl(get(), get()) }
 }
