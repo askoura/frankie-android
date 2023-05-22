@@ -6,9 +6,9 @@ import android.content.Context
 import android.util.Base64
 import android.webkit.*
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.frankie.app.db.FrankieDb
 import com.frankie.app.db.model.Response
+import com.frankie.app.ui.common.FileUtils
 import com.frankie.expressionmanager.ext.ScriptUtils
 import com.frankie.expressionmanager.model.*
 import com.frankie.expressionmanager.usecase.*
@@ -40,21 +40,7 @@ class EMNavProcessor constructor(
 
     }
 
-    // later this will take the sid as input
-    private fun getProcessedFile(): ValidationJsonOutput {
-        // this is a static file loaded in the assets
-        // later this will be a dynamic file downloaded from the internet
-        val processedComponents: String =
-            getActivity().assets.open("processed_1.json").bufferedReader().use {
-                it.readText()
-            }
-        return jacksonKtMapper.readValue(
-            processedComponents,
-            jacksonTypeRef<ValidationJsonOutput>()
-        )
-    }
-
-    fun start(surveyLang: SurveyLang, navListener: NavigationListener) {
+    fun start(surveyId: String, surveyLang: SurveyLang, navListener: NavigationListener) {
         val navigationUseCaseInput = NavigationUseCaseInput(
             navigationInfo = NavigationInfo(
                 navigationDirection = NavigationDirection.Start,
@@ -65,6 +51,7 @@ class EMNavProcessor constructor(
             lang = surveyLang,
         )
         navigationUseCase(
+            surveyId,
             navigationUseCaseInput,
             onSuccess = { navigationJsonOutput ->
                 val responseId = UUID.randomUUID()
@@ -80,12 +67,11 @@ class EMNavProcessor constructor(
                         listOf(SurveyLang.DE, SurveyLang.AR)
                     )
                 navListener.onSuccess(result)
-            },
-            onError = { navListener.onError(it) }
-        )
+            }
+        ) { navListener.onError(it) }
     }
 
-    fun navigate(useCaseInput: NavigateRequest, navListener: NavigationListener) {
+    fun navigate(surveyId: String, useCaseInput: NavigateRequest, navListener: NavigationListener) {
         var response: Response
         val responseId = useCaseInput.responseId!!
         runBlocking {
@@ -105,6 +91,7 @@ class EMNavProcessor constructor(
             lang = lang,
         )
         navigationUseCase(
+            surveyId,
             navigationUseCaseInput,
             onSuccess = { navigationJsonOutput ->
                 val result = navigationJsonOutput
@@ -119,12 +106,12 @@ class EMNavProcessor constructor(
                     )
                 updateResponse(response, lang, navigationJsonOutput)
                 navListener.onSuccess(result)
-            },
-            onError = { navListener.onError(it) }
-        )
+            }
+        ) { navListener.onError(it) }
     }
 
     private fun navigationUseCase(
+        surveyId: String,
         navigationUseCaseInput: NavigationUseCaseInput,
         onSuccess: (NavigationJsonOutput) -> Unit,
         onError: (Throwable) -> Unit
@@ -135,7 +122,7 @@ class EMNavProcessor constructor(
                     throw java.lang.IllegalStateException("Should not resort to Script engine")
                 }
             },
-            getProcessedFile(),
+            FileUtils.getValidationJson(getActivity(), surveyId)!!,
             true,
             navigationUseCaseInput
         )

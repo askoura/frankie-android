@@ -7,13 +7,10 @@ import android.util.Log
 import android.webkit.*
 import androidx.webkit.*
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.frankie.app.ui.common.FileUtils
 import com.frankie.expressionmanager.ext.ScriptUtils
 import com.frankie.expressionmanager.model.*
-import com.frankie.expressionmanager.usecase.ValidationJsonOutput
-import java.sql.Blob
 import java.util.*
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -54,7 +51,7 @@ class FrankieWebView
         @JavascriptInterface
         fun navigate(body: String) {
             val navigateRequest: NavigateRequest = jacksonObjectMapper().readValue(body)
-            emNavProcessor.navigate(navigateRequest, object : NavigationListener {
+            emNavProcessor.navigate(surveyId, navigateRequest, object : NavigationListener {
                 override fun onSuccess(apiNavigationOutput: ApiNavigationOutput) {
                     val string = jacksonKtMapper.writeValueAsString(apiNavigationOutput)
                     loadUrl("javascript:navigateOffline($string)")
@@ -74,7 +71,7 @@ class FrankieWebView
 
         @JavascriptInterface
         fun start() {
-            emNavProcessor.start(SurveyLang.EN, object : NavigationListener {
+            emNavProcessor.start(surveyId, SurveyLang.EN, object : NavigationListener {
                 override fun onSuccess(apiNavigationOutput: ApiNavigationOutput) {
                     val string = jacksonKtMapper.writeValueAsString(apiNavigationOutput)
                     loadUrl("javascript:navigateOffline($string)")
@@ -87,9 +84,12 @@ class FrankieWebView
         }
 
         @JavascriptInterface
-        fun getParam(key: String):String {
+        fun getParam(key: String): String {
             Log.v("blah", "getParam($key)")
-            return  ""
+            if (key == "surveyId") {
+                return surveyId
+            }
+            return ""
         }
     }
 
@@ -107,11 +107,7 @@ class FrankieWebView
     }
 
     private fun getRuntimeJs(): WebResourceResponse {
-        val script = jacksonKtMapper.readValue(
-                FileUtils.getValidationJsonFile(context, surveyId).bufferedReader().use {
-                    it.readText()
-                }, jacksonTypeRef<ValidationJsonOutput>()
-        ).script
+        val script = FileUtils.getValidationJson(context, surveyId)?.script
         return WebResourceResponse(
             "text/javascript",
             "utf-8",
