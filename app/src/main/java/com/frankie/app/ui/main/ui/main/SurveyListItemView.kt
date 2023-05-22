@@ -12,9 +12,10 @@ import com.frankie.app.databinding.ItemSurveyBinding
 import com.frankie.app.ui.common.color
 import com.frankie.app.ui.common.dpToPx
 
-class SurveyListItemView @JvmOverloads constructor(context: Context,
-                                                   attrs: AttributeSet? = null)
-    : ConstraintLayout(context, attrs) {
+class SurveyListItemView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null
+) : ConstraintLayout(context, attrs) {
 
     private val binding = ItemSurveyBinding.inflate(LayoutInflater.from(context), this)
 
@@ -22,14 +23,19 @@ class SurveyListItemView @JvmOverloads constructor(context: Context,
         setPadding(context.dpToPx(16))
     }
 
-    fun bind(surveyData: SurveyData,
-             onSyncClicked: (SurveyData) -> Unit,
-             onPlayClicked: (SurveyData) -> Unit,
-             onInfoClicked: (SurveyData) -> Unit) {
+    fun bind(
+        surveyData: SurveyData,
+        onSyncClicked: (SurveyData) -> Unit,
+        onPlayClicked: (SurveyData) -> Unit,
+        onInfoClicked: (SurveyData) -> Unit
+    ) {
+        val isPlayEnabled = !surveyData.newVersionAvailable
+        val isSyncOfflineEnabled = surveyData.newVersionAvailable
         binding.name.text = surveyData.name
-        binding.play.isEnabled = !surveyData.newVersionAvailable
-        binding.play.setColorFilter(!surveyData.newVersionAvailable)
-        binding.sync.setColorFilter(surveyData.newVersionAvailable)
+        binding.play.isEnabled = isPlayEnabled
+        binding.sync.isEnabled = isSyncOfflineEnabled
+        binding.play.setColorFilter(isPlayEnabled)
+        binding.sync.setColorFilter(isSyncOfflineEnabled)
         binding.sync.setOnClickListener { onSyncClicked(surveyData) }
         binding.play.setOnClickListener { onPlayClicked(surveyData) }
         binding.info.setOnClickListener { onInfoClicked(surveyData) }

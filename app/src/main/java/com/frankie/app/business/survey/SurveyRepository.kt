@@ -1,6 +1,5 @@
 package com.frankie.app.business.survey
 
-import com.frankie.app.api.common.User
 import com.frankie.app.api.survey.Language
 import com.frankie.app.api.survey.PublishInfo
 import com.frankie.app.api.survey.SurveyDesign
@@ -31,20 +30,25 @@ interface SurveyRepository {
     }
 }
 
-class SurveyRepositoryImpl(private val service: SurveyService,
-                           private val surveyDataDao: SurveyDataDao,
-                           private val permissionDao: PermissionDao,
-                           private val sessionManager: SessionManager) : SurveyRepository {
+class SurveyRepositoryImpl(
+    private val service: SurveyService,
+    private val surveyDataDao: SurveyDataDao,
+    private val permissionDao: PermissionDao,
+    private val sessionManager: SessionManager
+) : SurveyRepository {
     override fun getSurveyList(): Flow<Result<List<SurveyData>>> {
         return flow {
             val surveyList = service.getSurveyList().map { survey ->
                 val design = service.getSurveyDesign(survey.id, PublishInfo())
                 val savedSurvey = surveyDataDao.getSurveyDataById(survey.id)
-                val newVersionAvailable = savedSurvey?.publishInfoEntity?.toPublishInfo()?.let { it != design.publishInfo }
-                        ?: false
-                SurveyData.fromSurveyAndDesign(survey,
-                        savedSurvey?.publishInfoEntity?.toPublishInfo() ?: PublishInfo(),
-                        newVersionAvailable)
+                val newVersionAvailable = savedSurvey?.publishInfoEntity?.toPublishInfo()
+                    ?.let { it != design.publishInfo }
+                    ?: true
+                SurveyData.fromSurveyAndDesign(
+                    survey,
+                    savedSurvey?.publishInfoEntity?.toPublishInfo() ?: PublishInfo(),
+                    newVersionAvailable
+                )
             }
             saveSurveysToDB(surveyList)
             savePermissionsToDB(surveyList)
@@ -64,21 +68,35 @@ class SurveyRepositoryImpl(private val service: SurveyService,
     }
 
     private suspend fun savePermissionsToDB(surveyList: List<SurveyData>) {
-        permissionDao.updateUserPermissions(sessionManager.getUserIdOrThrow(), surveyList.map { it.id })
+        permissionDao.updateUserPermissions(
+            sessionManager.getUserIdOrThrow(),
+            surveyList.map { it.id })
     }
 
     override suspend fun surveyDesign(surveyData: SurveyData): SurveyDesign {
         return service.getSurveyDesign(surveyData.id, surveyData.publishInfo)
     }
 
-    override fun getSurveyFile(surveyId: String, resourceId: String): Flow<Result<SurveyRepository.DataStream>> {
+    override fun getSurveyFile(
+        surveyId: String,
+        resourceId: String
+    ): Flow<Result<SurveyRepository.DataStream>> {
         return flow {
             val responseBody = service.getSurveyFile(surveyId, resourceId)
             responseBody.byteStream().use { inputStream ->
                 val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
                 var bytes = inputStream.read(buffer)
                 while (bytes >= 0) {
-                    emit(Result.success(SurveyRepository.DataStream.Chunk(buffer.copyOfRange(0, bytes))))
+                    emit(
+                        Result.success(
+                            SurveyRepository.DataStream.Chunk(
+                                buffer.copyOfRange(
+                                    0,
+                                    bytes
+                                )
+                            )
+                        )
+                    )
                     bytes = inputStream.read(buffer)
                 }
                 emit(Result.success(SurveyRepository.DataStream.End))
@@ -93,34 +111,19 @@ class SurveyRepositoryImpl(private val service: SurveyService,
 
 private fun SurveyData.toSurveyDataEntity(): SurveyDataEntity {
     return SurveyDataEntity(
-            id = this.id,
-            creationDate = this.creationDate,
-            lastModified = this.lastModified,
-            name = this.name,
-            languagesEntity = LanguagesEntity(defaultLanguage.toLanguageEntity(), additionalLanguages.map { it.toLanguageEntity() }),
-            status = this.status,
-            usage = this.usage,
-            quota = this.quota,
-            navigationMode = this.navigationMode,
-            publishInfoEntity = this.publishInfo.toPublishInfoEntity(),
-            newVersionAvailable = this.newVersionAvailable,
-    )
-}
-
-private fun SurveyDataEntity.toSurveyData(): SurveyData {
-    return SurveyData(
-            id = this.id,
-            creationDate = this.creationDate,
-            lastModified = this.lastModified,
-            name = this.name,
-            defaultLanguage = languagesEntity!!.defaultLanguageEntity!!.toLanguage(),
-            additionalLanguages = languagesEntity.additionalLanguagesEntity!!.map { it.toLanguage() },
-            status = this.status,
-            usage = this.usage,
-            quota = this.quota,
-            navigationMode = this.navigationMode,
-            publishInfo = publishInfoEntity?.toPublishInfo() ?: PublishInfo(),
-            newVersionAvailable = this.newVersionAvailable,
+        id = this.id,
+        creationDate = this.creationDate,
+        lastModified = this.lastModified,
+        name = this.name,
+        languagesEntity = LanguagesEntity(
+            defaultLanguage.toLanguageEntity(),
+            additionalLanguages.map { it.toLanguageEntity() }),
+        status = this.status,
+        usage = this.usage,
+        quota = this.quota,
+        navigationMode = this.navigationMode,
+        publishInfoEntity = this.publishInfo.toPublishInfoEntity(),
+        newVersionAvailable = this.newVersionAvailable,
     )
 }
 
@@ -134,9 +137,5 @@ fun PublishInfoEntity.toPublishInfo(): PublishInfo {
 
 fun Language.toLanguageEntity(): LanguageEntity {
     return LanguageEntity(code, langName)
-}
-
-fun LanguageEntity.toLanguage(): Language {
-    return Language(code, langName)
 }
 

@@ -36,7 +36,7 @@ class MainFragment : Fragment() {
                               savedInstanceState: Bundle?): View {
         binding = FragmentMainBinding.inflate(inflater, container, false)
 
-        adapter = SurveyListAdapter(onSyncClicked = { surveyData -> viewModel.surveyClicked(surveyData) },
+        adapter = SurveyListAdapter(onSyncClicked = { surveyData -> viewModel.syncSurveyForOffline(surveyData) },
                 onPlayClicked = { surveyData -> startActivity(SurveyActivity.createIntent(requireContext(), surveyData.id)) },
                 onInfoClicked = { })
         binding.recycler.adapter = adapter

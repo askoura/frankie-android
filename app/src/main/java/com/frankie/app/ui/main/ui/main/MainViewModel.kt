@@ -12,10 +12,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class MainViewModel(private val surveyRepository: SurveyRepository,
-                    private val logoutUseCase: LogoutUseCase,
-                    private val downloadManager: DownloadManager,
-                    errorProcessor: ErrorProcessor) : ViewModel(), ErrorProcessor by errorProcessor {
+class MainViewModel(
+    private val surveyRepository: SurveyRepository,
+    private val logoutUseCase: LogoutUseCase,
+    private val downloadManager: DownloadManager,
+    errorProcessor: ErrorProcessor
+) : ViewModel(), ErrorProcessor by errorProcessor {
     private val _state = MutableStateFlow(State())
     val state = _state.asStateFlow()
     fun fetchSurveyList() {
@@ -23,7 +25,9 @@ class MainViewModel(private val surveyRepository: SurveyRepository,
             _state.update { _state.value.copy(isLoading = true) }
             surveyRepository.getSurveyList().collect { result ->
                 if (result.isSuccess) {
-                    _state.update { _state.value.copy(isLoading = false, surveyList = result.getOrThrow()) }
+                    _state.update {
+                        _state.value.copy(isLoading = false, surveyList = result.getOrThrow())
+                    }
                 } else {
                     _state.update { _state.value.copy(isLoading = false) }
                     processError(result.exceptionOrNull()!!)
@@ -32,13 +36,16 @@ class MainViewModel(private val surveyRepository: SurveyRepository,
         }
     }
 
-    fun surveyClicked(surveyData: SurveyData) {
+    fun syncSurveyForOffline(surveyData: SurveyData) {
         viewModelScope.launch {
             _state.update { _state.value.copy(isLoading = true) }
             downloadManager.downloadSurveyFiles(surveyData).collect { result ->
                 _state.update { _state.value.copy(isLoading = false) }
                 if (result.isSuccess) {
-                    val newList = _state.value.surveyList.map { if (it.id == surveyData.id) result.getOrDefault(it) else it }
+                    val newSurvey = result.getOrNull()
+                    val newList = _state.value.surveyList.map {
+                        if (it.id == surveyData.id) newSurvey ?: it else it
+                    }
                     _state.update { _state.value.copy(isLoading = false, surveyList = newList) }
                 } else {
                     processError(result.exceptionOrNull()!!)
@@ -52,8 +59,8 @@ class MainViewModel(private val surveyRepository: SurveyRepository,
     }
 
     data class State(
-            val isLoading: Boolean = false,
-            val surveyList: List<SurveyData> = emptyList()
+        val isLoading: Boolean = false,
+        val surveyList: List<SurveyData> = emptyList()
     )
 
 }

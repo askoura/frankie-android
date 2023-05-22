@@ -23,7 +23,7 @@ class DownloadManagerImpl(private val appContext: Context, private val surveyRep
     override suspend fun downloadSurveyFiles(surveyData: SurveyData): Flow<Result<SurveyData>> {
         return flow {
             val design = surveyRepository.surveyDesign(surveyData)
-            saveValidationJsonOutput(surveyData.id, design.validationJsonOutput).collect()
+            saveValidationJsonOutput(surveyData.id, design.validationJsonOutput.toString()).collect()
             design.files.forEach { file ->
                 val flow = surveyRepository.getSurveyFile(surveyData.id, file.name)
                 saveFile(flow, getResourceFile(appContext, file.name, surveyData.id)).collect {
