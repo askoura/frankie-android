@@ -29,9 +29,11 @@ class FrankieWebView
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
     private var saverUri: Uri? = null
 
-    val fileSelectedCallback = ValueCallback<Uri> { value ->
+    val fileSelectedCallback = ValueCallback<Uri?> { value ->
         saverUri = value
-        filePathCallback?.onReceiveValue(arrayOf(value))
+        value?.let {
+            filePathCallback?.onReceiveValue(arrayOf(value))
+        } ?: filePathCallback?.onReceiveValue(null)
     }
 
     fun resetFileUploadVariables() {
@@ -156,9 +158,11 @@ class FrankieWebView
                 filePathCallback: ValueCallback<Array<Uri>>?,
                 fileChooserParams: FileChooserParams?
             ): Boolean {
-                this@FrankieWebView.filePathCallback = filePathCallback
-                (context as? SurveyActivity)?.pickFromGallery()
-                return true
+                filePathCallback?.let {
+                    this@FrankieWebView.filePathCallback = it
+                    (context as? SurveyActivity)?.pickFromGallery()
+                    return true
+                } ?: return false
             }
         }
     }

@@ -60,7 +60,12 @@ class SurveyActivity : AppCompatActivity() {
         when (resultCode) {
             Activity.RESULT_OK -> processOk(requestCode, data)
             Activity.RESULT_CANCELED -> {
-                // don't do shit
+                when (requestCode) {
+                    CAMERA_INTENT -> processCameraResult()
+                    GALLERY_INTENT -> {
+                        binding.webview.fileSelectedCallback.onReceiveValue(null)
+                    }
+                }
             }
         }
     }
