@@ -15,6 +15,7 @@ import com.frankie.expressionmanager.ext.ScriptUtils
 import com.frankie.expressionmanager.model.*
 import com.frankie.expressionmanager.usecase.*
 import kotlinx.coroutines.*
+import java.io.InputStream
 import java.util.*
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -202,6 +203,21 @@ class EMNavProcessor constructor(
         val str = dataUrl.substring(dataUrl.indexOf(",") + 1)
         val imageData: ByteArray = Base64.decode(str, Base64.NO_WRAP)
         responseFile.writeBytes(imageData)
+        return saveFileResponse(fileName, uuid, key, responseFile.length())
+    }
+
+    fun uploadFile(
+        key: String,
+        fileName: String,
+        inputStream:InputStream
+    ): ResponseUploadFile {
+        val uuid = UUID.randomUUID()
+        val responseFile = FileUtils.getResponseFile(
+            getActivity(),
+            uuid.toString(),
+            surveyId!!
+        )
+        responseFile.writeBytes(inputStream.readBytes())
         return saveFileResponse(fileName, uuid, key, responseFile.length())
     }
 

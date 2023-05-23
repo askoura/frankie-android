@@ -3,6 +3,7 @@ package com.frankie.app
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.net.Uri
 import android.util.AttributeSet
 import android.util.Log
 import android.webkit.*
@@ -23,6 +24,20 @@ class FrankieWebView
 @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : WebView(context, attrs) {
+
+
+    private var filePathCallback: ValueCallback<Array<Uri>>? = null
+    private var saverUri: Uri? = null
+
+    val fileSelectedCallback = ValueCallback<Uri> { value ->
+        saverUri = value
+        filePathCallback?.onReceiveValue(arrayOf(value))
+    }
+
+    fun resetFileUploadVariables() {
+        filePathCallback = null
+        saverUri = null
+    }
 
     private val emNavProcessor = EMNavProcessor(context)
     private lateinit var surveyId: String
@@ -77,6 +92,20 @@ class FrankieWebView
         }
 
         @JavascriptInterface
+        fun uploadFile(key: String, fileName: String) {
+            context.contentResolver.openInputStream(saverUri!!)?.let {
+                val uploadFile =
+                    emNavProcessor.uploadFile(key, fileName, it)
+                val string = jacksonKtMapper.writeValueAsString(uploadFile)
+                resetFileUploadVariables()
+                (context as Activity).runOnUiThread {
+                    loadUrl("javascript:onFileUploaded($string)")
+                }
+            }
+
+        }
+
+        @JavascriptInterface
         fun uploadDataUrl(key: String, dataUrl: String, fileName: String) {
             val uploadFile =
                 emNavProcessor.uploadDataUrl(key, dataUrl, fileName)
@@ -121,7 +150,19 @@ class FrankieWebView
         settings.setSupportZoom(false)
 
         webViewClient = frankieWebViewClient
+        webChromeClient = object : WebChromeClient() {
+            override fun onShowFileChooser(
+                webView: WebView?,
+                filePathCallback: ValueCallback<Array<Uri>>?,
+                fileChooserParams: FileChooserParams?
+            ): Boolean {
+                this@FrankieWebView.filePathCallback = filePathCallback
+                (context as? SurveyActivity)?.pickFromGallery()
+                return true
+            }
+        }
     }
+
 
     private fun getRuntimeJs(): WebResourceResponse {
         val script = FileUtils.getValidationJson(context, surveyId)?.script

@@ -1,6 +1,8 @@
 package com.frankie.app
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -21,7 +23,7 @@ class SurveyActivity : AppCompatActivity() {
         binding = ActivitySurveyBinding.inflate(layoutInflater)
         setContentView(binding.root)
         val surveyId = intent.getStringExtra(SURVEY_ID)
-                ?: throw IllegalArgumentException("Survey ID is required")
+            ?: throw IllegalArgumentException("Survey ID is required")
         binding.webview.loadSurvey(surveyId)
     }
 
@@ -40,11 +42,53 @@ class SurveyActivity : AppCompatActivity() {
         }
     }
 
+    fun pickFromGallery() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false)
+            type = "image/*"
+        }
+        try {
+            startActivityForResult(intent, GALLERY_INTENT)
+        } catch (e: ActivityNotFoundException) {
+            e.printStackTrace()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (resultCode) {
+            Activity.RESULT_OK -> processOk(requestCode, data)
+            Activity.RESULT_CANCELED -> {
+                // don't do shit
+            }
+        }
+    }
+
+    private fun processGalleryResult(data: Intent?) {
+        data?.data?.let { uri ->
+            binding.webview.fileSelectedCallback.onReceiveValue(uri)
+        }
+    }
+
+    private fun processOk(requestCode: Int, data: Intent?) {
+        when (requestCode) {
+            CAMERA_INTENT -> processCameraResult()
+            GALLERY_INTENT -> processGalleryResult(data)
+        }
+    }
+
+    private fun processCameraResult() {
+        TODO("Not yet implemented")
+    }
+
     companion object {
+        const val CAMERA_INTENT = 1
+        const val GALLERY_INTENT = 2
         private const val SURVEY_ID = "survey_id"
         fun createIntent(context: Context, surveyId: String): Intent =
-                Intent(context, SurveyActivity::class.java).apply {
-                    putExtra(SURVEY_ID, surveyId)
-                }
+            Intent(context, SurveyActivity::class.java).apply {
+                putExtra(SURVEY_ID, surveyId)
+            }
     }
 }
