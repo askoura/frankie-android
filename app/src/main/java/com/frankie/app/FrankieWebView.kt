@@ -1,20 +1,22 @@
 package com.frankie.app
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
 import android.webkit.*
 import androidx.webkit.*
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.frankie.app.ui.common.FileUtils
 import com.frankie.expressionmanager.ext.ScriptUtils
 import com.frankie.expressionmanager.model.*
+import org.koin.android.BuildConfig
 import java.io.File
 import java.io.FileInputStream
 import java.util.*
+
 
 @SuppressLint("SetJavaScriptEnabled")
 class FrankieWebView
@@ -37,6 +39,9 @@ class FrankieWebView
             } else if (url.contains("/survey/$surveyId/resource/")) {
                 val filename = url.substringAfterLast("/")
                 wrapResource(FileUtils.getResourceFile(context, filename, surveyId))
+            } else if (url.contains("/survey/$surveyId/response/attach")) {
+                val fileUUId = url.substringAfterLast("/")
+                wrapResource(FileUtils.getResponseFile(context, fileUUId, surveyId))
             } else if (url.startsWith(CUSTOM_DOMAIN) && !url.endsWith("favicon.ico")) {
                 val data =
                     context.assets.open(url.replace(CUSTOM_DOMAIN, "$REACT_APP_BUILD_FOLDER/"))
@@ -73,8 +78,12 @@ class FrankieWebView
 
         @JavascriptInterface
         fun uploadDataUrl(key: String, dataUrl: String, fileName: String) {
-            Log.v(TAG, dataUrl.toString())
-
+            val uploadFile =
+                emNavProcessor.uploadDataUrl(key, dataUrl, fileName)
+            val string = jacksonKtMapper.writeValueAsString(uploadFile)
+            (context as Activity).runOnUiThread {
+                loadUrl("javascript:onDataUrlUploaded($string)")
+            }
         }
 
         @JavascriptInterface
@@ -121,7 +130,12 @@ class FrankieWebView
             "utf-8",
             200,
             "OK",
-            mutableMapOf("Access-Control-Allow-Origin" to "*"),
+            mutableMapOf(
+                "Access-Control-Allow-Origin" to "*",
+                "Access-Control-Allow-Methods" to "GET,POST,PUT,DELETE",
+                "Access-Control-Allow-Credentials" to "true",
+                "Access-Control-Allow-Headers" to "access-control-allow-origin"
+            ),
             (script + "\n" + ScriptUtils().commonScript).byteInputStream()
         )
     }

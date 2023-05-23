@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.util.Base64
 import android.webkit.*
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.frankie.app.business.settings.SharedPrefsManagerImpl
 import com.frankie.app.db.FrankieDb
@@ -21,6 +22,8 @@ class EMNavProcessor constructor(
     activityContext: Context
 ) {
     private val webView = WebView(activityContext)
+    private var responseId: UUID? = null
+    private var surveyId: String? = null
     private val frankieDb = FrankieDb.getDatabase(activityContext)
 
     fun getActivity(): Activity = webView.context as Activity
@@ -42,6 +45,7 @@ class EMNavProcessor constructor(
     }
 
     fun start(surveyId: String, surveyLang: SurveyLang, navListener: NavigationListener) {
+        this.surveyId = surveyId
         val navigationUseCaseInput = NavigationUseCaseInput(
             navigationInfo = NavigationInfo(
                 navigationDirection = NavigationDirection.Start,
@@ -52,18 +56,16 @@ class EMNavProcessor constructor(
             lang = surveyLang,
         )
         navigationUseCase(
-            surveyId,
             navigationUseCaseInput,
             onSuccess = { navigationJsonOutput ->
-                val responseId = UUID.randomUUID()
+                responseId = UUID.randomUUID()
                 saveResponse(
-                    responseId,
                     surveyLang,
                     navigationJsonOutput
                 )
                 val result = navigationJsonOutput
                     .with(
-                        responseId,
+                        responseId!!,
                         SurveyLang.EN,
                         listOf(SurveyLang.DE, SurveyLang.AR)
                     )
@@ -73,8 +75,9 @@ class EMNavProcessor constructor(
     }
 
     fun navigate(surveyId: String, useCaseInput: NavigateRequest, navListener: NavigationListener) {
+        this.surveyId = surveyId
         var response: Response
-        val responseId = useCaseInput.responseId!!
+        responseId = useCaseInput.responseId!!
         runBlocking {
             response = frankieDb.responseDao().get(responseId.toString())
         }
@@ -92,12 +95,11 @@ class EMNavProcessor constructor(
             lang = lang,
         )
         navigationUseCase(
-            surveyId,
             navigationUseCaseInput,
             onSuccess = { navigationJsonOutput ->
                 val result = navigationJsonOutput
                     .with(
-                        responseId,
+                        responseId!!,
                         lang,
                         mutableListOf(SurveyLang.EN, SurveyLang.DE, SurveyLang.AR).apply {
                             remove(
@@ -112,7 +114,6 @@ class EMNavProcessor constructor(
     }
 
     private fun navigationUseCase(
-        surveyId: String,
         navigationUseCaseInput: NavigationUseCaseInput,
         onSuccess: (NavigationJsonOutput) -> Unit,
         onError: (Throwable) -> Unit
@@ -123,7 +124,7 @@ class EMNavProcessor constructor(
                     throw java.lang.IllegalStateException("Should not resort to Script engine")
                 }
             },
-            FileUtils.getValidationJson(getActivity(), surveyId)!!,
+            FileUtils.getValidationJson(getActivity(), surveyId!!)!!,
             true,
             navigationUseCaseInput
         )
@@ -146,7 +147,6 @@ class EMNavProcessor constructor(
     }
 
     private fun saveResponse(
-        responseId: UUID,
         surveyLang: SurveyLang,
         result: NavigationJsonOutput
     ) {
@@ -188,7 +188,58 @@ class EMNavProcessor constructor(
         }
     }
 
+    fun uploadDataUrl(
+        key: String,
+        dataUrl: String,
+        fileName: String
+    ): ResponseUploadFile {
+        val uuid = UUID.randomUUID()
+        val responseFile = FileUtils.getResponseFile(
+            getActivity(),
+            uuid.toString(),
+            surveyId!!
+        )
+        val str = dataUrl.substring(dataUrl.indexOf(",") + 1)
+        val imageData: ByteArray = Base64.decode(str, Base64.NO_WRAP)
+        responseFile.writeBytes(imageData)
+        return saveFileResponse(fileName, uuid, key, responseFile.length())
+    }
+
+    fun saveFileResponse(
+        fileName: String,
+        uuid: UUID,
+        key: String,
+        fileSize: Long
+    ): ResponseUploadFile {
+        var response: Response
+        runBlocking {
+            response = frankieDb.responseDao().get(responseId.toString())
+        }
+        val responseUploadFile = ResponseUploadFile(fileName, uuid.toString(), fileSize)
+        val newValues = response.values.toMutableMap().apply {
+            put("$key.value", responseUploadFile)
+        }
+        CoroutineScope(Dispatchers.IO).launch {
+            frankieDb.responseDao().update(
+                values = newValues,
+                id = response.id,
+                navigationIndex = response.navigationIndex,
+                lang = response.lang,
+                events = response.events
+
+            )
+        }
+        return responseUploadFile
+    }
+
 }
+
+data class ResponseUploadFile(
+    val filename: String,
+    @JsonProperty("stored_filename")
+    val storedFilename: String,
+    val size: Long
+)
 
 interface NavigationListener {
     fun onSuccess(apiNavigationOutput: ApiNavigationOutput)

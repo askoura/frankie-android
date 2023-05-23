@@ -27,6 +27,10 @@ object FileUtils {
         return getTargetFile(context, fileName, surveyId, FileType.RESOURCES)
     }
 
+    fun getResponseFile(context: Context, fileName: String, surveyId: String): File {
+        return getTargetFile(context, fileName, surveyId, FileType.RESPONSES)
+    }
+
     fun getValidationJsonFile(context: Context, surveyId: String): File {
         return getTargetFile(context, VALIDATION_JSON_FILENAME, surveyId, FileType.DESIGN)
     }
