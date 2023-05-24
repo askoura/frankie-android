@@ -5,7 +5,9 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.webkit.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +18,7 @@ import java.util.*
 class SurveyActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySurveyBinding
     var backPressedTime: Long = 0
+    private var capturedPhotoUri: Uri? = null
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,13 +58,26 @@ class SurveyActivity : AppCompatActivity() {
         }
     }
 
+    fun takePhoto(uploadFileUri: Uri) {
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
+            addFlags(
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                          Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
+            putExtra(MediaStore.EXTRA_OUTPUT, uploadFileUri)
+        }
+        startActivityForResult(intent, CAMERA_INTENT)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (resultCode) {
             Activity.RESULT_OK -> processOk(requestCode, data)
             Activity.RESULT_CANCELED -> {
                 when (requestCode) {
-                    CAMERA_INTENT -> processCameraResult()
+                    CAMERA_INTENT -> {
+                        // do nothing
+                    }
                     GALLERY_INTENT -> {
                         binding.webview.fileSelectedCallback.onReceiveValue(null)
                     }
@@ -84,7 +100,7 @@ class SurveyActivity : AppCompatActivity() {
     }
 
     private fun processCameraResult() {
-        TODO("Not yet implemented")
+        binding.webview.onCameraResult()
     }
 
     companion object {

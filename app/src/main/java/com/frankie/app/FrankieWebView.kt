@@ -7,6 +7,7 @@ import android.net.Uri
 import android.util.AttributeSet
 import android.util.Log
 import android.webkit.*
+import androidx.core.content.FileProvider
 import androidx.webkit.*
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -16,6 +17,7 @@ import com.frankie.expressionmanager.model.*
 import org.koin.android.BuildConfig
 import java.io.File
 import java.io.FileInputStream
+import java.io.InputStream
 import java.util.*
 
 
@@ -28,9 +30,11 @@ class FrankieWebView
 
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
     private var saverUri: Uri? = null
+    private var photoKey: String? = null
 
     val fileSelectedCallback = ValueCallback<Uri?> { value ->
         saverUri = value
+        photoKey = null
         value?.let {
             filePathCallback?.onReceiveValue(arrayOf(value))
         } ?: filePathCallback?.onReceiveValue(null)
@@ -39,6 +43,7 @@ class FrankieWebView
     fun resetFileUploadVariables() {
         filePathCallback = null
         saverUri = null
+        photoKey = null
     }
 
     private val emNavProcessor = EMNavProcessor(context)
@@ -60,21 +65,38 @@ class FrankieWebView
                 val fileUUId = url.substringAfterLast("/")
                 wrapResource(FileUtils.getResponseFile(context, fileUUId, surveyId))
             } else if (url.startsWith(CUSTOM_DOMAIN) && !url.endsWith("favicon.ico")) {
-                val data =
-                    context.assets.open(url.replace(CUSTOM_DOMAIN, "$REACT_APP_BUILD_FOLDER/"))
-                        .bufferedReader().use {
-                            it.readText()
-                        }
-                return WebResourceResponse(
-                    if (url.endsWith("js")) "text/javascript" else "text/css",
-                    "utf-8",
-                    data.byteInputStream()
-                )
+                val extension = url.substringAfterLast(".")
+                if (extension == "css" || extension == "js") {
+                    val data =
+                        context.assets.open(url.replace(CUSTOM_DOMAIN, "$REACT_APP_BUILD_FOLDER/"))
+                            .bufferedReader().use {
+                                it.readText()
+                            }
+                    return WebResourceResponse(
+                        if (url.endsWith("js")) "text/javascript" else "text/css",
+                        "utf-8",
+                        data.byteInputStream()
+                    )
+                } else {
+                    val data =
+                        context.assets.open(url.replace(CUSTOM_DOMAIN, "$REACT_APP_BUILD_FOLDER/"))
+                    return WebResourceResponse(
+                        getMimeTypeFromExtension(extension),
+                        "utf-8",
+                        data
+                    )
+                }
             } else {
                 null
             }
         }
     }
+
+    fun getMimeTypeFromExtension(extension: String): String? {
+        val mimeTypeMap = MimeTypeMap.getSingleton()
+        return mimeTypeMap.getMimeTypeFromExtension(extension.lowercase())
+    }
+
     private val androidJavascriptInterface = object {
         @Suppress("unused")
         @JavascriptInterface
@@ -91,6 +113,16 @@ class FrankieWebView
                     // TODO("Report Error to MainActivity")
                 }
             })
+        }
+
+        @JavascriptInterface
+        fun capturePhoto(key: String) {
+            photoKey = key
+            val uuid = UUID.randomUUID()
+            val file = FileUtils.getResponseFile(context, uuid.toString(), surveyId)
+            saverUri = FileProvider
+                .getUriForFile(context, context.packageName + ".provider", file)
+            (context as? SurveyActivity)?.takePhoto(saverUri!!)
         }
 
         @JavascriptInterface
@@ -211,6 +243,33 @@ class FrankieWebView
                 onBackHandler(value == "true")
             } ?: onBackHandler(false)
         }
+    }
+
+    fun onCameraResult() {
+        var stream: InputStream? = null
+        try {
+            stream = context.contentResolver.openInputStream(saverUri!!)
+            val result = emNavProcessor.saveFileResponse(
+                fileName = "capured-image.jpg",
+                uuid = UUID.fromString(saverUri.toString().substringAfterLast("/")),
+                fileSize = stream!!.readBytes().size.toLong(),
+                key = photoKey!!
+            )
+            (context as Activity).runOnUiThread {
+                loadUrl(
+                    "javascript:onPhotoCatpured$photoKey(${
+                        jacksonKtMapper.writeValueAsString(
+                            result
+                        )
+                    })"
+                )
+            }
+
+        } finally {
+            stream?.close()
+        }
+
+        resetFileUploadVariables()
     }
 
     companion object {
