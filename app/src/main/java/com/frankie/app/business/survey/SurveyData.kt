@@ -1,9 +1,13 @@
 package com.frankie.app.business.survey
 
+import android.os.Parcelable
 import com.frankie.app.api.survey.Language
 import com.frankie.app.api.survey.PublishInfo
 import com.frankie.app.api.survey.Survey
+import com.frankie.expressionmanager.model.NavigationMode
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class SurveyData(
     val id: String,
     val creationDate: String,
@@ -14,10 +18,10 @@ data class SurveyData(
     val status: String,
     val usage: String,
     val quota: Int,
-    val navigationMode: String,
+    val navigationMode: NavigationMode,
     val publishInfo: PublishInfo,
     val newVersionAvailable: Boolean
-) {
+) : Parcelable {
     companion object {
         fun fromSurveyAndDesign(
             survey: Survey,

@@ -45,12 +45,17 @@ class EMNavProcessor constructor(
 
     }
 
-    fun start(surveyId: String, surveyLang: SurveyLang, navListener: NavigationListener) {
+    fun start(
+        surveyId: String,
+        surveyLang: SurveyLang,
+        navListener: NavigationListener,
+        navigationMode: NavigationMode
+    ) {
         this.surveyId = surveyId
         val navigationUseCaseInput = NavigationUseCaseInput(
             navigationInfo = NavigationInfo(
                 navigationDirection = NavigationDirection.Start,
-                navigationMode = NavigationMode.GROUP_BY_GROUP,
+                navigationMode = navigationMode,
                 navigationIndex = null
             ),
             defaultLang = SurveyLang.EN,
@@ -75,7 +80,12 @@ class EMNavProcessor constructor(
         ) { navListener.onError(it) }
     }
 
-    fun navigate(surveyId: String, useCaseInput: NavigateRequest, navListener: NavigationListener) {
+    fun navigate(
+        surveyId: String,
+        useCaseInput: NavigateRequest,
+        navListener: NavigationListener,
+        navigationMode: NavigationMode
+    ) {
         this.surveyId = surveyId
         var response: Response
         responseId = useCaseInput.responseId!!
@@ -89,7 +99,7 @@ class EMNavProcessor constructor(
             },
             navigationInfo = NavigationInfo(
                 navigationDirection = useCaseInput.navigationDirection!!,
-                navigationMode = NavigationMode.GROUP_BY_GROUP,
+                navigationMode = navigationMode,
                 navigationIndex = response.navigationIndex
             ),
             defaultLang = SurveyLang.EN,
@@ -209,7 +219,7 @@ class EMNavProcessor constructor(
     fun uploadFile(
         key: String,
         fileName: String,
-        inputStream:InputStream
+        inputStream: InputStream
     ): ResponseUploadFile {
         val uuid = UUID.randomUUID()
         val responseFile = FileUtils.getResponseFile(

@@ -11,6 +11,7 @@ import androidx.core.content.FileProvider
 import androidx.webkit.*
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.ui.common.FileUtils
 import com.frankie.expressionmanager.ext.ScriptUtils
 import com.frankie.expressionmanager.model.*
@@ -31,10 +32,12 @@ class FrankieWebView
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
     private var saverUri: Uri? = null
     private var photoKey: String? = null
+    private var videoKey: String? = null
 
     val fileSelectedCallback = ValueCallback<Uri?> { value ->
         saverUri = value
         photoKey = null
+        videoKey = null
         value?.let {
             filePathCallback?.onReceiveValue(arrayOf(value))
         } ?: filePathCallback?.onReceiveValue(null)
@@ -44,10 +47,11 @@ class FrankieWebView
         filePathCallback = null
         saverUri = null
         photoKey = null
+        videoKey = null
     }
 
     private val emNavProcessor = EMNavProcessor(context)
-    private lateinit var surveyId: String
+    private lateinit var survey: SurveyData
 
     private val frankieWebViewClient = object : WebViewClient() {
         override fun shouldInterceptRequest(
@@ -56,14 +60,14 @@ class FrankieWebView
             val url = request?.url.toString()
             Log.v(TAG, url)
 
-            return if (url.endsWith("/survey/$surveyId/run/runtime.js")) {
+            return if (url.endsWith("/survey/${survey.id}/run/runtime.js")) {
                 getRuntimeJs()
-            } else if (url.contains("/survey/$surveyId/resource/")) {
+            } else if (url.contains("/survey/${survey.id}/resource/")) {
                 val filename = url.substringAfterLast("/")
-                wrapResource(FileUtils.getResourceFile(context, filename, surveyId))
-            } else if (url.contains("/survey/$surveyId/response/attach")) {
+                wrapResource(FileUtils.getResourceFile(context, filename, survey.id))
+            } else if (url.contains("/survey/${survey.id}/response/attach")) {
                 val fileUUId = url.substringAfterLast("/")
-                wrapResource(FileUtils.getResponseFile(context, fileUUId, surveyId))
+                wrapResource(FileUtils.getResponseFile(context, fileUUId, survey.id))
             } else if (url.startsWith(CUSTOM_DOMAIN) && !url.endsWith("favicon.ico")) {
                 val extension = url.substringAfterLast(".")
                 if (extension == "css" || extension == "js") {
@@ -103,7 +107,7 @@ class FrankieWebView
         fun navigate(body: String) {
             val mapper = jacksonKtMapper.registerModule(JavaTimeModule())
             val navigateRequest: NavigateRequest = mapper.readValue(body)
-            emNavProcessor.navigate(surveyId, navigateRequest, object : NavigationListener {
+            emNavProcessor.navigate(survey.id, navigateRequest, object : NavigationListener {
                 override fun onSuccess(apiNavigationOutput: ApiNavigationOutput) {
                     val string = mapper.writeValueAsString(apiNavigationOutput)
                     loadUrl("javascript:navigateOffline($string)")
@@ -112,17 +116,24 @@ class FrankieWebView
                 override fun onError(error: Throwable) {
                     // TODO("Report Error to MainActivity")
                 }
-            })
+            }, survey.navigationMode)
         }
 
         @JavascriptInterface
         fun capturePhoto(key: String) {
             photoKey = key
             val uuid = UUID.randomUUID()
-            val file = FileUtils.getResponseFile(context, uuid.toString(), surveyId)
+            val file = FileUtils.getResponseFile(context, uuid.toString(), survey.id)
             saverUri = FileProvider
                 .getUriForFile(context, context.packageName + ".provider", file)
             (context as? SurveyActivity)?.takePhoto(saverUri!!)
+        }
+
+
+        @JavascriptInterface
+        fun captureVideo(key: String) {
+            videoKey = key
+            (context as? SurveyActivity)?.takeVideo()
         }
 
         @JavascriptInterface
@@ -151,7 +162,7 @@ class FrankieWebView
 
         @JavascriptInterface
         fun start() {
-            emNavProcessor.start(surveyId, SurveyLang.EN, object : NavigationListener {
+            emNavProcessor.start(survey.id, SurveyLang.EN, object : NavigationListener {
                 override fun onSuccess(apiNavigationOutput: ApiNavigationOutput) {
                     val string = jacksonKtMapper.writeValueAsString(apiNavigationOutput)
                     loadUrl("javascript:navigateOffline($string)")
@@ -160,14 +171,14 @@ class FrankieWebView
                 override fun onError(error: Throwable) {
                     // TODO("Report Error to MainActivity")
                 }
-            })
+            }, survey.navigationMode)
         }
 
         @JavascriptInterface
         fun getParam(key: String): String {
             Log.v("blah", "getParam($key)")
             if (key == "surveyId") {
-                return surveyId
+                return survey.id
             }
             return ""
         }
@@ -201,7 +212,7 @@ class FrankieWebView
 
 
     private fun getRuntimeJs(): WebResourceResponse {
-        val script = FileUtils.getValidationJson(context, surveyId)?.script
+        val script = FileUtils.getValidationJson(context, survey.id)?.script
         return WebResourceResponse(
             "text/javascript",
             "utf-8",
@@ -229,8 +240,8 @@ class FrankieWebView
     }
 
 
-    fun loadSurvey(sid: String) {
-        surveyId = sid
+    fun loadSurvey(surveyData: SurveyData) {
+        survey = surveyData
         val data = context.assets.open("$REACT_APP_BUILD_FOLDER/index.html").bufferedReader().use {
             it.readText()
         }
@@ -258,6 +269,32 @@ class FrankieWebView
             (context as Activity).runOnUiThread {
                 loadUrl(
                     "javascript:onPhotoCatpured$photoKey(${
+                        jacksonKtMapper.writeValueAsString(
+                            result
+                        )
+                    })"
+                )
+            }
+
+        } finally {
+            stream?.close()
+        }
+
+        resetFileUploadVariables()
+    }
+
+    fun onVideoResult(contentUri: Uri?) {
+        var stream: InputStream? = null
+        try {
+            stream = context.contentResolver.openInputStream(contentUri!!)
+            val result = emNavProcessor.uploadFile(
+                key = videoKey!!,
+                fileName = "capured-video.mp4",
+                inputStream = stream!!
+            )
+            (context as Activity).runOnUiThread {
+                loadUrl(
+                    "javascript:onVideoCatpured$videoKey(${
                         jacksonKtMapper.writeValueAsString(
                             result
                         )

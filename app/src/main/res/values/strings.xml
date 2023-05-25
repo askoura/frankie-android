@@ -16,4 +16,5 @@
     <string name="validation_psw_error">Password minimum length is 8</string>
     <string name="progress_dialog_title">Please wait</string>
     <string name="progress_dialog_description">Downloading...</string>
+    <string name="chrome_version_not_supported">Chrome version not supported</string>
 </resources>

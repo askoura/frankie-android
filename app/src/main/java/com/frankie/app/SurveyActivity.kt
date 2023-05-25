@@ -7,10 +7,12 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
 import android.provider.MediaStore
 import android.webkit.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.databinding.ActivitySurveyBinding
 import com.frankie.expressionmanager.model.*
 import java.util.*
@@ -18,16 +20,15 @@ import java.util.*
 class SurveyActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySurveyBinding
     var backPressedTime: Long = 0
-    private var capturedPhotoUri: Uri? = null
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySurveyBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val surveyId = intent.getStringExtra(SURVEY_ID)
-            ?: throw IllegalArgumentException("Survey ID is required")
-        binding.webview.loadSurvey(surveyId)
+        val survey: SurveyData = intent.getParcelableExtra(SURVEY)
+            ?: throw IllegalArgumentException("Survey is required")
+        binding.webview.loadSurvey(survey)
     }
 
     @Deprecated("Use Fancy new method")
@@ -69,15 +70,26 @@ class SurveyActivity : AppCompatActivity() {
         startActivityForResult(intent, CAMERA_INTENT)
     }
 
+    fun takeVideo() {
+        val intent = Intent(MediaStore.ACTION_VIDEO_CAPTURE).apply {
+            addFlags(
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                          Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
+        }
+        startActivityForResult(intent, VIDEO_INTENT)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (resultCode) {
             Activity.RESULT_OK -> processOk(requestCode, data)
             Activity.RESULT_CANCELED -> {
                 when (requestCode) {
-                    CAMERA_INTENT -> {
+                    VIDEO_INTENT, CAMERA_INTENT -> {
                         // do nothing
                     }
+
                     GALLERY_INTENT -> {
                         binding.webview.fileSelectedCallback.onReceiveValue(null)
                     }
@@ -95,6 +107,7 @@ class SurveyActivity : AppCompatActivity() {
     private fun processOk(requestCode: Int, data: Intent?) {
         when (requestCode) {
             CAMERA_INTENT -> processCameraResult()
+            VIDEO_INTENT -> processVideoResult(data?.data)
             GALLERY_INTENT -> processGalleryResult(data)
         }
     }
@@ -103,13 +116,18 @@ class SurveyActivity : AppCompatActivity() {
         binding.webview.onCameraResult()
     }
 
+    private fun processVideoResult(contentUri: Uri?) {
+        binding.webview.onVideoResult(contentUri)
+    }
+
     companion object {
         const val CAMERA_INTENT = 1
         const val GALLERY_INTENT = 2
-        private const val SURVEY_ID = "survey_id"
-        fun createIntent(context: Context, surveyId: String): Intent =
+        const val VIDEO_INTENT = 3
+        private const val SURVEY = "survey"
+        fun createIntent(context: Context, survey: SurveyData): Intent =
             Intent(context, SurveyActivity::class.java).apply {
-                putExtra(SURVEY_ID, surveyId)
+                putExtra(SURVEY, survey as Parcelable)
             }
     }
 }

@@ -3,8 +3,11 @@ package com.frankie.app.ui.main
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.webkit.WebView
 import androidx.appcompat.app.AppCompatActivity
 import com.frankie.app.R
+import com.frankie.app.ui.common.WebViewUtils
 import com.frankie.app.ui.main.ui.main.MainFragment
 
 class MainActivity : AppCompatActivity() {
@@ -14,8 +17,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, MainFragment.newInstance())
-                    .commitNow()
+                .replace(R.id.container, MainFragment.newInstance())
+                .commitNow()
         }
     }
 

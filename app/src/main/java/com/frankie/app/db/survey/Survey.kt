@@ -7,20 +7,21 @@ import androidx.room.TypeConverter
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.frankie.app.api.survey.PublishInfo
+import com.frankie.expressionmanager.model.NavigationMode
 
 @Entity(tableName = "survey_data_table")
 data class SurveyDataEntity(
-        @PrimaryKey val id: String = "",
-        val creationDate: String = "",
-        val lastModified: String = "",
-        val name: String = "",
-        @Embedded val languagesEntity: LanguagesEntity? = LanguagesEntity(),
-        val status: String = "",
-        val usage: String = "",
-        val quota: Int = 0,
-        val navigationMode: String = "",
-        @Embedded val publishInfoEntity: PublishInfoEntity? = PublishInfoEntity(),
-        val newVersionAvailable: Boolean = false,
+    @PrimaryKey val id: String = "",
+    val creationDate: String = "",
+    val lastModified: String = "",
+    val name: String = "",
+    @Embedded val languagesEntity: LanguagesEntity? = LanguagesEntity(),
+    val status: String = "",
+    val usage: String = "",
+    val quota: Int = 0,
+    val navigationMode: NavigationMode = NavigationMode.GROUP_BY_GROUP,
+    @Embedded val publishInfoEntity: PublishInfoEntity? = PublishInfoEntity(),
+    val newVersionAvailable: Boolean = false,
 )
 
 data class LanguageEntity(
