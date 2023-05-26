@@ -127,6 +127,12 @@ class FrankieWebView
             navigate(mapper, navigateRequest)
         }
 
+        @Suppress("unused")
+        @JavascriptInterface
+        fun onBackPressed() {
+            (context as SurveyActivity).onBackPressed()
+        }
+
         @JavascriptInterface
         fun start() {
             val mapper = jacksonKtMapper.registerModule(JavaTimeModule())
@@ -276,10 +282,12 @@ class FrankieWebView
     }
 
     fun onBack(onBackHandler: (Boolean) -> Unit) {
-        evaluateJavascript("handleBack()") { value ->
-            value?.let {
-                onBackHandler(value == "true")
-            } ?: onBackHandler(false)
+        (context as Activity).runOnUiThread {
+            evaluateJavascript("handleBack()") { value ->
+                value?.let {
+                    onBackHandler(value == "true")
+                } ?: onBackHandler(false)
+            }
         }
     }
 

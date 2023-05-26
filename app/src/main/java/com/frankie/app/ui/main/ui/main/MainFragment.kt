@@ -1,12 +1,17 @@
 package com.frankie.app.ui.main.ui.main
 
 import android.app.ProgressDialog
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.frankie.app.R
@@ -38,6 +43,38 @@ class MainFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentMainBinding.inflate(inflater, container, false)
+        val menuHost: MenuHost = requireActivity()
+
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                // Add menu items here
+                menuInflater.inflate(R.menu.main, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                // Handle the menu selection
+                return when (menuItem.itemId) {
+                    android.R.id.home -> {
+                        activity?.onBackPressed()
+                        return true
+                    }
+
+                    R.id.refresh -> {
+                        viewModel.fetchSurveyList()
+                        true
+                    }
+
+                    R.id.logout -> {
+                        viewModel.logout()
+                        startActivity(LoginActivity.createIntent(binding.root.context))
+                        activity?.finish()
+                        true
+                    }
+
+                    else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
         adapter = SurveyListAdapter(onSyncClicked = { surveyData ->
             viewModel.syncSurveyForOffline(surveyData)
@@ -61,18 +98,6 @@ class MainFragment : Fragment() {
             onInfoClicked = { })
         binding.recycler.adapter = adapter
         binding.recycler.layoutManager = LinearLayoutManager(binding.root.context)
-
-        binding.btnAllSurveys.setOnClickListener {
-            viewModel.fetchSurveyList()
-        }
-        binding.btnLogout.setOnClickListener {
-            viewModel.logout()
-            startActivity(LoginActivity.createIntent(binding.root.context))
-            activity?.finish()
-        }
-        binding.btnSurveyUsers.setOnClickListener {
-            startActivity(Intent(binding.root.context, SurveyActivity::class.java))
-        }
 
         lifecycleScope.launch {
             viewModel.state.collect { state ->

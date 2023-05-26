@@ -4,9 +4,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.frankie.app.R
 import com.frankie.app.SurveyActivity
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.databinding.ActivityResponsesBinding
@@ -45,6 +47,20 @@ class ResponsesActivity : AppCompatActivity() {
             }
         }
 
+        title = getString(R.string.title_activity_responses);
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                return true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onResume() {
