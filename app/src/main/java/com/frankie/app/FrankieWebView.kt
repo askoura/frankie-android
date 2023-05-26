@@ -33,6 +33,7 @@ class FrankieWebView
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
     private var saverUri: Uri? = null
     private var photoKey: String? = null
+    private var barcodeKey: String? = null
     private var videoKey: String? = null
 
     val fileSelectedCallback = ValueCallback<Uri?> { value ->
@@ -160,6 +161,12 @@ class FrankieWebView
             saverUri = FileProvider
                 .getUriForFile(context, context.packageName + ".provider", file)
             (context as? SurveyActivity)?.takePhoto(saverUri!!)
+        }
+
+        @JavascriptInterface
+        fun scanBarcode(key: String) {
+            barcodeKey = key
+            (context as? SurveyActivity)?.scanBarcode()
         }
 
 
@@ -303,6 +310,12 @@ class FrankieWebView
         resetFileUploadVariables()
     }
 
+    fun onBarcodeScanned(contents: String) {
+        (context as Activity).runOnUiThread {
+            loadUrl("javascript:onBarcodeScanned$barcodeKey(\"$contents\")")
+        }
+    }
+
     fun onVideoResult(contentUri: Uri?) {
         var stream: InputStream? = null
         try {
@@ -328,6 +341,7 @@ class FrankieWebView
 
         resetFileUploadVariables()
     }
+
 
     companion object {
         private const val TAG = "FrankieWebView"

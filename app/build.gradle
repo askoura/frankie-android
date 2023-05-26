@@ -59,6 +59,8 @@ dependencies {
     // upgrading this will mess up older versions.... just don't
     implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.0'
+
+    implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
 
     def koinVersion = "3.4.0"

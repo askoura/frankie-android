@@ -4,6 +4,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:hardwareAccelerated="true"
         android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"

@@ -15,11 +15,15 @@ import androidx.appcompat.app.AppCompatActivity
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.databinding.ActivitySurveyBinding
 import com.frankie.expressionmanager.model.*
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanIntentResult
+import com.journeyapps.barcodescanner.ScanOptions
 import java.util.*
+
 
 class SurveyActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySurveyBinding
-    var backPressedTime: Long = 0
+    private var backPressedTime: Long = 0
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -121,6 +125,26 @@ class SurveyActivity : AppCompatActivity() {
         binding.webview.onVideoResult(contentUri)
     }
 
+    private val barcodeLauncher = registerForActivityResult(
+        ScanContract()
+    ) { result: ScanIntentResult ->
+        if (result.contents == null) {
+            Toast.makeText(this@SurveyActivity, "Cancelled", Toast.LENGTH_LONG).show()
+        } else {
+            binding.webview.onBarcodeScanned(result.contents)
+        }
+    }
+
+
+    fun scanBarcode() {
+        val options = ScanOptions()
+        options.setDesiredBarcodeFormats(ScanOptions.ONE_D_CODE_TYPES)
+        options.setPrompt("Scan a barcode")
+        options.setBeepEnabled(true)
+        options.setBarcodeImageEnabled(false)
+        barcodeLauncher.launch(options)
+    }
+
     companion object {
         const val CAMERA_INTENT = 1
         const val GALLERY_INTENT = 2
@@ -132,7 +156,7 @@ class SurveyActivity : AppCompatActivity() {
                 putExtra(SURVEY, survey as Parcelable)
             }
 
-        fun createIntent(context: Context, survey: SurveyData, responseId:String): Intent =
+        fun createIntent(context: Context, survey: SurveyData, responseId: String): Intent =
             Intent(context, SurveyActivity::class.java).apply {
                 putExtra(SURVEY, survey as Parcelable)
                 putExtra(RESPONSE_ID, responseId)
