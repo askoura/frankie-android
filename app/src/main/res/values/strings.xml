@@ -17,4 +17,7 @@
     <string name="progress_dialog_title">Please wait</string>
     <string name="progress_dialog_description">Downloading...</string>
     <string name="chrome_version_not_supported">Chrome version not supported</string>
+    <string name="response_start_date">Start Date: %s</string>
+    <string name="response_submit_date">Submit Date: %s</string>
+    <string name="response_lang">Language: %s</string>
 </resources>

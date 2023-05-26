@@ -21,6 +21,7 @@ val androidModule = module {
     single { FrankieDb.getDatabase(get(named("appContext"))) }
     single { get<FrankieDb>().surveyDataDao() }
     single { get<FrankieDb>().permissionDao() }
+    single { get<FrankieDb>().responseDao() }
     factory<ErrorProcessor> { ErrorProcessorImpl() }
     factory<ErrorDisplayManager> { (context: Context) -> ErrorDisplayManagerImpl(context, get()) }
 }

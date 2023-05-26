@@ -35,8 +35,19 @@
         android:layout_margin="8dp"
         android:padding="8dp"
         android:src="@drawable/ic_outline_info_24"
-        app:layout_constraintEnd_toStartOf="@id/sync"
+        app:layout_constraintEnd_toStartOf="@id/responses"
         app:layout_constraintStart_toEndOf="@id/icon"
+        app:layout_constraintTop_toBottomOf="@+id/name" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/responses"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:padding="8dp"
+        android:src="@drawable/baseline_table_rows_24"
+        app:layout_constraintEnd_toStartOf="@id/sync"
+        app:layout_constraintStart_toEndOf="@id/info"
         app:layout_constraintTop_toBottomOf="@+id/name" />
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -47,7 +58,7 @@
         android:padding="8dp"
         android:src="@drawable/ic_baseline_sync_24"
         app:layout_constraintEnd_toStartOf="@id/play"
-        app:layout_constraintStart_toEndOf="@id/info"
+        app:layout_constraintStart_toEndOf="@id/responses"
         app:layout_constraintTop_toBottomOf="@+id/name" />
 
     <androidx.appcompat.widget.AppCompatImageView

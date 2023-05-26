@@ -1,0 +1,47 @@
+package com.frankie.app.ui.responses
+
+import android.content.Context
+import android.util.AttributeSet
+import android.view.LayoutInflater
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.setPadding
+import com.frankie.app.R
+import com.frankie.app.databinding.ItemResponseBinding
+import com.frankie.app.db.model.Response
+import com.frankie.app.ui.common.dpToPx
+
+class ResponseItemView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null
+) : ConstraintLayout(context, attrs) {
+
+    private val binding = ItemResponseBinding.inflate(LayoutInflater.from(context), this)
+
+    init {
+        setPadding(context.dpToPx(16))
+    }
+
+    fun bind(
+        response: Response,
+        onResumeClicked: (Response) -> Unit,
+        onDeleteClicked: (Response) -> Unit
+    ) {
+        binding.edit.visibility = if (response.submitDate == null) VISIBLE else GONE
+        binding.edit.setOnClickListener { onResumeClicked(response) }
+        binding.delete.visibility = if (response.submitDate == null) VISIBLE else GONE
+        binding.delete.setOnClickListener { onDeleteClicked(response) }
+        binding.header.text = response.id
+        binding.startDate.text =
+            context.getString(R.string.response_start_date, response.startDate.toString())
+        binding.submitDate.text =
+            context.getString(R.string.response_submit_date, response.submitDate.toString())
+        binding.lang.text = context.getString(R.string.response_lang, response.lang.code)
+        binding.content.text =
+            response.values.entries.joinToString(separator = "\n",
+                transform = { "${it.key.replace(".value", "")}: ${it.value}" }
+            )
+
+
+    }
+
+}

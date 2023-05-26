@@ -28,7 +28,8 @@ class SurveyActivity : AppCompatActivity() {
         setContentView(binding.root)
         val survey: SurveyData = intent.getParcelableExtra(SURVEY)
             ?: throw IllegalArgumentException("Survey is required")
-        binding.webview.loadSurvey(survey)
+        val responseId: String? = intent.getStringExtra(RESPONSE_ID)
+        binding.webview.loadSurvey(survey, responseId)
     }
 
     @Deprecated("Use Fancy new method")
@@ -125,9 +126,16 @@ class SurveyActivity : AppCompatActivity() {
         const val GALLERY_INTENT = 2
         const val VIDEO_INTENT = 3
         private const val SURVEY = "survey"
+        private const val RESPONSE_ID = "response_id"
         fun createIntent(context: Context, survey: SurveyData): Intent =
             Intent(context, SurveyActivity::class.java).apply {
                 putExtra(SURVEY, survey as Parcelable)
+            }
+
+        fun createIntent(context: Context, survey: SurveyData, responseId:String): Intent =
+            Intent(context, SurveyActivity::class.java).apply {
+                putExtra(SURVEY, survey as Parcelable)
+                putExtra(RESPONSE_ID, responseId)
             }
     }
 }

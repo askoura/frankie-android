@@ -9,6 +9,7 @@ import android.util.Log
 import android.webkit.*
 import androidx.core.content.FileProvider
 import androidx.webkit.*
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.frankie.app.business.survey.SurveyData
@@ -52,6 +53,8 @@ class FrankieWebView
 
     private val emNavProcessor = EMNavProcessor(context)
     private lateinit var survey: SurveyData
+    private var responseId: String? = null
+
 
     private val frankieWebViewClient = object : WebViewClient() {
         override fun shouldInterceptRequest(
@@ -101,22 +104,52 @@ class FrankieWebView
         return mimeTypeMap.getMimeTypeFromExtension(extension.lowercase())
     }
 
+    private fun navigate(mapper: ObjectMapper, navigateRequest: NavigateRequest) {
+        emNavProcessor.navigate(survey.id, navigateRequest, object : NavigationListener {
+            override fun onSuccess(apiNavigationOutput: ApiNavigationOutput) {
+                val string = mapper.writeValueAsString(apiNavigationOutput)
+                loadUrl("javascript:navigateOffline($string)")
+            }
+
+            override fun onError(error: Throwable) {
+                // TODO("Report Error to MainActivity")
+            }
+        }, survey.navigationMode)
+    }
+
     private val androidJavascriptInterface = object {
         @Suppress("unused")
         @JavascriptInterface
         fun navigate(body: String) {
             val mapper = jacksonKtMapper.registerModule(JavaTimeModule())
             val navigateRequest: NavigateRequest = mapper.readValue(body)
-            emNavProcessor.navigate(survey.id, navigateRequest, object : NavigationListener {
-                override fun onSuccess(apiNavigationOutput: ApiNavigationOutput) {
-                    val string = mapper.writeValueAsString(apiNavigationOutput)
-                    loadUrl("javascript:navigateOffline($string)")
-                }
+            navigate(mapper, navigateRequest)
+        }
 
-                override fun onError(error: Throwable) {
-                    // TODO("Report Error to MainActivity")
-                }
-            }, survey.navigationMode)
+        @JavascriptInterface
+        fun start() {
+            val mapper = jacksonKtMapper.registerModule(JavaTimeModule())
+            if (responseId == null) {
+                emNavProcessor.start(survey.id, SurveyLang.EN, object : NavigationListener {
+                    override fun onSuccess(apiNavigationOutput: ApiNavigationOutput) {
+                        val string = mapper.writeValueAsString(apiNavigationOutput)
+                        loadUrl("javascript:navigateOffline($string)")
+                    }
+
+                    override fun onError(error: Throwable) {
+                        // TODO("Report Error to MainActivity")
+                    }
+                }, survey.navigationMode)
+            } else {
+                navigate(
+                    mapper,
+                    NavigateRequest(
+                        responseId = UUID.fromString(responseId),
+                        navigationDirection = NavigationDirection.Resume
+                    )
+                )
+            }
+
         }
 
         @JavascriptInterface
@@ -158,20 +191,6 @@ class FrankieWebView
             (context as Activity).runOnUiThread {
                 loadUrl("javascript:onDataUrlUploaded($string)")
             }
-        }
-
-        @JavascriptInterface
-        fun start() {
-            emNavProcessor.start(survey.id, SurveyLang.EN, object : NavigationListener {
-                override fun onSuccess(apiNavigationOutput: ApiNavigationOutput) {
-                    val string = jacksonKtMapper.writeValueAsString(apiNavigationOutput)
-                    loadUrl("javascript:navigateOffline($string)")
-                }
-
-                override fun onError(error: Throwable) {
-                    // TODO("Report Error to MainActivity")
-                }
-            }, survey.navigationMode)
         }
 
         @JavascriptInterface
@@ -240,8 +259,9 @@ class FrankieWebView
     }
 
 
-    fun loadSurvey(surveyData: SurveyData) {
+    fun loadSurvey(surveyData: SurveyData, responseId: String?) {
         survey = surveyData
+        this.responseId = responseId
         val data = context.assets.open("$REACT_APP_BUILD_FOLDER/index.html").bufferedReader().use {
             it.readText()
         }

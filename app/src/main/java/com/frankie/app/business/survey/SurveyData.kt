@@ -20,13 +20,15 @@ data class SurveyData(
     val quota: Int,
     val navigationMode: NavigationMode,
     val publishInfo: PublishInfo,
-    val newVersionAvailable: Boolean
+    val newVersionAvailable: Boolean,
+    val responsesCount: Int,
 ) : Parcelable {
     companion object {
         fun fromSurveyAndDesign(
             survey: Survey,
             currentPublishInfo: PublishInfo,
             newVersionAvailable: Boolean,
+            responsesCount: Int
         ): SurveyData {
             return SurveyData(
                 survey.id,
@@ -40,7 +42,8 @@ data class SurveyData(
                 survey.quota,
                 survey.navigationMode,
                 currentPublishInfo,
-                newVersionAvailable
+                newVersionAvailable,
+                responsesCount
             )
         }
     }

@@ -2,6 +2,8 @@ package com.frankie.app.di
 
 import com.frankie.app.api.RetrofitProvider.provideRetrofit
 import com.frankie.app.api.survey.SurveyService
+import com.frankie.app.business.responses.ResponseRepository
+import com.frankie.app.business.responses.ResponseRepositoryImpl
 import com.frankie.app.business.survey.SurveyRepository
 import com.frankie.app.business.survey.SurveyRepositoryImpl
 import com.frankie.app.storage.DownloadManager
@@ -13,7 +15,8 @@ import org.koin.dsl.module
 
 val mainModule = module {
     single<SurveyService> { provideRetrofit(get(), get()).create(SurveyService::class.java) }
-    single<SurveyRepository> { SurveyRepositoryImpl(get(), get(), get(), get()) }
+    single<SurveyRepository> { SurveyRepositoryImpl(get(), get(), get(), get(), get()) }
+    single<ResponseRepository> { ResponseRepositoryImpl(get(), get()) }
     single<DownloadManager> { DownloadManagerImpl(get(named("appContext")), get()) }
     viewModel { MainViewModel(get(), get(), get(), get()) }
 }

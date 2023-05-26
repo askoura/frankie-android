@@ -4,6 +4,7 @@ import com.frankie.app.api.survey.Language
 import com.frankie.app.api.survey.PublishInfo
 import com.frankie.app.api.survey.SurveyDesign
 import com.frankie.app.api.survey.SurveyService
+import com.frankie.app.db.ResponseDao
 import com.frankie.app.db.permission.PermissionDao
 import com.frankie.app.db.survey.LanguageEntity
 import com.frankie.app.db.survey.LanguagesEntity
@@ -33,6 +34,7 @@ interface SurveyRepository {
 class SurveyRepositoryImpl(
     private val service: SurveyService,
     private val surveyDataDao: SurveyDataDao,
+    private val responseDao: ResponseDao,
     private val permissionDao: PermissionDao,
     private val sessionManager: SessionManager
 ) : SurveyRepository {
@@ -41,13 +43,18 @@ class SurveyRepositoryImpl(
             val surveyList = service.getSurveyList().map { survey ->
                 val design = service.getSurveyDesign(survey.id, PublishInfo())
                 val savedSurvey = surveyDataDao.getSurveyDataById(survey.id)
+                val count = responseDao.countByUserAndSurvey(
+                    surveyId = survey.id,
+                    userId = sessionManager.getUserIdOrThrow()
+                )
                 val newVersionAvailable = savedSurvey?.publishInfoEntity?.toPublishInfo()
                     ?.let { it != design.publishInfo }
                     ?: true
                 SurveyData.fromSurveyAndDesign(
                     survey,
                     savedSurvey?.publishInfoEntity?.toPublishInfo() ?: PublishInfo(),
-                    newVersionAvailable
+                    newVersionAvailable,
+                    count
                 )
             }
             saveSurveysToDB(surveyList)

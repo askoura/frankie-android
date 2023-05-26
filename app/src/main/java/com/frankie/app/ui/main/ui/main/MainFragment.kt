@@ -14,6 +14,7 @@ import com.frankie.app.SurveyActivity
 import com.frankie.app.databinding.FragmentMainBinding
 import com.frankie.app.ui.common.error.ErrorDisplayManager
 import com.frankie.app.ui.login.LoginActivity
+import com.frankie.app.ui.responses.ResponsesActivity
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.getViewModel
@@ -32,13 +33,32 @@ class MainFragment : Fragment() {
 
     private var progressDialog: ProgressDialog? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         binding = FragmentMainBinding.inflate(inflater, container, false)
 
-        adapter = SurveyListAdapter(onSyncClicked = { surveyData -> viewModel.syncSurveyForOffline(surveyData) },
-                onPlayClicked = { surveyData -> startActivity(SurveyActivity.createIntent(requireContext(), surveyData)) },
-                onInfoClicked = { })
+        adapter = SurveyListAdapter(onSyncClicked = { surveyData ->
+            viewModel.syncSurveyForOffline(surveyData)
+        },
+            onPlayClicked = { surveyData ->
+                startActivity(
+                    SurveyActivity.createIntent(
+                        requireContext(),
+                        surveyData
+                    )
+                )
+            },
+            onResponsesClicked = { surveyData ->
+                startActivity(
+                    ResponsesActivity.createIntent(
+                        requireContext(),
+                        surveyData
+                    )
+                )
+            },
+            onInfoClicked = { })
         binding.recycler.adapter = adapter
         binding.recycler.layoutManager = LinearLayoutManager(binding.root.context)
 
@@ -76,10 +96,12 @@ class MainFragment : Fragment() {
             progressDialog?.dismiss()
         }
         if (show) {
-            progressDialog = ProgressDialog.show(binding.root.context,
-                    getString(R.string.progress_dialog_title),
-                    getString(R.string.progress_dialog_description),
-                    true)
+            progressDialog = ProgressDialog.show(
+                binding.root.context,
+                getString(R.string.progress_dialog_title),
+                getString(R.string.progress_dialog_description),
+                true
+            )
         }
     }
 

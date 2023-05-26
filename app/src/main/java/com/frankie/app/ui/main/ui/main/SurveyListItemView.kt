@@ -27,17 +27,22 @@ class SurveyListItemView @JvmOverloads constructor(
         surveyData: SurveyData,
         onSyncClicked: (SurveyData) -> Unit,
         onPlayClicked: (SurveyData) -> Unit,
+        onResponsesClicked: (SurveyData) -> Unit,
         onInfoClicked: (SurveyData) -> Unit
     ) {
         val isPlayEnabled = !surveyData.newVersionAvailable
         val isSyncOfflineEnabled = surveyData.newVersionAvailable
+        val isResponsesEnabled = surveyData.responsesCount > 0
         binding.name.text = surveyData.name
         binding.play.isEnabled = isPlayEnabled
         binding.sync.isEnabled = isSyncOfflineEnabled
+        binding.responses.isEnabled = isResponsesEnabled
         binding.play.setColorFilter(isPlayEnabled)
+        binding.responses.setColorFilter(isResponsesEnabled)
         binding.sync.setColorFilter(isSyncOfflineEnabled)
         binding.sync.setOnClickListener { onSyncClicked(surveyData) }
         binding.play.setOnClickListener { onPlayClicked(surveyData) }
+        binding.responses.setOnClickListener { onResponsesClicked(surveyData) }
         binding.info.setOnClickListener { onInfoClicked(surveyData) }
     }
 

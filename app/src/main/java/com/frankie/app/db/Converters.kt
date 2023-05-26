@@ -7,6 +7,7 @@ import com.frankie.expressionmanager.model.NavigationIndex
 import com.frankie.expressionmanager.model.ResponseEvent
 import com.frankie.expressionmanager.model.SurveyLang
 import com.frankie.expressionmanager.model.jacksonKtMapper
+import java.time.LocalDateTime
 
 
 class JSONOConverter {
@@ -33,8 +34,25 @@ class NavigationIndexConverter {
     }
 }
 
+class LocalDateConverter {
+    @TypeConverter
+    fun toDate(dateString: String?): LocalDateTime? {
+        return if (dateString == null) {
+            null
+        } else {
+            LocalDateTime.parse(dateString)
+        }
+    }
+
+    @TypeConverter
+    fun toDateString(date: LocalDateTime?): String? {
+        return date?.toString()
+    }
+}
+
 class ResponseEventListConverter {
     private val mapper = jacksonKtMapper.registerModule(JavaTimeModule())
+
     @TypeConverter
     fun fromString(value: String): List<ResponseEvent> {
         return mapper.readValue(value, jacksonTypeRef<List<ResponseEvent>>())

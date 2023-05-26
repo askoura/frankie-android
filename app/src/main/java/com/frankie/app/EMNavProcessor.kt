@@ -16,6 +16,7 @@ import com.frankie.expressionmanager.model.*
 import com.frankie.expressionmanager.usecase.*
 import kotlinx.coroutines.*
 import java.io.InputStream
+import java.time.LocalDateTime
 import java.util.*
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -168,6 +169,9 @@ class EMNavProcessor constructor(
                     responseId.toString(),
                     result.navigationIndex,
                     surveyLang,
+                    surveyId.toString(),
+                    LocalDateTime.now(),
+                    null,
                     userId,
                     mapOf(),
                     listOf(result.event)
@@ -189,6 +193,10 @@ class EMNavProcessor constructor(
                 },
                 id = response.id,
                 navigationIndex = result.navigationIndex,
+                startDate = response.startDate,
+                submitDate = if (result.navigationIndex is NavigationIndex.End)
+                    LocalDateTime.now()
+                else response.submitDate,
                 lang = surveyLang,
                 events = response.events.toMutableList().apply {
                     addAll(events)
@@ -249,6 +257,8 @@ class EMNavProcessor constructor(
             frankieDb.responseDao().update(
                 values = newValues,
                 id = response.id,
+                startDate = response.startDate,
+                submitDate = response.submitDate,
                 navigationIndex = response.navigationIndex,
                 lang = response.lang,
                 events = response.events

@@ -60,7 +60,7 @@ class MainViewModel(
 
     data class State(
         val isLoading: Boolean = false,
-        val surveyList: List<SurveyData> = emptyList()
+        val surveyList: List<SurveyData> = emptyList(),
     )
 
 }
