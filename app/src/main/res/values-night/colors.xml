@@ -9,7 +9,7 @@
     <color name="gray">#FF8E8E8E</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="tint">#FF000000</color>
-    <color name="enabled">#FF000000</color>
-    <color name="disabled">#FF8E8E8E</color>
+    <color name="tint">#FF8E8E8E</color>
+    <color name="enabled">#FF8E8E8E</color>
+    <color name="disabled">#FF000000</color>
 </resources>

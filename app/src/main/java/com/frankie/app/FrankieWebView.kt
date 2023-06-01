@@ -19,6 +19,7 @@ import com.frankie.expressionmanager.model.*
 import org.koin.android.BuildConfig
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileNotFoundException
 import java.io.InputStream
 import java.util.*
 
@@ -260,14 +261,19 @@ class FrankieWebView
         )
     }
 
-    private fun wrapResource(file: File): WebResourceResponse {
+    private fun wrapResource(file: File): WebResourceResponse? {
+        val inputStream = try {
+            FileInputStream(file)
+        } catch (e: FileNotFoundException) {
+            return null
+        }
         return WebResourceResponse(
             "",
             "utf-8",
             200,
             "OK",
             mutableMapOf("Access-Control-Allow-Origin" to "*"),
-            FileInputStream(file)
+            inputStream
         )
     }
 

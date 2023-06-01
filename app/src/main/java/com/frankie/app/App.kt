@@ -1,6 +1,7 @@
 package com.frankie.app
 
 import android.app.Application
+import androidx.appcompat.app.AppCompatDelegate
 import com.frankie.app.di.androidModule
 import com.frankie.app.di.launchModule
 import com.frankie.app.di.loginModule
@@ -14,6 +15,7 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
         startKoin {
             androidContext(this@App)

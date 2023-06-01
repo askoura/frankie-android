@@ -5,13 +5,17 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
 import android.provider.MediaStore
 import android.webkit.*
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.databinding.ActivitySurveyBinding
 import com.frankie.expressionmanager.model.*
@@ -24,13 +28,15 @@ import java.util.*
 class SurveyActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySurveyBinding
     private var backPressedTime: Long = 0
+    private var photoUri: Uri? = null
+
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySurveyBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val survey: SurveyData = intent.getParcelableExtra(SURVEY)
+        val survey: SurveyData = intent.getParcelableExtra(EXTRA_SURVEY)
             ?: throw IllegalArgumentException("Survey is required")
         val responseId: String? = intent.getStringExtra(RESPONSE_ID)
         binding.webview.loadSurvey(survey, responseId)
@@ -43,10 +49,44 @@ class SurveyActivity : AppCompatActivity() {
                 val t = System.currentTimeMillis()
                 if (t - backPressedTime > 3000) { // 3 secs
                     backPressedTime = t
-                    Toast.makeText(this, "Press back again to exit.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, R.string.press_back_to_exit, Toast.LENGTH_SHORT).show()
                 } else {
                     finish()
                 }
+            }
+        }
+    }
+
+    private fun getCameraPermission(onGranted: () -> Unit) {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            val permissions = arrayOf(android.Manifest.permission.CAMERA)
+            ActivityCompat.requestPermissions(this, permissions, REQUEST_CAMERA_PERMISSION)
+        } else {
+            onGranted()
+        }
+    }
+
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            if (grantResults.isNotEmpty() &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED
+            ) {
+                if (photoUri != null) {
+                    takePhotoOnPermissionGranted()
+                } else {
+                    takeVideoOnPermissionGranted()
+                }
+
+            } else {
+                notifyPermissionDenied()
             }
         }
     }
@@ -58,50 +98,73 @@ class SurveyActivity : AppCompatActivity() {
             type = "image/*"
         }
         try {
-            startActivityForResult(intent, GALLERY_INTENT)
+            galleryLauncher.launch(intent)
         } catch (e: ActivityNotFoundException) {
             e.printStackTrace()
         }
     }
 
-    fun takePhoto(uploadFileUri: Uri) {
+    private fun takePhotoOnPermissionGranted() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
             addFlags(
                 Intent.FLAG_GRANT_READ_URI_PERMISSION or
                           Intent.FLAG_GRANT_WRITE_URI_PERMISSION
             )
-            putExtra(MediaStore.EXTRA_OUTPUT, uploadFileUri)
+            putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
         }
-        startActivityForResult(intent, CAMERA_INTENT)
+        photoLauncher.launch(intent)
     }
 
-    fun takeVideo() {
+    private fun takeVideoOnPermissionGranted() {
         val intent = Intent(MediaStore.ACTION_VIDEO_CAPTURE).apply {
             addFlags(
                 Intent.FLAG_GRANT_READ_URI_PERMISSION or
                           Intent.FLAG_GRANT_WRITE_URI_PERMISSION
             )
         }
-        startActivityForResult(intent, VIDEO_INTENT)
+        videoLauncher.launch(intent)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when (resultCode) {
-            Activity.RESULT_OK -> processOk(requestCode, data)
-            Activity.RESULT_CANCELED -> {
-                when (requestCode) {
-                    VIDEO_INTENT, CAMERA_INTENT -> {
-                        // do nothing
-                    }
+    fun takePhoto(uploadFileUri: Uri) {
+        photoUri = uploadFileUri
+        getCameraPermission { takePhotoOnPermissionGranted() }
+    }
 
-                    GALLERY_INTENT -> {
-                        binding.webview.fileSelectedCallback.onReceiveValue(null)
-                    }
+
+    fun takeVideo() {
+        getCameraPermission { takeVideoOnPermissionGranted() }
+    }
+
+    private val photoLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            when (result.resultCode) {
+                Activity.RESULT_OK -> processCameraResult()
+                Activity.RESULT_CANCELED -> {
+                    notifyResultCancelled()
+                    photoUri = null
                 }
             }
         }
-    }
+
+
+    private val galleryLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                processGalleryResult(result.data)
+            } else {
+                notifyResultCancelled()
+            }
+        }
+
+    private val videoLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                processVideoResult(result.data?.data)
+            } else {
+                notifyResultCancelled()
+            }
+        }
+
 
     private fun processGalleryResult(data: Intent?) {
         data?.data?.let { uri ->
@@ -109,15 +172,8 @@ class SurveyActivity : AppCompatActivity() {
         }
     }
 
-    private fun processOk(requestCode: Int, data: Intent?) {
-        when (requestCode) {
-            CAMERA_INTENT -> processCameraResult()
-            VIDEO_INTENT -> processVideoResult(data?.data)
-            GALLERY_INTENT -> processGalleryResult(data)
-        }
-    }
-
     private fun processCameraResult() {
+        photoUri = null
         binding.webview.onCameraResult()
     }
 
@@ -129,7 +185,7 @@ class SurveyActivity : AppCompatActivity() {
         ScanContract()
     ) { result: ScanIntentResult ->
         if (result.contents == null) {
-            Toast.makeText(this@SurveyActivity, "Cancelled", Toast.LENGTH_LONG).show()
+            notifyResultCancelled()
         } else {
             binding.webview.onBarcodeScanned(result.contents)
         }
@@ -145,20 +201,26 @@ class SurveyActivity : AppCompatActivity() {
         barcodeLauncher.launch(options)
     }
 
+    private fun notifyPermissionDenied() {
+        Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun notifyResultCancelled() {
+        Toast.makeText(this, R.string.canceled, Toast.LENGTH_SHORT).show()
+    }
+
     companion object {
-        const val CAMERA_INTENT = 1
-        const val GALLERY_INTENT = 2
-        const val VIDEO_INTENT = 3
-        private const val SURVEY = "survey"
+        private const val EXTRA_SURVEY = "survey"
         private const val RESPONSE_ID = "response_id"
+        private const val REQUEST_CAMERA_PERMISSION = 1
         fun createIntent(context: Context, survey: SurveyData): Intent =
             Intent(context, SurveyActivity::class.java).apply {
-                putExtra(SURVEY, survey as Parcelable)
+                putExtra(EXTRA_SURVEY, survey as Parcelable)
             }
 
         fun createIntent(context: Context, survey: SurveyData, responseId: String): Intent =
             Intent(context, SurveyActivity::class.java).apply {
-                putExtra(SURVEY, survey as Parcelable)
+                putExtra(EXTRA_SURVEY, survey as Parcelable)
                 putExtra(RESPONSE_ID, responseId)
             }
     }

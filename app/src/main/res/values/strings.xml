@@ -15,9 +15,12 @@
     <string name="validation_email_error">Please enter valid email</string>
     <string name="validation_psw_error">Password minimum length is 8</string>
     <string name="progress_dialog_title">Please wait</string>
-    <string name="progress_dialog_description">Downloading...</string>
+    <string name="progress_dialog_description">Downloading…</string>
     <string name="chrome_version_not_supported">Chrome version not supported</string>
     <string name="response_start_date">Start Date: %s</string>
     <string name="response_submit_date">Submit Date: %s</string>
     <string name="response_lang">Language: %s</string>
+    <string name="permission_denied">Permission Denied!!</string>
+    <string name="canceled">Cancelled</string>
+    <string name="press_back_to_exit">\"Press back again to exit.</string>
 </resources>

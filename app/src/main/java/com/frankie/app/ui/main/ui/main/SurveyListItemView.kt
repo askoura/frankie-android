@@ -48,9 +48,9 @@ class SurveyListItemView @JvmOverloads constructor(
 
     private fun AppCompatImageView.setColorFilter(isEnabled: Boolean) {
         if (isEnabled) {
-            setColorFilter(context.color(R.color.black))
+            setColorFilter(context.color(R.color.enabled))
         } else {
-            setColorFilter(context.color(R.color.gray))
+            setColorFilter(context.color(R.color.disabled))
         }
     }
 }

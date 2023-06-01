@@ -13,12 +13,6 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitProvider {
 
-    fun provideRetrofitPreAuth(): Retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(JacksonConverterFactory.create())
-        .client(getHttpClientBuilder().build())
-        .build()
-
     fun provideRetrofitRefreshToken(): Retrofit =
         getRetrofit(getHttpClientBuilder().build())
 
@@ -28,10 +22,14 @@ object RetrofitProvider {
     ): Retrofit {
         val httpClient = getHttpClientBuilder().addInterceptor { chain ->
             val original = chain.request()
-            val request = original.newBuilder()
-                .header("Authorization", "Bearer ${sessionManager.getActiveToken()}")
+            val requestBuilder = original.newBuilder()
                 .method(original.method, original.body)
-                .build()
+
+            sessionManager.getActiveToken()?.let {
+                requestBuilder.header("Authorization", "Bearer $it")
+            }
+
+            val request = requestBuilder.build()
 
             val response = chain.proceed(request)
             if (response.code != 401) {
@@ -71,16 +69,17 @@ object RetrofitProvider {
                 HttpLoggingInterceptor.Level.BODY
             httpClient.networkInterceptors().add(httpLoggingInterceptor)
         }
-        httpClient.callTimeout(30, TimeUnit.SECONDS)
-        httpClient.connectTimeout(30, TimeUnit.SECONDS)
-        httpClient.readTimeout(30, TimeUnit.SECONDS)
-        httpClient.writeTimeout(30, TimeUnit.SECONDS)
+        httpClient.callTimeout(0, TimeUnit.SECONDS)
+        httpClient.connectTimeout(10, TimeUnit.SECONDS)
         return httpClient
     }
 
-    private const val SCHEME = "http://"
-    private const val BACKEND_HOST = "frankie.app"
-    private const val BACKEND_PORT = "8080"
+    private const val SCHEME = "https://"
+    //    private const val SCHEME = "https://"
+    private const val BACKEND_HOST = "api.staging-frankiesurveys.com"
+    //    private const val BACKEND_HOST = "staging-frankie.app"
+    private const val BACKEND_PORT = ""
+    //    private const val BACKEND_PORT = "8080"
     private const val BASE_URL = "$SCHEME$BACKEND_HOST:$BACKEND_PORT"
 
 }

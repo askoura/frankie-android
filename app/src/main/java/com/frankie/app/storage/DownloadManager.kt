@@ -18,19 +18,27 @@ interface DownloadManager {
     suspend fun downloadSurveyFiles(surveyData: SurveyData): Flow<Result<SurveyData>>
 }
 
-class DownloadManagerImpl(private val appContext: Context, private val surveyRepository: SurveyRepository) : DownloadManager {
+class DownloadManagerImpl(
+    private val appContext: Context,
+    private val surveyRepository: SurveyRepository
+) : DownloadManager {
 
     override suspend fun downloadSurveyFiles(surveyData: SurveyData): Flow<Result<SurveyData>> {
         return flow {
             val design = surveyRepository.surveyDesign(surveyData)
-            saveValidationJsonOutput(surveyData.id, design.validationJsonOutput.toString()).collect()
+            saveValidationJsonOutput(
+                surveyData.id,
+                design.validationJsonOutput.toString()
+            ).collect()
             design.files.forEach { file ->
                 val flow = surveyRepository.getSurveyFile(surveyData.id, file.name)
                 saveFile(flow, getResourceFile(appContext, file.name, surveyData.id)).collect {
-                    if (it.isFailure) emit(Result.failure(it.exceptionOrNull()!!))
+                    if (it.isFailure)
+                        emit(Result.failure(it.exceptionOrNull()!!))
                 }
             }
-            val updatedSurveyData = surveyData.copy(newVersionAvailable = false, publishInfo = design.publishInfo)
+            val updatedSurveyData =
+                surveyData.copy(newVersionAvailable = false, publishInfo = design.publishInfo)
             surveyRepository.saveSurveyToDB(updatedSurveyData)
 
             emit(Result.success(updatedSurveyData))
@@ -39,7 +47,10 @@ class DownloadManagerImpl(private val appContext: Context, private val surveyRep
         }.flowOn(Dispatchers.IO)
     }
 
-    private suspend fun saveValidationJsonOutput(surveyId: String, validationOutput: String): Flow<Result<Unit>> {
+    private suspend fun saveValidationJsonOutput(
+        surveyId: String,
+        validationOutput: String
+    ): Flow<Result<Unit>> {
         return flow {
             val file = getValidationJsonFile(appContext, surveyId)
             file.outputStream().use { outputStream ->
@@ -49,7 +60,10 @@ class DownloadManagerImpl(private val appContext: Context, private val surveyRep
         }.flowOn(Dispatchers.IO)
     }
 
-    private suspend fun saveFile(flow: Flow<Result<SurveyRepository.DataStream>>, file: File): Flow<Result<Unit>> {
+    private suspend fun saveFile(
+        flow: Flow<Result<SurveyRepository.DataStream>>,
+        file: File
+    ): Flow<Result<Unit>> {
         return flow {
             file.outputStream().use { outputStream ->
                 flow.collect { result ->

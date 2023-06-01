@@ -5,6 +5,9 @@ import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.frankie.expressionmanager.model.jacksonKtMapper
 import com.frankie.expressionmanager.usecase.ValidationJsonOutput
 import java.io.File
+import java.net.URLDecoder
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets.UTF_8
 
 object FileUtils {
 
@@ -23,12 +26,25 @@ object FileUtils {
         return File(folder, fileName)
     }
 
+    private fun encode(fileName: String) =
+        URLEncoder.encode(URLDecoder.decode(fileName, UTF_8.toString()), UTF_8.toString())
+
     fun getResourceFile(context: Context, fileName: String, surveyId: String): File {
-        return getTargetFile(context, fileName, surveyId, FileType.RESOURCES)
+        return getTargetFile(
+            context,
+            encode(fileName),
+            surveyId,
+            FileType.RESOURCES
+        )
     }
 
     fun getResponseFile(context: Context, fileName: String, surveyId: String): File {
-        return getTargetFile(context, fileName, surveyId, FileType.RESPONSES)
+        return getTargetFile(
+            context,
+            encode(fileName),
+            surveyId,
+            FileType.RESPONSES
+        )
     }
 
     fun getValidationJsonFile(context: Context, surveyId: String): File {
