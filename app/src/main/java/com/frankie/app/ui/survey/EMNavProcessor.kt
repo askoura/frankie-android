@@ -1,9 +1,10 @@
-package com.frankie.app
+package com.frankie.app.ui.survey
 
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.util.Base64
+import android.util.Log
 import android.webkit.*
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.node.ObjectNode
@@ -17,6 +18,7 @@ import com.frankie.expressionmanager.usecase.*
 import kotlinx.coroutines.*
 import java.io.InputStream
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.*
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -28,7 +30,7 @@ class EMNavProcessor constructor(
     private var surveyId: String? = null
     private val frankieDb = FrankieDb.getDatabase(activityContext)
 
-    fun getActivity(): Activity = webView.context as Activity
+    private fun getActivity(): Activity = webView.context as Activity
 
     init {
         webView.clearCache(true)
@@ -170,7 +172,7 @@ class EMNavProcessor constructor(
                     result.navigationIndex,
                     surveyLang,
                     surveyId.toString(),
-                    LocalDateTime.now(),
+                    LocalDateTime.now(ZoneOffset.UTC),
                     null,
                     userId,
                     mapOf(),
@@ -195,7 +197,7 @@ class EMNavProcessor constructor(
                 navigationIndex = result.navigationIndex,
                 startDate = response.startDate,
                 submitDate = if (result.navigationIndex is NavigationIndex.End)
-                    LocalDateTime.now()
+                    LocalDateTime.now(ZoneOffset.UTC)
                 else response.submitDate,
                 lang = surveyLang,
                 events = response.events.toMutableList().apply {
@@ -254,6 +256,13 @@ class EMNavProcessor constructor(
             put("$key.value", responseUploadFile)
         }
         CoroutineScope(Dispatchers.IO).launch {
+            (response.values["$key.value"] as? Map<*, *>)?.get("stored_filename")?.let {
+                val file = FileUtils.getResponseFile(getActivity(), it.toString(), surveyId!!)
+                if (file.exists()) {
+                    Log.d(TAG, "deleting old file: $it")
+                    file.delete()
+                }
+            }
             frankieDb.responseDao().update(
                 values = newValues,
                 id = response.id,
@@ -266,6 +275,10 @@ class EMNavProcessor constructor(
             )
         }
         return responseUploadFile
+    }
+
+    companion object {
+        private const val TAG = "EMNavProcessor"
     }
 
 }

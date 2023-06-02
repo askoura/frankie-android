@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.frankie.app.R
-import com.frankie.app.SurveyActivity
+import com.frankie.app.ui.survey.SurveyActivity
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.databinding.ActivityResponsesBinding
 import com.frankie.app.db.model.Response

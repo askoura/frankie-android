@@ -1,4 +1,4 @@
-package com.frankie.app
+package com.frankie.app.ui.survey
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -13,9 +13,11 @@ import android.provider.MediaStore
 import android.webkit.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.frankie.app.R
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.databinding.ActivitySurveyBinding
 import com.frankie.expressionmanager.model.*
@@ -27,8 +29,14 @@ import java.util.*
 
 class SurveyActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySurveyBinding
+    private lateinit var responseId: String
     private var backPressedTime: Long = 0
     private var photoUri: Uri? = null
+
+
+    val survey: SurveyData
+        get() = intent.getParcelableExtra(EXTRA_SURVEY)
+            ?: throw IllegalArgumentException("Survey is required")
 
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -36,10 +44,19 @@ class SurveyActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySurveyBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val survey: SurveyData = intent.getParcelableExtra(EXTRA_SURVEY)
-            ?: throw IllegalArgumentException("Survey is required")
+        if (!intent.hasExtra(EXTRA_SURVEY)) {
+            finish()
+            return
+        }
+
         val responseId: String? = intent.getStringExtra(RESPONSE_ID)
         binding.webview.loadSurvey(survey, responseId)
+
+    }
+
+    fun onResponseIdReceived(responseId: String) {
+        this.responseId = responseId
+        checkAudioPermissionAndRecord()
     }
 
     @Deprecated("Use Fancy new method")
@@ -68,6 +85,27 @@ class SurveyActivity : AppCompatActivity() {
         }
     }
 
+    private fun checkAudioPermissionAndRecord() {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            val permissions = arrayOf(android.Manifest.permission.RECORD_AUDIO)
+            ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION)
+        } else {
+            recordAudio()
+        }
+    }
+
+    private fun recordAudio() {
+        AudioRecordingService.start(this, survey, responseId)
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        AudioRecordingService.stop(this)
+    }
+
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -87,6 +125,14 @@ class SurveyActivity : AppCompatActivity() {
 
             } else {
                 notifyPermissionDenied()
+            }
+        } else if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
+            if (grantResults.isNotEmpty() &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED
+            ) {
+                recordAudio()
+            } else {
+                notifyRecordPermissionDenied()
             }
         }
     }
@@ -201,6 +247,21 @@ class SurveyActivity : AppCompatActivity() {
         barcodeLauncher.launch(options)
     }
 
+    private fun notifyRecordPermissionDenied() {
+        val builder = AlertDialog.Builder(this)
+        builder.apply {
+            setTitle(R.string.error_audio_permission_missing_title)
+            setMessage(R.string.error_audio_permission_missing_desc)
+            setNeutralButton(
+                android.R.string.ok
+            ) { _, _ ->
+                this@SurveyActivity.finish()
+            }
+
+        }
+        builder.create().show()
+    }
+
     private fun notifyPermissionDenied() {
         Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show()
     }
@@ -209,10 +270,16 @@ class SurveyActivity : AppCompatActivity() {
         Toast.makeText(this, R.string.canceled, Toast.LENGTH_SHORT).show()
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+    }
+
     companion object {
+        private const val TAG = "SurveyActivity"
         private const val EXTRA_SURVEY = "survey"
         private const val RESPONSE_ID = "response_id"
         private const val REQUEST_CAMERA_PERMISSION = 1
+        private const val REQUEST_RECORD_AUDIO_PERMISSION = 2
         fun createIntent(context: Context, survey: SurveyData): Intent =
             Intent(context, SurveyActivity::class.java).apply {
                 putExtra(EXTRA_SURVEY, survey as Parcelable)

@@ -7,7 +7,6 @@ import com.frankie.expressionmanager.usecase.ValidationJsonOutput
 import java.io.File
 import java.net.URLDecoder
 import java.net.URLEncoder
-import java.nio.charset.StandardCharsets.UTF_8
 
 object FileUtils {
 
@@ -27,7 +26,7 @@ object FileUtils {
     }
 
     private fun encode(fileName: String) =
-        URLEncoder.encode(URLDecoder.decode(fileName, UTF_8.toString()), UTF_8.toString())
+        URLEncoder.encode(URLDecoder.decode(fileName, "UTF-8"), "UTF-8")
 
     fun getResourceFile(context: Context, fileName: String, surveyId: String): File {
         return getTargetFile(

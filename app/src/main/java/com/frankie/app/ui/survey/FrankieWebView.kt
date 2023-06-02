@@ -1,4 +1,4 @@
-package com.frankie.app
+package com.frankie.app.ui.survey
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -29,6 +29,8 @@ class FrankieWebView
 @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : WebView(context, attrs) {
+
+    val surveyActivity: SurveyActivity? get() = context as? SurveyActivity
 
 
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
@@ -109,6 +111,9 @@ class FrankieWebView
     private fun navigate(mapper: ObjectMapper, navigateRequest: NavigateRequest) {
         emNavProcessor.navigate(survey.id, navigateRequest, object : NavigationListener {
             override fun onSuccess(apiNavigationOutput: ApiNavigationOutput) {
+                if (navigateRequest.navigationDirection == NavigationDirection.Resume) {
+                    surveyActivity?.onResponseIdReceived(apiNavigationOutput.responseId.toString())
+                }
                 val string = mapper.writeValueAsString(apiNavigationOutput)
                 loadUrl("javascript:navigateOffline($string)")
             }
@@ -131,7 +136,7 @@ class FrankieWebView
         @Suppress("unused")
         @JavascriptInterface
         fun onBackPressed() {
-            (context as SurveyActivity).onBackPressed()
+            surveyActivity?.onBackPressed()
         }
 
         @JavascriptInterface
@@ -141,6 +146,7 @@ class FrankieWebView
                 emNavProcessor.start(survey.id, SurveyLang.EN, object : NavigationListener {
                     override fun onSuccess(apiNavigationOutput: ApiNavigationOutput) {
                         val string = mapper.writeValueAsString(apiNavigationOutput)
+                        surveyActivity?.onResponseIdReceived(apiNavigationOutput.responseId.toString())
                         loadUrl("javascript:navigateOffline($string)")
                     }
 
@@ -167,20 +173,20 @@ class FrankieWebView
             val file = FileUtils.getResponseFile(context, uuid.toString(), survey.id)
             saverUri = FileProvider
                 .getUriForFile(context, context.packageName + ".provider", file)
-            (context as? SurveyActivity)?.takePhoto(saverUri!!)
+            surveyActivity?.takePhoto(saverUri!!)
         }
 
         @JavascriptInterface
         fun scanBarcode(key: String) {
             barcodeKey = key
-            (context as? SurveyActivity)?.scanBarcode()
+            surveyActivity?.scanBarcode()
         }
 
 
         @JavascriptInterface
         fun captureVideo(key: String) {
             videoKey = key
-            (context as? SurveyActivity)?.takeVideo()
+            surveyActivity?.takeVideo()
         }
 
         @JavascriptInterface
@@ -209,7 +215,6 @@ class FrankieWebView
 
         @JavascriptInterface
         fun getParam(key: String): String {
-            Log.v("blah", "getParam($key)")
             if (key == "surveyId") {
                 return survey.id
             }
@@ -236,7 +241,7 @@ class FrankieWebView
             ): Boolean {
                 filePathCallback?.let {
                     this@FrankieWebView.filePathCallback = it
-                    (context as? SurveyActivity)?.pickFromGallery()
+                    surveyActivity?.pickFromGallery()
                     return true
                 } ?: return false
             }
