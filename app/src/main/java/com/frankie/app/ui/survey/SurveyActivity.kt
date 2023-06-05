@@ -1,14 +1,20 @@
 package com.frankie.app.ui.survey
 
+import android.Manifest.permission
+import android.Manifest.permission.ACCESS_COARSE_LOCATION
+import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.Manifest.permission.RECORD_AUDIO
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
 import android.os.Bundle
+import android.os.Looper
 import android.os.Parcelable
+import android.os.PersistableBundle
 import android.provider.MediaStore
 import android.webkit.*
 import android.widget.Toast
@@ -16,14 +22,27 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.checkSelfPermission
+import androidx.lifecycle.coroutineScope
 import com.frankie.app.R
+import com.frankie.app.business.responses.ResponseRepository
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.databinding.ActivitySurveyBinding
 import com.frankie.expressionmanager.model.*
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationAvailability
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.*
 
 
@@ -32,6 +51,11 @@ class SurveyActivity : AppCompatActivity() {
     private lateinit var responseId: String
     private var backPressedTime: Long = 0
     private var photoUri: Uri? = null
+    private lateinit var locationCallback: LocationCallback
+
+    private var requestingLocationUpdates = false
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private val responseRepository: ResponseRepository by inject()
 
 
     val survey: SurveyData
@@ -49,10 +73,91 @@ class SurveyActivity : AppCompatActivity() {
             return
         }
 
-        val responseId: String? = intent.getStringExtra(RESPONSE_ID)
-        binding.webview.loadSurvey(survey, responseId)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
+        val responseIdExtra: String? = intent.getStringExtra(RESPONSE_ID)
+        binding.webview.loadSurvey(survey, responseIdExtra)
+
+        locationCallback = object : LocationCallback() {
+            override fun onLocationAvailability(p0: LocationAvailability) {
+                super.onLocationAvailability(p0)
+            }
+
+            override fun onLocationResult(locationResult: LocationResult) {
+                super.onLocationResult(locationResult)
+                locationResult.lastLocation?.let {
+                    stopLocationUpdates()
+                    val event = ResponseEvent.Location(
+                        it.longitude, it.latitude, LocalDateTime.now(ZoneOffset.UTC)
+                    )
+                    lifecycle.coroutineScope.launch {
+                        responseRepository.saveLocationEvent(responseId, event).collect()
+
+                    }
+                }
+
+
+            }
+        }
+        updateValuesFromBundle(savedInstanceState)
     }
+
+    private fun createLocationRequest() = LocationRequest.create().apply {
+        interval = 10000
+        fastestInterval = 5000
+        priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+    }
+
+
+    private fun updateValuesFromBundle(savedInstanceState: Bundle?) {
+        savedInstanceState ?: return
+
+        // Update the value of requestingLocationUpdates from the Bundle.
+        if (savedInstanceState.keySet().contains(REQUESTING_LOCATION_UPDATES_KEY)) {
+            requestingLocationUpdates = savedInstanceState.getBoolean(
+                REQUESTING_LOCATION_UPDATES_KEY
+            )
+        }
+    }
+
+
+    override fun onPause() {
+        super.onPause()
+        stopLocationUpdates()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
+        outState.putBoolean(REQUESTING_LOCATION_UPDATES_KEY, requestingLocationUpdates)
+        super.onSaveInstanceState(outState, outPersistentState)
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+        if (requestingLocationUpdates)
+            startLocationUpdates()
+    }
+
+    private fun startLocationUpdates() {
+        if (checkSelfPermission(
+                this,
+                ACCESS_FINE_LOCATION
+            ) != PERMISSION_GRANTED
+        ) {
+            return
+        }
+        fusedLocationClient.requestLocationUpdates(
+            createLocationRequest(),
+            locationCallback,
+            Looper.getMainLooper()
+        )
+    }
+
+
+    private fun stopLocationUpdates() {
+        fusedLocationClient.removeLocationUpdates(locationCallback)
+    }
+
 
     fun onResponseIdReceived(responseId: String) {
         this.responseId = responseId
@@ -75,10 +180,10 @@ class SurveyActivity : AppCompatActivity() {
     }
 
     private fun getCameraPermission(onGranted: () -> Unit) {
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)
-            != PackageManager.PERMISSION_GRANTED
+        if (checkSelfPermission(this, permission.CAMERA)
+            != PERMISSION_GRANTED
         ) {
-            val permissions = arrayOf(android.Manifest.permission.CAMERA)
+            val permissions = arrayOf(permission.CAMERA)
             ActivityCompat.requestPermissions(this, permissions, REQUEST_CAMERA_PERMISSION)
         } else {
             onGranted()
@@ -86,18 +191,28 @@ class SurveyActivity : AppCompatActivity() {
     }
 
     private fun checkAudioPermissionAndRecord() {
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO)
-            != PackageManager.PERMISSION_GRANTED
+        if (checkSelfPermission(this, RECORD_AUDIO) != PERMISSION_GRANTED
+            || checkSelfPermission(this, ACCESS_FINE_LOCATION) != PERMISSION_GRANTED
         ) {
-            val permissions = arrayOf(android.Manifest.permission.RECORD_AUDIO)
-            ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION)
+            val permissions = arrayOf(
+                RECORD_AUDIO,
+                ACCESS_FINE_LOCATION,
+                ACCESS_COARSE_LOCATION
+            )
+            ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORDING_PERMISSION)
         } else {
             recordAudio()
+            recordLocation()
         }
     }
 
     private fun recordAudio() {
         AudioRecordingService.start(this, survey, responseId)
+    }
+
+    private fun recordLocation() {
+        requestingLocationUpdates = true
+        startLocationUpdates()
 
     }
 
@@ -115,7 +230,7 @@ class SurveyActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults.isNotEmpty() &&
-                grantResults[0] == PackageManager.PERMISSION_GRANTED
+                grantResults[0] == PERMISSION_GRANTED
             ) {
                 if (photoUri != null) {
                     takePhotoOnPermissionGranted()
@@ -126,11 +241,13 @@ class SurveyActivity : AppCompatActivity() {
             } else {
                 notifyPermissionDenied()
             }
-        } else if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
+        } else if (requestCode == REQUEST_RECORDING_PERMISSION) {
             if (grantResults.isNotEmpty() &&
-                grantResults[0] == PackageManager.PERMISSION_GRANTED
+                grantResults[permissions.indexOf(RECORD_AUDIO)] == PERMISSION_GRANTED &&
+                grantResults[permissions.indexOf(ACCESS_FINE_LOCATION)] == PERMISSION_GRANTED
             ) {
                 recordAudio()
+                recordLocation()
             } else {
                 notifyRecordPermissionDenied()
             }
@@ -250,8 +367,8 @@ class SurveyActivity : AppCompatActivity() {
     private fun notifyRecordPermissionDenied() {
         val builder = AlertDialog.Builder(this)
         builder.apply {
-            setTitle(R.string.error_audio_permission_missing_title)
-            setMessage(R.string.error_audio_permission_missing_desc)
+            setTitle(R.string.error_recording_permission_missing_title)
+            setMessage(R.string.error_recording_permission_missing_desc)
             setNeutralButton(
                 android.R.string.ok
             ) { _, _ ->
@@ -278,8 +395,9 @@ class SurveyActivity : AppCompatActivity() {
         private const val TAG = "SurveyActivity"
         private const val EXTRA_SURVEY = "survey"
         private const val RESPONSE_ID = "response_id"
+        private const val REQUESTING_LOCATION_UPDATES_KEY = "requesting_location_updates_key"
         private const val REQUEST_CAMERA_PERMISSION = 1
-        private const val REQUEST_RECORD_AUDIO_PERMISSION = 2
+        private const val REQUEST_RECORDING_PERMISSION = 2
         fun createIntent(context: Context, survey: SurveyData): Intent =
             Intent(context, SurveyActivity::class.java).apply {
                 putExtra(EXTRA_SURVEY, survey as Parcelable)

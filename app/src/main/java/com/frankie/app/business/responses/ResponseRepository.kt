@@ -18,6 +18,7 @@ interface ResponseRepository {
     fun getResponses(surveyId: String): Flow<Result<List<Response>>>
     fun deleteResponse(responseId: String): Flow<Result<Unit>>
     fun saveRecordingEvent(responseId: String, uuid: UUID): Flow<Result<Unit>>
+    fun saveLocationEvent(responseId: String, event: ResponseEvent.Location): Flow<Result<Unit>>
 }
 
 class ResponseRepositoryImpl(
@@ -49,6 +50,28 @@ class ResponseRepositoryImpl(
                     fileName = uuid.toString(),
                     time = LocalDateTime.now(ZoneOffset.UTC)
                 ))
+            }
+            val result = responseDao.update(
+                id = responseId,
+                values = response.values,
+                lang = response.lang,
+                startDate = response.startDate,
+                submitDate = response.submitDate,
+                navigationIndex = response.navigationIndex,
+                events = newEvents
+            )
+            emit(Result.success(result))
+        }.flowOn(Dispatchers.IO)
+    }
+
+    override fun saveLocationEvent(
+        responseId: String,
+        event: ResponseEvent.Location
+    ): Flow<Result<Unit>> {
+        return flow {
+            val response = responseDao.get(responseId)
+            val newEvents = response.events.toMutableList().apply {
+                add(event)
             }
             val result = responseDao.update(
                 id = responseId,

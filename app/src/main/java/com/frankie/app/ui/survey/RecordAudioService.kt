@@ -29,7 +29,7 @@ import java.util.UUID
 
 
 class AudioRecordingService : Service() {
-    private lateinit var mediaRecorder: MediaRecorder
+    private var mediaRecorder: MediaRecorder? = null
 
     private val responseRepository: ResponseRepository by inject()
 
@@ -37,14 +37,6 @@ class AudioRecordingService : Service() {
         return null
     }
 
-    override fun onCreate() {
-        super.onCreate()
-        @Suppress("DEPRECATION")
-        mediaRecorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-            MediaRecorder(this)
-        else
-            MediaRecorder()
-    }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         startForegroundService()
@@ -121,7 +113,12 @@ class AudioRecordingService : Service() {
         CoroutineScope(Dispatchers.Main).launch {
             responseRepository.saveRecordingEvent(responseId, uuid).collect()
         }
-        mediaRecorder.apply {
+        @Suppress("DEPRECATION")
+        mediaRecorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+            MediaRecorder(this)
+        else
+            MediaRecorder()
+        mediaRecorder?.apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
             setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
             setOutputFile(file.absolutePath)
@@ -136,9 +133,9 @@ class AudioRecordingService : Service() {
     }
 
     private fun stopRecording() {
-        mediaRecorder.stop()
-        mediaRecorder.reset()
-        mediaRecorder.release()
+        mediaRecorder?.stop()
+        mediaRecorder?.reset()
+        mediaRecorder?.release()
     }
 
 

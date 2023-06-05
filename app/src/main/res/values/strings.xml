@@ -10,8 +10,8 @@
     <string name="error_general_description">Please try again later.</string>
     <string name="error_auth_title">Session expired.</string>
     <string name="error_auth_description">Please sign in again.</string>
-    <string name="error_audio_permission_missing_title">Record Audio permission denied</string>
-    <string name="error_audio_permission_missing_desc">Record Audio permission must be granted to proceed. Please go to settings to grant app record audio permission</string>
+    <string name="error_recording_permission_missing_title">Critical permission denied</string>
+    <string name="error_recording_permission_missing_desc">Access Location and Record Audio permissions must be granted to proceed. Please go to settings to grant app both permissions</string>
     <string name="error_login_title">Sign in failed!</string>
     <string name="error_login_description">Please enter valid credentials</string>
     <string name="validation_email_error">Please enter valid email</string>
