@@ -168,7 +168,7 @@ class EMNavProcessor constructor(
                     null,
                     userId,
                     mapOf(),
-                    listOf(result.event)
+                    if (survey.saveTimings) listOf(result.event) else emptyList()
                 )
             )
         }
@@ -193,8 +193,10 @@ class EMNavProcessor constructor(
                 else response.submitDate,
                 lang = surveyLang,
                 events = response.events.toMutableList().apply {
-                    addAll(events)
-                    add(result.event)
+                    if (survey.saveTimings) {
+                        addAll(events)
+                        add(result.event)
+                    }
                 }
 
             )
