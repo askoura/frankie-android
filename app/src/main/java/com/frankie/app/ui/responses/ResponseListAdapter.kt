@@ -9,7 +9,7 @@ import com.frankie.app.db.model.Response
 class ResponseListAdapter(
     private val onResumeClicked: (Response) -> Unit,
     private val onDeleteClicked: (Response) -> Unit
-) : ListAdapter<Response, ResponseListAdapter.ViewHolder>(ResponseDiffCallBack()) {
+) : ListAdapter<ResponseItem, ResponseListAdapter.ViewHolder>(ResponseDiffCallBack()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = ResponseItemView(parent.context)
@@ -31,17 +31,17 @@ class ResponseListAdapter(
     ) :
         RecyclerView.ViewHolder(responseItemView) {
 
-        fun bind(response: Response) {
+        fun bind(response: ResponseItem) {
             responseItemView.bind(response, onResumeClicked, onDeleteClicked)
         }
     }
 
-    private class ResponseDiffCallBack : DiffUtil.ItemCallback<Response>() {
-        override fun areItemsTheSame(oldItem: Response, newItem: Response): Boolean {
-            return oldItem.id == newItem.id
+    private class ResponseDiffCallBack : DiffUtil.ItemCallback<ResponseItem>() {
+        override fun areItemsTheSame(oldItem: ResponseItem, newItem: ResponseItem): Boolean {
+            return oldItem.responses.id == newItem.responses.id
         }
 
-        override fun areContentsTheSame(oldItem: Response, newItem: Response): Boolean {
+        override fun areContentsTheSame(oldItem: ResponseItem, newItem: ResponseItem): Boolean {
             return oldItem == newItem
         }
 

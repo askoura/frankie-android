@@ -19,12 +19,15 @@ import com.frankie.app.R
 import com.frankie.app.business.responses.ResponseRepository
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.ui.common.FileUtils
+import com.frankie.expressionmanager.model.ResponseEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import java.io.IOException
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.UUID
 
 
@@ -110,8 +113,11 @@ class AudioRecordingService : Service() {
             uuid.toString(),
             surveyId
         )
+        val event = ResponseEvent.VoiceRecording(
+            uuid.toString(), LocalDateTime.now(ZoneOffset.UTC)
+        )
         CoroutineScope(Dispatchers.Main).launch {
-            responseRepository.saveRecordingEvent(responseId, uuid).collect()
+            responseRepository.addEvent(responseId, event).collect()
         }
         @Suppress("DEPRECATION")
         mediaRecorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)

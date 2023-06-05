@@ -12,11 +12,11 @@ import androidx.webkit.*
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.frankie.app.BuildConfig
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.ui.common.FileUtils
 import com.frankie.expressionmanager.ext.ScriptUtils
 import com.frankie.expressionmanager.model.*
-import org.koin.android.BuildConfig
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -55,7 +55,7 @@ class FrankieWebView
         videoKey = null
     }
 
-    private val emNavProcessor = EMNavProcessor(context)
+    private val emNavProcessor = EMNavProcessor(context, survey)
     private lateinit var survey: SurveyData
     private var responseId: String? = null
 
@@ -109,7 +109,7 @@ class FrankieWebView
     }
 
     private fun navigate(mapper: ObjectMapper, navigateRequest: NavigateRequest) {
-        emNavProcessor.navigate(survey.id, navigateRequest, object : NavigationListener {
+        emNavProcessor.navigate(navigateRequest, object : NavigationListener {
             override fun onSuccess(apiNavigationOutput: ApiNavigationOutput) {
                 if (navigateRequest.navigationDirection == NavigationDirection.Resume) {
                     surveyActivity?.onResponseIdReceived(apiNavigationOutput.responseId.toString())
@@ -143,7 +143,7 @@ class FrankieWebView
         fun start() {
             val mapper = jacksonKtMapper.registerModule(JavaTimeModule())
             if (responseId == null) {
-                emNavProcessor.start(survey.id, SurveyLang.EN, object : NavigationListener {
+                emNavProcessor.start(object : NavigationListener {
                     override fun onSuccess(apiNavigationOutput: ApiNavigationOutput) {
                         val string = mapper.writeValueAsString(apiNavigationOutput)
                         surveyActivity?.onResponseIdReceived(apiNavigationOutput.responseId.toString())
@@ -172,7 +172,7 @@ class FrankieWebView
             val uuid = UUID.randomUUID()
             val file = FileUtils.getResponseFile(context, uuid.toString(), survey.id)
             saverUri = FileProvider
-                .getUriForFile(context, context.packageName + ".provider", file)
+                .getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", file)
             surveyActivity?.takePhoto(saverUri!!)
         }
 

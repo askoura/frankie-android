@@ -4,24 +4,45 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
+import androidx.room.TypeConverters
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.frankie.app.api.survey.PublishInfo
+import com.frankie.app.db.JSONOConverter
+import com.frankie.app.db.LocalDateConverter
+import com.frankie.app.db.NavigationIndexConverter
+import com.frankie.app.db.ResponseEventListConverter
+import com.frankie.app.db.SurveyLangConverter
 import com.frankie.expressionmanager.model.NavigationMode
+import java.time.LocalDateTime
 
 @Entity(tableName = "survey_data_table")
+@TypeConverters(
+    LocalDateConverter::class
+)
 data class SurveyDataEntity(
     @PrimaryKey val id: String = "",
-    val creationDate: String = "",
-    val lastModified: String = "",
+    val creationDate: LocalDateTime,
+    val lastModified: LocalDateTime,
+    val startDate: LocalDateTime?,
+    val endDate: LocalDateTime?,
     val name: String = "",
     @Embedded val languagesEntity: LanguagesEntity? = LanguagesEntity(),
     val status: String = "",
     val usage: String = "",
-    val quota: Int = 0,
-    val navigationMode: NavigationMode = NavigationMode.GROUP_BY_GROUP,
+    val quota: Int,
+    val userQuota: Int,
+    val navigationMode: NavigationMode,
     @Embedded val publishInfoEntity: PublishInfoEntity? = PublishInfoEntity(),
-    val newVersionAvailable: Boolean = false,
+    val newVersionAvailable: Boolean,
+    val totalResponsesCount: Int,
+    val syncedResponseCount: Int,
+    val saveTimings: Boolean,
+    val backgroundAudio: Boolean,
+    val recordGps: Boolean,
+    val allowIncomplete: Boolean,
+    val allowJump: Boolean,
+    val allowPrevious: Boolean
 )
 
 data class LanguageEntity(

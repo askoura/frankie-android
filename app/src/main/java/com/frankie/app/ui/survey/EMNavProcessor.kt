@@ -9,6 +9,7 @@ import android.webkit.*
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.frankie.app.business.settings.SharedPrefsManagerImpl
+import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.db.FrankieDb
 import com.frankie.app.db.model.Response
 import com.frankie.app.ui.common.FileUtils
@@ -23,11 +24,11 @@ import java.util.*
 
 @SuppressLint("SetJavaScriptEnabled")
 class EMNavProcessor constructor(
-    activityContext: Context
+    activityContext: Context,
+    val survey: SurveyData
 ) {
     private val webView = WebView(activityContext)
     private var responseId: UUID? = null
-    private var surveyId: String? = null
     private val frankieDb = FrankieDb.getDatabase(activityContext)
 
     private fun getActivity(): Activity = webView.context as Activity
@@ -49,34 +50,31 @@ class EMNavProcessor constructor(
     }
 
     fun start(
-        surveyId: String,
-        surveyLang: SurveyLang,
         navListener: NavigationListener,
         navigationMode: NavigationMode
     ) {
-        this.surveyId = surveyId
         val navigationUseCaseInput = NavigationUseCaseInput(
             navigationInfo = NavigationInfo(
                 navigationDirection = NavigationDirection.Start,
                 navigationMode = navigationMode,
                 navigationIndex = null
             ),
-            defaultLang = SurveyLang.EN,
-            lang = surveyLang,
+            defaultLang = survey.defaultLanguage.toSurveyLang(),
+            lang = survey.defaultLanguage.toSurveyLang(),
         )
         navigationUseCase(
             navigationUseCaseInput,
             onSuccess = { navigationJsonOutput ->
                 responseId = UUID.randomUUID()
                 saveResponse(
-                    surveyLang,
+                    survey.defaultLanguage.toSurveyLang(),
                     navigationJsonOutput
                 )
                 val result = navigationJsonOutput
                     .with(
                         responseId!!,
-                        SurveyLang.EN,
-                        listOf(SurveyLang.DE, SurveyLang.AR)
+                        survey.defaultLanguage.toSurveyLang(),
+                        listOf(SurveyLang.DE, SurveyLang.AR), survey
                     )
                 navListener.onSuccess(result)
             }
@@ -84,12 +82,10 @@ class EMNavProcessor constructor(
     }
 
     fun navigate(
-        surveyId: String,
         useCaseInput: NavigateRequest,
         navListener: NavigationListener,
         navigationMode: NavigationMode
     ) {
-        this.surveyId = surveyId
         var response: Response
         responseId = useCaseInput.responseId!!
         runBlocking {
@@ -105,7 +101,7 @@ class EMNavProcessor constructor(
                 navigationMode = navigationMode,
                 navigationIndex = response.navigationIndex
             ),
-            defaultLang = SurveyLang.EN,
+            defaultLang = survey.defaultLanguage.toSurveyLang(),
             lang = lang,
         )
         navigationUseCase(
@@ -115,11 +111,7 @@ class EMNavProcessor constructor(
                     .with(
                         responseId!!,
                         lang,
-                        mutableListOf(SurveyLang.EN, SurveyLang.DE, SurveyLang.AR).apply {
-                            remove(
-                                lang
-                            )
-                        }
+                        survey.allLang.toMutableList().apply { remove(lang) }, survey
                     )
                 updateResponse(response, lang, navigationJsonOutput, useCaseInput.events)
                 navListener.onSuccess(result)
@@ -138,7 +130,7 @@ class EMNavProcessor constructor(
                     throw java.lang.IllegalStateException("Should not resort to Script engine")
                 }
             },
-            FileUtils.getValidationJson(getActivity(), surveyId!!)!!,
+            FileUtils.getValidationJson(getActivity(), survey.id)!!,
             true,
             navigationUseCaseInput
         )
@@ -171,7 +163,7 @@ class EMNavProcessor constructor(
                     responseId.toString(),
                     result.navigationIndex,
                     surveyLang,
-                    surveyId.toString(),
+                    survey.id,
                     LocalDateTime.now(ZoneOffset.UTC),
                     null,
                     userId,
@@ -218,7 +210,7 @@ class EMNavProcessor constructor(
         val responseFile = FileUtils.getResponseFile(
             getActivity(),
             uuid.toString(),
-            surveyId!!
+            survey.id
         )
         val str = dataUrl.substring(dataUrl.indexOf(",") + 1)
         val imageData: ByteArray = Base64.decode(str, Base64.NO_WRAP)
@@ -235,7 +227,7 @@ class EMNavProcessor constructor(
         val responseFile = FileUtils.getResponseFile(
             getActivity(),
             uuid.toString(),
-            surveyId!!
+            survey.id
         )
         responseFile.writeBytes(inputStream.readBytes())
         return saveFileResponse(fileName, uuid, key, responseFile.length())
@@ -257,7 +249,7 @@ class EMNavProcessor constructor(
         }
         CoroutineScope(Dispatchers.IO).launch {
             (response.values["$key.value"] as? Map<*, *>)?.get("stored_filename")?.let {
-                val file = FileUtils.getResponseFile(getActivity(), it.toString(), surveyId!!)
+                val file = FileUtils.getResponseFile(getActivity(), it.toString(), survey.id)
                 if (file.exists()) {
                     Log.d(TAG, "deleting old file: $it")
                     file.delete()
@@ -295,9 +287,22 @@ interface NavigationListener {
     fun onError(error: Throwable)
 }
 
-fun NavigationJsonOutput.with(responseId: UUID, lang: SurveyLang, additionalLang: List<SurveyLang>)
+fun NavigationJsonOutput.with(
+    responseId: UUID,
+    lang: SurveyLang,
+    additionalLang: List<SurveyLang>,
+    surveyData: SurveyData
+)
           : ApiNavigationOutput {
-    return ApiNavigationOutput(survey, state, navigationIndex, responseId, lang, additionalLang)
+    return ApiNavigationOutput(
+        survey,
+        state,
+        navigationIndex,
+        responseId,
+        lang,
+        additionalLang,
+        surveyData.toNavProps()
+    )
 }
 
 data class ApiNavigationOutput(
@@ -307,7 +312,7 @@ data class ApiNavigationOutput(
     val responseId: UUID,
     val lang: SurveyLang,
     val additionalLang: List<SurveyLang>?,
-    val navProps: NavProps = NavProps()
+    val navProps: NavProps
 )
 
 data class NavProps(
@@ -316,3 +321,5 @@ data class NavProps(
     val allowPrevious: Boolean = true,
     val saveTimings: Boolean = true
 )
+
+fun SurveyData.toNavProps() = NavProps(allowIncomplete, allowJump, allowPrevious, saveTimings)

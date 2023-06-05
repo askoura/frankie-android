@@ -1,10 +1,10 @@
 package com.frankie.app.db
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.TypeConverters
 import com.frankie.app.db.model.Response
 import com.frankie.expressionmanager.model.NavigationIndex
@@ -54,6 +54,23 @@ interface ResponseDao {
     @Query("SELECT * FROM response WHERE userId = :userId AND surveyId = :surveyId")
     suspend fun getAllByUserAndSurvey(userId: String, surveyId: String): List<Response>
 
+    @Transaction
+    suspend fun addEvent(responseId: String, event: ResponseEvent) {
+        val response = get(responseId)
+        val newEvents = response.events.toMutableList().apply {
+            add(event)
+        }
+        update(
+            id = responseId,
+            values = response.values,
+            lang = response.lang,
+            startDate = response.startDate,
+            submitDate = response.submitDate,
+            navigationIndex = response.navigationIndex,
+            events = newEvents
+        )
+    }
+
 
     @TypeConverters(
         JSONOConverter::class,
@@ -64,4 +81,13 @@ interface ResponseDao {
     )
     @Query("SELECT COUNT(*) FROM response WHERE userId = :userId AND surveyId = :surveyId")
     suspend fun countByUserAndSurvey(userId: String, surveyId: String): Int
+    @TypeConverters(
+        JSONOConverter::class,
+        SurveyLangConverter::class,
+        LocalDateConverter::class,
+        NavigationIndexConverter::class,
+        ResponseEventListConverter::class
+    )
+    @Query("SELECT COUNT(*) FROM response WHERE userId = :userId AND surveyId = :surveyId AND submitDate IS NOT NULL")
+    suspend fun countCompleteByUserAndSurvey(userId: String, surveyId: String): Int
 }

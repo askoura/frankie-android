@@ -18,10 +18,10 @@ class LaunchActivity : AppCompatActivity() {
     private val viewModel by lazy { getViewModel<LaunchViewModel>() }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (!WebViewUtils.chromeSupported(this)) {
-            notifyUnsupportedChromeAndQuit()
-            return
-        }
+//        if (!WebViewUtils.chromeSupported(this)) {
+//            notifyUnsupportedChromeAndQuit()
+//            return
+//        }
         lifecycle.coroutineScope.launch {
             viewModel.launchEvents.collect { launchEvent ->
                 when (launchEvent) {

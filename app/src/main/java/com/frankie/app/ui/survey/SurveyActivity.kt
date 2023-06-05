@@ -86,13 +86,15 @@ class SurveyActivity : AppCompatActivity() {
             override fun onLocationResult(locationResult: LocationResult) {
                 super.onLocationResult(locationResult)
                 locationResult.lastLocation?.let {
+                    if (!requestingLocationUpdates) {
+                        return@let
+                    }
                     stopLocationUpdates()
                     val event = ResponseEvent.Location(
                         it.longitude, it.latitude, LocalDateTime.now(ZoneOffset.UTC)
                     )
                     lifecycle.coroutineScope.launch {
-                        responseRepository.saveLocationEvent(responseId, event).collect()
-
+                        responseRepository.addEvent(responseId, event).collect()
                     }
                 }
 
@@ -123,19 +125,12 @@ class SurveyActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        stopLocationUpdates()
+
     }
 
     override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
         outState.putBoolean(REQUESTING_LOCATION_UPDATES_KEY, requestingLocationUpdates)
         super.onSaveInstanceState(outState, outPersistentState)
-    }
-
-
-    override fun onResume() {
-        super.onResume()
-        if (requestingLocationUpdates)
-            startLocationUpdates()
     }
 
     private fun startLocationUpdates() {
@@ -155,6 +150,7 @@ class SurveyActivity : AppCompatActivity() {
 
 
     private fun stopLocationUpdates() {
+        requestingLocationUpdates = false
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
@@ -191,15 +187,29 @@ class SurveyActivity : AppCompatActivity() {
     }
 
     private fun checkAudioPermissionAndRecord() {
-        if (checkSelfPermission(this, RECORD_AUDIO) != PERMISSION_GRANTED
-            || checkSelfPermission(this, ACCESS_FINE_LOCATION) != PERMISSION_GRANTED
-        ) {
-            val permissions = arrayOf(
-                RECORD_AUDIO,
-                ACCESS_FINE_LOCATION,
-                ACCESS_COARSE_LOCATION
+        val shouldRequestAudio =
+            survey.backgroundAudio && checkSelfPermission(this, RECORD_AUDIO) != PERMISSION_GRANTED
+        val shouldRequestLocation = survey.recordGps && checkSelfPermission(
+            this,
+            ACCESS_FINE_LOCATION
+        ) != PERMISSION_GRANTED
+        if (shouldRequestAudio || shouldRequestLocation) {
+            val permissions = mutableListOf<String>().apply {
+                if (shouldRequestAudio)
+                    add(RECORD_AUDIO)
+                if (shouldRequestLocation)
+                    addAll(
+                        listOf(
+                            ACCESS_FINE_LOCATION,
+                            ACCESS_COARSE_LOCATION
+                        )
+                    )
+            }
+            ActivityCompat.requestPermissions(
+                this,
+                permissions.toTypedArray(),
+                REQUEST_RECORDING_PERMISSION
             )
-            ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORDING_PERMISSION)
         } else {
             recordAudio()
             recordLocation()
@@ -207,18 +217,23 @@ class SurveyActivity : AppCompatActivity() {
     }
 
     private fun recordAudio() {
-        AudioRecordingService.start(this, survey, responseId)
+        if (survey.backgroundAudio) {
+            AudioRecordingService.start(this, survey, responseId)
+        }
     }
 
     private fun recordLocation() {
-        requestingLocationUpdates = true
-        startLocationUpdates()
+        if (survey.recordGps) {
+            requestingLocationUpdates = true
+            startLocationUpdates()
+        }
 
     }
 
     override fun onDestroy() {
         super.onDestroy()
         AudioRecordingService.stop(this)
+        stopLocationUpdates()
     }
 
 

@@ -9,6 +9,7 @@ import com.frankie.app.R
 import com.frankie.app.databinding.ItemResponseBinding
 import com.frankie.app.db.model.Response
 import com.frankie.app.ui.common.dpToPx
+import com.frankie.app.ui.common.setEnabledTint
 
 class ResponseItemView @JvmOverloads constructor(
     context: Context,
@@ -22,11 +23,14 @@ class ResponseItemView @JvmOverloads constructor(
     }
 
     fun bind(
-        response: Response,
+        responseItem: ResponseItem,
         onResumeClicked: (Response) -> Unit,
         onDeleteClicked: (Response) -> Unit
     ) {
+        val response = responseItem.responses
         binding.edit.visibility = if (response.submitDate == null) VISIBLE else GONE
+        binding.edit.isEnabled = responseItem.editEnabled
+        binding.edit.setEnabledTint(context, responseItem.editEnabled)
         binding.edit.setOnClickListener { onResumeClicked(response) }
         binding.delete.visibility = if (response.submitDate == null) VISIBLE else GONE
         binding.delete.setOnClickListener { onDeleteClicked(response) }
@@ -37,9 +41,10 @@ class ResponseItemView @JvmOverloads constructor(
             context.getString(R.string.response_submit_date, response.submitDate.toString())
         binding.lang.text = context.getString(R.string.response_lang, response.lang.code)
         binding.content.text =
-            response.values.entries.filter { it.value.toString().isNotBlank() }.joinToString(separator = "\n",
-                transform = { "${it.key.replace(".value", "")}: ${it.value}" }
-            )
+            response.values.entries.filter { it.value.toString().isNotBlank() }
+                .joinToString(separator = "\n",
+                    transform = { "${it.key.replace(".value", "")}: ${it.value}" }
+                )
 
 
     }

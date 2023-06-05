@@ -25,4 +25,14 @@
     <string name="permission_denied">Permission Denied!!</string>
     <string name="canceled">Cancelled</string>
     <string name="press_back_to_exit">\"Press back again to exit.</string>
+    <string name="local_responses_count">Local Responses: %d</string>
+    <string name="local_total_responses_count">Local Total Responses: %d</string>
+    <string name="unlimited_survey_quota">No Survey Quota</string>
+    <string name="survey_quota">Survey Quota: %d</string>
+    <string name="unlimited_user_quota">Unlimited User Quota</string>
+    <string name="user_quota">User Quota: %d</string>
+    <string name="no_start_date">No Start Date</string>
+    <string name="start_date">Start Date: %s</string>
+    <string name="no_end_date">No End Date</string>
+    <string name="end_date">End Date: %s</string>
 </resources>

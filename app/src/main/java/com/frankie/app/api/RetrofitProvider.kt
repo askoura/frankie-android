@@ -1,12 +1,12 @@
 package com.frankie.app.api
 
+import com.frankie.app.BuildConfig
 import com.frankie.app.business.auth.RefreshTokenUseCase
 import com.frankie.app.business.survey.SessionManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import org.koin.android.BuildConfig
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
 import java.util.concurrent.TimeUnit
@@ -74,12 +74,12 @@ object RetrofitProvider {
         return httpClient
     }
 
-    private const val SCHEME = "https://"
-    //    private const val SCHEME = "https://"
-    private const val BACKEND_HOST = "api.staging-frankiesurveys.com"
-    //    private const val BACKEND_HOST = "staging-frankie.app"
-    private const val BACKEND_PORT = ""
-    //    private const val BACKEND_PORT = "8080"
+//    private const val SCHEME = "https://"
+        private const val SCHEME = "http://"
+//    private const val BACKEND_HOST = "api.staging-frankiesurveys.com"
+        private const val BACKEND_HOST = "frankie.app"
+//    private const val BACKEND_PORT = ""
+        private const val BACKEND_PORT = "8080"
     private const val BASE_URL = "$SCHEME$BACKEND_HOST:$BACKEND_PORT"
 
 }

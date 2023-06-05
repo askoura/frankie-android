@@ -30,6 +30,77 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Survey Name" />
 
+    <TextView
+        android:id="@+id/start_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8sp"
+        android:gravity="start"
+        android:textColor="@color/tint"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/icon"
+        app:layout_constraintTop_toBottomOf="@id/name"
+        tools:text="Start Date: 22" />
+
+    <TextView
+        android:id="@+id/end_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8sp"
+        android:gravity="start"
+        android:textColor="@color/tint"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/icon"
+        app:layout_constraintTop_toBottomOf="@id/start_date"
+        tools:text="End Date: 22" />
+
+    <TextView
+        android:id="@+id/quota"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8sp"
+        android:gravity="start"
+        android:textColor="@color/tint"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/icon"
+        app:layout_constraintTop_toBottomOf="@id/end_date"
+        tools:text="Quota: 22" />
+
+    <TextView
+        android:id="@+id/user_quota"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8sp"
+        android:gravity="start"
+        android:textColor="@color/tint"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/icon"
+        app:layout_constraintTop_toBottomOf="@id/quota"
+        tools:text="User Quota: 22" />
+
+    <TextView
+        android:id="@+id/local_response_count"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8sp"
+        android:gravity="start"
+        android:textColor="@color/tint"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/icon"
+        app:layout_constraintTop_toBottomOf="@id/user_quota"
+        tools:text="Local: 22" />
+    <TextView
+        android:id="@+id/complete_local_response_count"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8sp"
+        android:gravity="start"
+        android:textColor="@color/tint"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/icon"
+        app:layout_constraintTop_toBottomOf="@id/local_response_count"
+        tools:text="Total Response: 22" />
+
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/info"
         android:layout_width="wrap_content"
@@ -40,7 +111,7 @@
         android:tint="@color/tint"
         app:layout_constraintEnd_toStartOf="@id/responses"
         app:layout_constraintStart_toEndOf="@id/icon"
-        app:layout_constraintTop_toBottomOf="@+id/name" />
+        app:layout_constraintTop_toBottomOf="@+id/complete_local_response_count" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/responses"
@@ -52,7 +123,7 @@
         android:tint="@color/tint"
         app:layout_constraintEnd_toStartOf="@id/sync"
         app:layout_constraintStart_toEndOf="@id/info"
-        app:layout_constraintTop_toBottomOf="@+id/name" />
+        app:layout_constraintTop_toBottomOf="@+id/complete_local_response_count" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/sync"
@@ -64,7 +135,7 @@
         android:tint="@color/tint"
         app:layout_constraintEnd_toStartOf="@id/play"
         app:layout_constraintStart_toEndOf="@id/responses"
-        app:layout_constraintTop_toBottomOf="@+id/name" />
+        app:layout_constraintTop_toBottomOf="@+id/complete_local_response_count" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/play"
@@ -76,6 +147,6 @@
         android:tint="@color/tint"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/sync"
-        app:layout_constraintTop_toBottomOf="@+id/name" />
+        app:layout_constraintTop_toBottomOf="@+id/complete_local_response_count" />
 
 </merge>

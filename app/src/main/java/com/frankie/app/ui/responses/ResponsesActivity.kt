@@ -9,10 +9,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.frankie.app.R
-import com.frankie.app.ui.survey.SurveyActivity
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.databinding.ActivityResponsesBinding
 import com.frankie.app.db.model.Response
+import com.frankie.app.ui.survey.SurveyActivity
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 
@@ -35,7 +35,7 @@ class ResponsesActivity : AppCompatActivity() {
         adapter = ResponseListAdapter({ response: Response ->
             startActivity(SurveyActivity.createIntent(this, survey, response.id))
         }, { response: Response ->
-            viewModel.deleteResponse(response.id)
+            viewModel.deleteResponse(survey, response.id)
         })
         binding.recycler.adapter = adapter
         binding.recycler.layoutManager = LinearLayoutManager(binding.root.context)
@@ -47,7 +47,7 @@ class ResponsesActivity : AppCompatActivity() {
             }
         }
 
-        title = getString(R.string.title_activity_responses);
+        title = getString(R.string.title_activity_responses)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
     }
@@ -65,7 +65,7 @@ class ResponsesActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.fetchResponses(survey.id)
+        viewModel.fetchResponses(survey)
     }
 
 

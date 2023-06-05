@@ -3,6 +3,7 @@ package com.frankie.app.ui.responses
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.frankie.app.business.responses.ResponseRepository
+import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.db.model.Response
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,27 +12,35 @@ import kotlinx.coroutines.launch
 
 class ResponsesViewModel(private val responsesRepository: ResponseRepository) : ViewModel() {
 
-    private val _responses = MutableStateFlow<List<Response>>(emptyList())
+    private val _responses = MutableStateFlow<List<ResponseItem>>(emptyList())
     val responses = _responses.asStateFlow()
 
-    fun fetchResponses(surveyId: String) {
+    fun fetchResponses(surveyData: SurveyData) {
         viewModelScope.launch {
-            responsesRepository.getResponses(surveyId).collect { result ->
+            responsesRepository.getResponses(surveyData.id).collect { result ->
+                val newList = result.getOrThrow()
+                val count = newList.count { it.submitDate != null }
+                val quotaExceeded = surveyData.quotaExceeded(count)
                 _responses.update {
-                    result.getOrThrow()
+                    newList.map { ResponseItem(it, editEnabled = !quotaExceeded) }
                 }
             }
         }
     }
 
-    fun deleteResponse(responseId: String) {
+    fun deleteResponse(surveyData: SurveyData, responseId: String) {
         viewModelScope.launch {
             responsesRepository.deleteResponse(responseId).collect {
-                _responses.update { list ->
-                    list.filter { it.id != responseId }
+                _responses.update { responses ->
+                    val list = responses.filter { it.responses.id != responseId }
+                    val count = list.count { it.responses.submitDate != null }
+                    val quotaExceeded = surveyData.quotaExceeded(count)
+                    list.map { it.copy(editEnabled = !quotaExceeded) }
                 }
             }
         }
     }
 }
+
+data class ResponseItem(val responses: Response, val editEnabled: Boolean)
 

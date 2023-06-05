@@ -47,6 +47,10 @@ class SurveyRepositoryImpl(
                     surveyId = survey.id,
                     userId = sessionManager.getUserIdOrThrow()
                 )
+                val responseCount = responseDao.countCompleteByUserAndSurvey(
+                    surveyId = survey.id,
+                    userId = sessionManager.getUserIdOrThrow()
+                )
                 val newVersionAvailable = savedSurvey?.publishInfoEntity?.toPublishInfo()
                     ?.let { it != design.publishInfo }
                     ?: true
@@ -54,7 +58,8 @@ class SurveyRepositoryImpl(
                     survey,
                     savedSurvey?.publishInfoEntity?.toPublishInfo() ?: PublishInfo(),
                     newVersionAvailable,
-                    count
+                    count,
+                    responseCount
                 )
             }
             saveSurveysToDB(surveyList)
@@ -121,16 +126,27 @@ private fun SurveyData.toSurveyDataEntity(): SurveyDataEntity {
         id = this.id,
         creationDate = this.creationDate,
         lastModified = this.lastModified,
+        endDate = this.endDate,
+        startDate = this.startDate,
         name = this.name,
         languagesEntity = LanguagesEntity(
             defaultLanguage.toLanguageEntity(),
             additionalLanguages.map { it.toLanguageEntity() }),
         status = this.status,
         usage = this.usage,
-        quota = this.quota,
+        quota = this.surveyQuota,
+        userQuota = this.userQuota,
         navigationMode = this.navigationMode,
         publishInfoEntity = this.publishInfo.toPublishInfoEntity(),
         newVersionAvailable = this.newVersionAvailable,
+        saveTimings = this.saveTimings,
+        backgroundAudio = this.backgroundAudio,
+        recordGps = this.recordGps,
+        totalResponsesCount = this.totalResponseCount,
+        syncedResponseCount = this.syncedResponseCount,
+        allowIncomplete = this.allowIncomplete,
+        allowJump = this.allowJump,
+        allowPrevious = this.allowPrevious
     )
 }
 

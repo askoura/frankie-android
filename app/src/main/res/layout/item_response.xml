@@ -18,7 +18,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Response #1" />
-    <ImageButton
+
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -27,6 +28,7 @@
         android:src="@drawable/baseline_edit_24"
         app:layout_constraintEnd_toStartOf="@id/delete"
         app:layout_constraintTop_toTopOf="parent" />
+
     <ImageButton
         android:id="@+id/delete"
         android:layout_width="wrap_content"
