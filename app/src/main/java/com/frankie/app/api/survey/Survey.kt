@@ -43,6 +43,7 @@ data class Survey(
     @JsonProperty("allowIncomplete") val allowIncomplete: Boolean,
     @JsonProperty("allowJump") val allowJump: Boolean,
     @JsonProperty("allowPrevious") val allowPrevious: Boolean,
+    @JsonProperty("skipInvalid") val skipInvalid: Boolean,
 )
 
 @Parcelize

@@ -146,7 +146,8 @@ private fun SurveyData.toSurveyDataEntity(): SurveyDataEntity {
         syncedResponseCount = this.syncedResponseCount,
         allowIncomplete = this.allowIncomplete,
         allowJump = this.allowJump,
-        allowPrevious = this.allowPrevious
+        allowPrevious = this.allowPrevious,
+        skipInvalid = this.skipInvalid
     )
 }
 

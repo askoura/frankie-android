@@ -42,7 +42,8 @@ data class SurveyDataEntity(
     val recordGps: Boolean,
     val allowIncomplete: Boolean,
     val allowJump: Boolean,
-    val allowPrevious: Boolean
+    val allowPrevious: Boolean,
+    val skipInvalid: Boolean
 )
 
 data class LanguageEntity(

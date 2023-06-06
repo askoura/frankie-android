@@ -72,9 +72,10 @@ class EMNavProcessor constructor(
                 )
                 val result = navigationJsonOutput
                     .with(
-                        responseId!!,
-                        survey.defaultLanguage.toSurveyLang(),
-                        listOf(SurveyLang.DE, SurveyLang.AR), survey
+                        responseId = responseId!!,
+                        lang = survey.defaultLanguage.toSurveyLang(),
+                        additionalLang = survey.additionalLanguages.map { it.toSurveyLang() },
+                        navProps = survey.toNavProps()
                     )
                 navListener.onSuccess(result)
             }
@@ -109,9 +110,10 @@ class EMNavProcessor constructor(
             onSuccess = { navigationJsonOutput ->
                 val result = navigationJsonOutput
                     .with(
-                        responseId!!,
-                        lang,
-                        survey.allLang.toMutableList().apply { remove(lang) }, survey
+                        responseId = responseId!!,
+                        lang = lang,
+                        additionalLang = survey.allLang.toMutableList().apply { remove(lang) },
+                        navProps = survey.toNavProps()
                     )
                 updateResponse(response, lang, navigationJsonOutput, useCaseInput.events)
                 navListener.onSuccess(result)
@@ -130,9 +132,9 @@ class EMNavProcessor constructor(
                     throw java.lang.IllegalStateException("Should not resort to Script engine")
                 }
             },
-            FileUtils.getValidationJson(getActivity(), survey.id)!!,
-            true,
-            navigationUseCaseInput
+            validationJsonOutput = FileUtils.getValidationJson(getActivity(), survey.id)!!,
+            skipInvalid = survey.skipInvalid,
+            useCaseInput = navigationUseCaseInput
         )
         val script = navigationUseCaseWrapperImpl.getNavigationScript()
         (webView.context as Activity).runOnUiThread {
@@ -160,15 +162,15 @@ class EMNavProcessor constructor(
             val userId = SharedPrefsManagerImpl(getActivity()).userId!!
             frankieDb.responseDao().insert(
                 Response(
-                    responseId.toString(),
-                    result.navigationIndex,
-                    surveyLang,
-                    survey.id,
-                    LocalDateTime.now(ZoneOffset.UTC),
-                    null,
-                    userId,
-                    mapOf(),
-                    if (survey.saveTimings) listOf(result.event) else emptyList()
+                    id = responseId.toString(),
+                    navigationIndex = result.navigationIndex,
+                    lang = surveyLang,
+                    surveyId = survey.id,
+                    startDate = LocalDateTime.now(ZoneOffset.UTC),
+                    submitDate = null,
+                    userId = userId,
+                    values = mapOf(),
+                    events = if (survey.saveTimings) listOf(result.event) else emptyList()
                 )
             )
         }
@@ -210,14 +212,19 @@ class EMNavProcessor constructor(
     ): ResponseUploadFile {
         val uuid = UUID.randomUUID()
         val responseFile = FileUtils.getResponseFile(
-            getActivity(),
-            uuid.toString(),
-            survey.id
+            context = getActivity(),
+            fileName = uuid.toString(),
+            surveyId = survey.id
         )
         val str = dataUrl.substring(dataUrl.indexOf(",") + 1)
         val imageData: ByteArray = Base64.decode(str, Base64.NO_WRAP)
         responseFile.writeBytes(imageData)
-        return saveFileResponse(fileName, uuid, key, responseFile.length())
+        return saveFileResponse(
+            fileName = fileName,
+            uuid = uuid,
+            key = key,
+            fileSize = responseFile.length()
+        )
     }
 
     fun uploadFile(
@@ -227,12 +234,17 @@ class EMNavProcessor constructor(
     ): ResponseUploadFile {
         val uuid = UUID.randomUUID()
         val responseFile = FileUtils.getResponseFile(
-            getActivity(),
-            uuid.toString(),
-            survey.id
+            context = getActivity(),
+            fileName = uuid.toString(),
+            surveyId = survey.id
         )
         responseFile.writeBytes(inputStream.readBytes())
-        return saveFileResponse(fileName, uuid, key, responseFile.length())
+        return saveFileResponse(
+            fileName = fileName,
+            uuid = uuid,
+            key = key,
+            fileSize = responseFile.length()
+        )
     }
 
     fun saveFileResponse(
@@ -245,7 +257,11 @@ class EMNavProcessor constructor(
         runBlocking {
             response = frankieDb.responseDao().get(responseId.toString())
         }
-        val responseUploadFile = ResponseUploadFile(fileName, uuid.toString(), fileSize)
+        val responseUploadFile = ResponseUploadFile(
+            filename = fileName,
+            storedFilename = uuid.toString(),
+            size = fileSize
+        )
         val newValues = response.values.toMutableMap().apply {
             put("$key.value", responseUploadFile)
         }
@@ -293,7 +309,7 @@ fun NavigationJsonOutput.with(
     responseId: UUID,
     lang: SurveyLang,
     additionalLang: List<SurveyLang>,
-    surveyData: SurveyData
+    navProps: NavProps
 )
           : ApiNavigationOutput {
     return ApiNavigationOutput(
@@ -303,7 +319,7 @@ fun NavigationJsonOutput.with(
         responseId,
         lang,
         additionalLang,
-        surveyData.toNavProps()
+        navProps
     )
 }
 

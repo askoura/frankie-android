@@ -37,6 +37,7 @@ data class SurveyData(
     val allowIncomplete: Boolean,
     val allowJump: Boolean,
     val allowPrevious: Boolean,
+    val skipInvalid: Boolean,
 ) : Parcelable {
 
     private val scheduled: Boolean
@@ -100,7 +101,8 @@ data class SurveyData(
                 survey.recordGps,
                 survey.allowIncomplete,
                 survey.allowJump,
-                survey.allowPrevious
+                survey.allowPrevious,
+                survey.skipInvalid
 
             )
         }
