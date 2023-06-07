@@ -55,7 +55,7 @@ class FrankieWebView
         videoKey = null
     }
 
-    private val emNavProcessor = EMNavProcessor(context, survey)
+    private lateinit var emNavProcessor:EMNavProcessor
     private lateinit var survey: SurveyData
     private var responseId: String? = null
 
@@ -285,6 +285,7 @@ class FrankieWebView
 
     fun loadSurvey(surveyData: SurveyData, responseId: String?) {
         survey = surveyData
+        emNavProcessor = EMNavProcessor(context, survey)
         this.responseId = responseId
         val data = context.assets.open("$REACT_APP_BUILD_FOLDER/index.html").bufferedReader().use {
             it.readText()
