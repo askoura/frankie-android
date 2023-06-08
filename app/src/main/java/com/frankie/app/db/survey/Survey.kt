@@ -17,9 +17,6 @@ import com.frankie.expressionmanager.model.NavigationMode
 import java.time.LocalDateTime
 
 @Entity(tableName = "survey_data_table")
-@TypeConverters(
-    LocalDateConverter::class
-)
 data class SurveyDataEntity(
     @PrimaryKey val id: String = "",
     val creationDate: LocalDateTime,
@@ -36,6 +33,7 @@ data class SurveyDataEntity(
     @Embedded val publishInfoEntity: PublishInfoEntity? = PublishInfoEntity(),
     val newVersionAvailable: Boolean,
     val totalResponsesCount: Int,
+    val fileQuestions: List<String>,
     val syncedResponseCount: Int,
     val saveTimings: Boolean,
     val backgroundAudio: Boolean,

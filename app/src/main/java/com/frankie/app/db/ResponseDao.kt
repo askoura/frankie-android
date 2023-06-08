@@ -25,6 +25,9 @@ interface ResponseDao {
     @Query("DELETE FROM response WHERE id = :responseId")
     suspend fun deleteById(responseId: String)
 
+    @Query("UPDATE response SET is_synced = 1 WHERE id == :id")
+    suspend fun setSynced(id: String)
+
     @Query(
         "UPDATE response SET " +
                   "response_values = :values," +
@@ -33,13 +36,6 @@ interface ResponseDao {
                   "submitDate = :submitDate," +
                   "lang = :lang," +
                   " navigation_index = :navigationIndex WHERE id == :id"
-    )
-    @TypeConverters(
-        JSONOConverter::class,
-        SurveyLangConverter::class,
-        NavigationIndexConverter::class,
-        LocalDateConverter::class,
-        ResponseEventListConverter::class
     )
     suspend fun update(
         values: Map<String, Any>,
@@ -72,22 +68,9 @@ interface ResponseDao {
     }
 
 
-    @TypeConverters(
-        JSONOConverter::class,
-        SurveyLangConverter::class,
-        LocalDateConverter::class,
-        NavigationIndexConverter::class,
-        ResponseEventListConverter::class
-    )
     @Query("SELECT COUNT(*) FROM response WHERE userId = :userId AND surveyId = :surveyId")
     suspend fun countByUserAndSurvey(userId: String, surveyId: String): Int
-    @TypeConverters(
-        JSONOConverter::class,
-        SurveyLangConverter::class,
-        LocalDateConverter::class,
-        NavigationIndexConverter::class,
-        ResponseEventListConverter::class
-    )
+
     @Query("SELECT COUNT(*) FROM response WHERE userId = :userId AND surveyId = :surveyId AND submitDate IS NOT NULL")
     suspend fun countCompleteByUserAndSurvey(userId: String, surveyId: String): Int
 }

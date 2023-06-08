@@ -5,6 +5,9 @@ import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.business.survey.SurveyRepository
 import com.frankie.app.ui.common.FileUtils.getResourceFile
 import com.frankie.app.ui.common.FileUtils.getValidationJsonFile
+import com.frankie.expressionmanager.model.DataType
+import com.frankie.expressionmanager.model.jacksonKtMapper
+import com.frankie.expressionmanager.usecase.ValidationOutput
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -26,6 +29,10 @@ class DownloadManagerImpl(
     override suspend fun downloadSurveyFiles(surveyData: SurveyData): Flow<Result<SurveyData>> {
         return flow {
             val design = surveyRepository.surveyDesign(surveyData)
+            val validationOutput = jacksonKtMapper.treeToValue(
+                design.validationJsonOutput,
+                ValidationOutput::class.java
+            )
             saveValidationJsonOutput(
                 surveyData.id,
                 design.validationJsonOutput.toString()
@@ -39,7 +46,9 @@ class DownloadManagerImpl(
             }
             val updatedSurveyData =
                 surveyData.copy(newVersionAvailable = false, publishInfo = design.publishInfo)
-            surveyRepository.saveSurveyToDB(updatedSurveyData)
+            val fileQuestions = validationOutput.schema.filter { it.dataType == DataType.FILE }
+                .map { it.componentCode }
+            surveyRepository.saveSurveyToDB(updatedSurveyData, fileQuestions)
 
             emit(Result.success(updatedSurveyData))
         }.catch {

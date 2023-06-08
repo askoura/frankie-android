@@ -168,6 +168,7 @@ class EMNavProcessor constructor(
                     surveyId = survey.id,
                     startDate = LocalDateTime.now(ZoneOffset.UTC),
                     submitDate = null,
+                    isSynced = false,
                     userId = userId,
                     values = mapOf(),
                     events = if (survey.saveTimings) listOf(result.event) else emptyList()

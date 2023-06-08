@@ -26,16 +26,16 @@ import java.time.LocalDateTime
         )
     ]
 )
-@TypeConverters(
-    JSONOConverter::class, SurveyLangConverter::class, LocalDateConverter::class,
-    NavigationIndexConverter::class, ResponseEventListConverter::class
-)
+
 data class Response(
     @PrimaryKey
     val id: String,
 
     @ColumnInfo(name = "navigation_index")
     val navigationIndex: NavigationIndex,
+
+    @ColumnInfo(name = "is_synced")
+    val isSynced: Boolean,
 
     val lang: SurveyLang,
 

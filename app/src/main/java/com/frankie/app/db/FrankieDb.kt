@@ -8,24 +8,32 @@ import androidx.room.TypeConverters
 import com.frankie.app.db.model.Response
 import com.frankie.app.db.permission.PermissionDao
 import com.frankie.app.db.permission.PermissionEntity
-import com.frankie.app.db.survey.SurveyDataDao
+import com.frankie.app.db.survey.SurveyDao
 import com.frankie.app.db.survey.SurveyDataEntity
 import com.frankie.app.db.survey.SurveyTypeConverters
 
 
 @Database(
-        entities = [
-            Response::class,
-            SurveyDataEntity::class,
-            PermissionEntity::class
-        ],
-        version = 1,
-        exportSchema = false
+    entities = [
+        Response::class,
+        SurveyDataEntity::class,
+        PermissionEntity::class
+    ],
+    version = 1,
+    exportSchema = false
 )
-@TypeConverters(SurveyTypeConverters::class)
+@TypeConverters(
+    SurveyTypeConverters::class,
+    JSONOConverter::class,
+    SurveyLangConverter::class,
+    NavigationIndexConverter::class,
+    LocalDateConverter::class,
+    StringListConverter::class,
+    ResponseEventListConverter::class
+)
 abstract class FrankieDb : RoomDatabase() {
     abstract fun responseDao(): ResponseDao
-    abstract fun surveyDataDao(): SurveyDataDao
+    abstract fun surveyDataDao(): SurveyDao
     abstract fun permissionDao(): PermissionDao
 
     companion object {
@@ -36,11 +44,11 @@ abstract class FrankieDb : RoomDatabase() {
         fun getDatabase(context: Context): FrankieDb {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
-                        context.applicationContext,
-                        FrankieDb::class.java,
-                        "frankie_db"
+                    context.applicationContext,
+                    FrankieDb::class.java,
+                    "frankie_db"
                 )
-                        .build()
+                    .build()
 
                 INSTANCE = instance
 

@@ -9,7 +9,7 @@ import com.frankie.app.db.permission.PermissionDao
 import com.frankie.app.db.survey.LanguageEntity
 import com.frankie.app.db.survey.LanguagesEntity
 import com.frankie.app.db.survey.PublishInfoEntity
-import com.frankie.app.db.survey.SurveyDataDao
+import com.frankie.app.db.survey.SurveyDao
 import com.frankie.app.db.survey.SurveyDataEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +21,7 @@ interface SurveyRepository {
     fun getSurveyList(): Flow<Result<List<SurveyData>>>
     fun getSurveyFile(surveyId: String, resourceId: String): Flow<Result<DataStream>>
 
-    suspend fun saveSurveyToDB(surveyData: SurveyData)
+    suspend fun saveSurveyToDB(surveyData: SurveyData, fileQuestions: List<String>)
 
     suspend fun surveyDesign(surveyData: SurveyData): SurveyDesign
 
@@ -33,7 +33,7 @@ interface SurveyRepository {
 
 class SurveyRepositoryImpl(
     private val service: SurveyService,
-    private val surveyDataDao: SurveyDataDao,
+    private val surveyDao: SurveyDao,
     private val responseDao: ResponseDao,
     private val permissionDao: PermissionDao,
     private val sessionManager: SessionManager
@@ -42,7 +42,7 @@ class SurveyRepositoryImpl(
         return flow {
             val surveyList = service.getSurveyList().map { survey ->
                 val design = service.getSurveyDesign(survey.id, PublishInfo())
-                val savedSurvey = surveyDataDao.getSurveyDataById(survey.id)
+                val savedSurvey = surveyDao.getSurveyDataById(survey.id)
                 val count = responseDao.countByUserAndSurvey(
                     surveyId = survey.id,
                     userId = sessionManager.getUserIdOrThrow()
@@ -71,12 +71,12 @@ class SurveyRepositoryImpl(
         }.flowOn(Dispatchers.IO)
     }
 
-    override suspend fun saveSurveyToDB(surveyData: SurveyData) {
-        surveyDataDao.insert(surveyData.toSurveyDataEntity())
+    override suspend fun saveSurveyToDB(surveyData: SurveyData, fileQuestions: List<String>) {
+        surveyDao.insert(surveyData.toSurveyDataEntity(fileQuestions))
     }
 
     private suspend fun saveSurveysToDB(surveyList: List<SurveyData>) {
-        surveyDataDao.insertAll(surveyList.map { it.toSurveyDataEntity() })
+        surveyDao.insertAll(surveyList.map { it.toSurveyDataEntity() })
     }
 
     private suspend fun savePermissionsToDB(surveyList: List<SurveyData>) {
@@ -121,7 +121,7 @@ class SurveyRepositoryImpl(
 
 }
 
-private fun SurveyData.toSurveyDataEntity(): SurveyDataEntity {
+private fun SurveyData.toSurveyDataEntity(fileQuestions:List<String> = emptyList()): SurveyDataEntity {
     return SurveyDataEntity(
         id = this.id,
         creationDate = this.creationDate,
@@ -147,7 +147,8 @@ private fun SurveyData.toSurveyDataEntity(): SurveyDataEntity {
         allowIncomplete = this.allowIncomplete,
         allowJump = this.allowJump,
         allowPrevious = this.allowPrevious,
-        skipInvalid = this.skipInvalid
+        skipInvalid = this.skipInvalid,
+        fileQuestions = fileQuestions
     )
 }
 
