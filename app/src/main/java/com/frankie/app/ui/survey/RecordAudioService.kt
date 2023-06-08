@@ -13,6 +13,7 @@ import android.os.IBinder
 import android.os.Parcelable
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import com.frankie.app.R
@@ -77,6 +78,7 @@ class AudioRecordingService : Service() {
         val notification: Notification = NotificationCompat.Builder(this, channelId)
             .setContentTitle("Audio Recording")
             .setContentText("Recording audio...")
+            .setForegroundServiceBehavior(FOREGROUND_SERVICE_IMMEDIATE)
             .setSmallIcon(R.drawable.baseline_record_voice_over_24)
             .build()
 
