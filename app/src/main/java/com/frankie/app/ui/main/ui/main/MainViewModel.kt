@@ -9,6 +9,7 @@ import com.frankie.app.storage.DownloadManager
 import com.frankie.app.ui.common.error.ErrorProcessor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -25,7 +26,10 @@ class MainViewModel(
         viewModelScope.launch {
             _state.update { _state.value.copy(isLoading = _firstLoad.value) }
             _firstLoad.value = false
-            surveyRepository.getSurveyList().collect { result ->
+            merge(
+                surveyRepository.getSurveyList(),
+                surveyRepository.getOfflineSurveyList()
+            ).collect { result ->
                 if (result.isSuccess) {
                     _state.update {
                         _state.value.copy(isLoading = false, surveyList = result.getOrThrow())

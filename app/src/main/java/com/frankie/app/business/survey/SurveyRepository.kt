@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.flowOn
 
 interface SurveyRepository {
     fun getSurveyList(): Flow<Result<List<SurveyData>>>
+    fun getOfflineSurveyList(): Flow<Result<List<SurveyData>>>
     fun getSurveyFile(surveyId: String, resourceId: String): Flow<Result<DataStream>>
 
     suspend fun saveSurveyToDB(surveyData: SurveyData, fileQuestions: List<String>)
@@ -40,7 +41,6 @@ class SurveyRepositoryImpl(
 ) : SurveyRepository {
     override fun getSurveyList(): Flow<Result<List<SurveyData>>> {
         return flow {
-            emit(Result.success(getOfflineSurveyList()))
             val surveyList = service.getSurveyList().map { survey ->
                 val design = service.getSurveyDesign(survey.id, PublishInfo())
                 val savedSurvey = surveyDao.getSurveyDataById(survey.id)
@@ -72,13 +72,15 @@ class SurveyRepositoryImpl(
         }.flowOn(Dispatchers.IO)
     }
 
-    private suspend fun getOfflineSurveyList(): List<SurveyData> {
-        val userId = sessionManager.getUserIdOrThrow()
-        return surveyDao.getAllSurveyData().map {
-            it.toSurveyData(
-                responseDao.countByUserAndSurvey(userId, it.id),
-                responseDao.countCompleteByUserAndSurvey(userId, it.id)
-            )
+    override fun getOfflineSurveyList(): Flow<Result<List<SurveyData>>> {
+        return flow {
+            val userId = sessionManager.getUserIdOrThrow()
+            emit(Result.success(surveyDao.getAllSurveyData().map {
+                it.toSurveyData(
+                    responseDao.countByUserAndSurvey(userId, it.id),
+                    responseDao.countCompleteByUserAndSurvey(userId, it.id)
+                )
+            }))
         }
     }
 
