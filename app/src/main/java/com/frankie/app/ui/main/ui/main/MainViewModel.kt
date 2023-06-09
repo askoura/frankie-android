@@ -6,6 +6,7 @@ import com.frankie.app.business.auth.LogoutUseCase
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.business.survey.SurveyRepository
 import com.frankie.app.storage.DownloadManager
+import com.frankie.app.storage.DownloadState
 import com.frankie.app.ui.common.error.ErrorProcessor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,9 +23,12 @@ class MainViewModel(
     private val _firstLoad = MutableStateFlow(false)
     private val _state = MutableStateFlow(State())
     val state = _state.asStateFlow()
+
+    private val _downloadState = MutableStateFlow(DownloadState(isInProgress = false))
+    val downloadState = _downloadState.asStateFlow()
     fun fetchSurveyList(triggeredByUser: Boolean) {
         viewModelScope.launch {
-            _state.update { _state.value.copy(isLoading = _firstLoad.value) }
+            _state.update { _state.value.copy(isLoading = _firstLoad.value || triggeredByUser) }
             _firstLoad.value = false
             merge(
                 surveyRepository.getSurveyList(),
@@ -46,15 +50,19 @@ class MainViewModel(
 
     fun syncSurveyForOffline(surveyData: SurveyData) {
         viewModelScope.launch {
-            _state.update { _state.value.copy(isLoading = true) }
             downloadManager.downloadSurveyFiles(surveyData).collect { result ->
-                _state.update { _state.value.copy(isLoading = false) }
                 if (result.isSuccess) {
-                    val newSurvey = result.getOrNull()
-                    val newList = _state.value.surveyList.map {
-                        if (it.id == surveyData.id) newSurvey ?: it else it
+                    val downloadState = result.getOrThrow()
+                    if (!downloadState.isInProgress && downloadState.surveyData != null) {
+                        val newList = _state.value.surveyList.map {
+                            if (it.id == downloadState.surveyData.id) downloadState.surveyData else it
+                        }
+                        _state.update { _state.value.copy(isLoading = false, surveyList = newList) }
+                        _downloadState.update { DownloadState(isInProgress = false) }
+                    } else {
+                        _downloadState.value = downloadState
                     }
-                    _state.update { _state.value.copy(isLoading = false, surveyList = newList) }
+
                 } else {
                     processError(result.exceptionOrNull()!!)
                 }

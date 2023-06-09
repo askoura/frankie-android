@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.frankie.app.R
 import com.frankie.app.databinding.FragmentMainBinding
+import com.frankie.app.storage.DownloadState
 import com.frankie.app.ui.common.error.ErrorDisplayManager
 import com.frankie.app.ui.login.LoginActivity
 import com.frankie.app.ui.responses.ResponsesActivity
@@ -102,7 +103,16 @@ class MainFragment : Fragment() {
         lifecycleScope.launch {
             viewModel.state.collect { state ->
                 adapter.submitList(state.surveyList)
-                showProgressDialog(state.isLoading)
+                showProgressDialog(
+                    show = state.isLoading,
+                    title = getString(R.string.progress_dialog_title),
+                    body = getString(R.string.progress_dialog_description)
+                )
+            }
+        }
+        lifecycleScope.launch {
+            viewModel.downloadState.collect { downloadState ->
+                processDownloadState(downloadState)
             }
         }
 
@@ -115,16 +125,37 @@ class MainFragment : Fragment() {
         return binding.root
     }
 
+    private fun processDownloadState(downloadState: DownloadState) {
+        downloadState.run {
+            if (!isInProgress) {
+                showProgressDialog(false)
+            } else {
+                val title = getString(R.string.progress_dialog_title)
+                val body = if (totalFilesCount > 0 && currentFileName.isNotBlank()) {
+                    "Downloading: ${downloadState.currentFileName.take(10)} (${downloadedFileCount + 1} of $totalFilesCount)"
+                } else {
+                    "Downloading..."
+                }
+                showProgressDialog(true, title, body)
+            }
+        }
+
+    }
+
     // TODO find better way to show progress
-    private fun showProgressDialog(show: Boolean) {
+    private fun showProgressDialog(
+        show: Boolean,
+        title: CharSequence = "",
+        body: CharSequence = ""
+    ) {
         if (progressDialog != null && progressDialog!!.isShowing) {
             progressDialog?.dismiss()
         }
         if (show) {
             progressDialog = ProgressDialog.show(
                 binding.root.context,
-                getString(R.string.progress_dialog_title),
-                getString(R.string.progress_dialog_description),
+                title,
+                body,
                 true
             )
         }
