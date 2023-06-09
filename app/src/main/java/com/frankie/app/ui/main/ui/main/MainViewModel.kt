@@ -18,11 +18,13 @@ class MainViewModel(
     private val downloadManager: DownloadManager,
     errorProcessor: ErrorProcessor
 ) : ViewModel(), ErrorProcessor by errorProcessor {
+    private val _firstLoad = MutableStateFlow(false)
     private val _state = MutableStateFlow(State())
     val state = _state.asStateFlow()
-    fun fetchSurveyList() {
+    fun fetchSurveyList(triggeredByUser: Boolean) {
         viewModelScope.launch {
-            _state.update { _state.value.copy(isLoading = true) }
+            _state.update { _state.value.copy(isLoading = _firstLoad.value) }
+            _firstLoad.value = false
             surveyRepository.getSurveyList().collect { result ->
                 if (result.isSuccess) {
                     _state.update {
@@ -30,7 +32,9 @@ class MainViewModel(
                     }
                 } else {
                     _state.update { _state.value.copy(isLoading = false) }
-                    processError(result.exceptionOrNull()!!)
+                    if (triggeredByUser || _firstLoad.value) {
+                        processError(result.exceptionOrNull()!!)
+                    }
                 }
             }
         }

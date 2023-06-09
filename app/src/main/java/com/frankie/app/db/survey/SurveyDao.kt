@@ -16,6 +16,9 @@ interface SurveyDao {
     @Query("SELECT * FROM survey_data_table WHERE id = :surveyDataId")
     suspend fun getSurveyDataById(surveyDataId: String): SurveyDataEntity?
 
+    @Query("SELECT * FROM survey_data_table")
+    suspend fun getAllSurveyData(): List<SurveyDataEntity>
+
 
     @Query("UPDATE survey_data_table SET fileQuestions = :filesQuestions WHERE id == :id")
     suspend fun setFileQuestions(id: String, filesQuestions: List<String>)

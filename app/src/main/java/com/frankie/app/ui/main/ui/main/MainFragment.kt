@@ -15,11 +15,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.frankie.app.R
-import com.frankie.app.ui.survey.SurveyActivity
 import com.frankie.app.databinding.FragmentMainBinding
 import com.frankie.app.ui.common.error.ErrorDisplayManager
 import com.frankie.app.ui.login.LoginActivity
 import com.frankie.app.ui.responses.ResponsesActivity
+import com.frankie.app.ui.survey.SurveyActivity
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.getViewModel
@@ -60,7 +60,7 @@ class MainFragment : Fragment() {
                     }
 
                     R.id.refresh -> {
-                        viewModel.fetchSurveyList()
+                        viewModel.fetchSurveyList(true)
                         true
                     }
 
@@ -132,6 +132,6 @@ class MainFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.fetchSurveyList()
+        viewModel.fetchSurveyList(false)
     }
 }

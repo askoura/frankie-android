@@ -40,6 +40,7 @@ class SurveyRepositoryImpl(
 ) : SurveyRepository {
     override fun getSurveyList(): Flow<Result<List<SurveyData>>> {
         return flow {
+            emit(Result.success(getOfflineSurveyList()))
             val surveyList = service.getSurveyList().map { survey ->
                 val design = service.getSurveyDesign(survey.id, PublishInfo())
                 val savedSurvey = surveyDao.getSurveyDataById(survey.id)
@@ -69,6 +70,16 @@ class SurveyRepositoryImpl(
         }.catch {
             emit(Result.failure(it))
         }.flowOn(Dispatchers.IO)
+    }
+
+    private suspend fun getOfflineSurveyList(): List<SurveyData> {
+        val userId = sessionManager.getUserIdOrThrow()
+        return surveyDao.getAllSurveyData().map {
+            it.toSurveyData(
+                responseDao.countByUserAndSurvey(userId, it.id),
+                responseDao.countCompleteByUserAndSurvey(userId, it.id)
+            )
+        }
     }
 
     override suspend fun saveSurveyToDB(surveyData: SurveyData, fileQuestions: List<String>) {
@@ -121,7 +132,7 @@ class SurveyRepositoryImpl(
 
 }
 
-private fun SurveyData.toSurveyDataEntity(fileQuestions:List<String> = emptyList()): SurveyDataEntity {
+private fun SurveyData.toSurveyDataEntity(fileQuestions: List<String> = emptyList()): SurveyDataEntity {
     return SurveyDataEntity(
         id = this.id,
         creationDate = this.creationDate,

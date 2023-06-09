@@ -4,15 +4,12 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
-import androidx.room.TypeConverters
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.frankie.app.api.survey.Language
 import com.frankie.app.api.survey.PublishInfo
-import com.frankie.app.db.JSONOConverter
-import com.frankie.app.db.LocalDateConverter
-import com.frankie.app.db.NavigationIndexConverter
-import com.frankie.app.db.ResponseEventListConverter
-import com.frankie.app.db.SurveyLangConverter
+import com.frankie.app.business.survey.SurveyData
+import com.frankie.app.business.survey.toPublishInfo
 import com.frankie.expressionmanager.model.NavigationMode
 import java.time.LocalDateTime
 
@@ -24,13 +21,13 @@ data class SurveyDataEntity(
     val startDate: LocalDateTime?,
     val endDate: LocalDateTime?,
     val name: String = "",
-    @Embedded val languagesEntity: LanguagesEntity? = LanguagesEntity(),
+    @Embedded val languagesEntity: LanguagesEntity = LanguagesEntity(),
     val status: String = "",
     val usage: String = "",
     val quota: Int,
     val userQuota: Int,
     val navigationMode: NavigationMode,
-    @Embedded val publishInfoEntity: PublishInfoEntity? = PublishInfoEntity(),
+    @Embedded val publishInfoEntity: PublishInfoEntity = PublishInfoEntity(),
     val newVersionAvailable: Boolean,
     val totalResponsesCount: Int,
     val fileQuestions: List<String>,
@@ -42,24 +39,58 @@ data class SurveyDataEntity(
     val allowJump: Boolean,
     val allowPrevious: Boolean,
     val skipInvalid: Boolean
-)
+) {
+    fun toSurveyData(
+        localResponseCount: Int,
+        localCompleteResponseCount: Int
+    ): SurveyData = SurveyData(
+        id,
+        creationDate,
+        lastModified,
+        startDate,
+        endDate,
+        name,
+        languagesEntity.defaultLanguageEntity.toLanguage(),
+        languagesEntity.additionalLanguagesEntity.map { it.toLanguage() },
+        status,
+        usage,
+        quota,
+        userQuota,
+        navigationMode,
+        publishInfoEntity.toPublishInfo(),
+        false,
+        localResponseCount,
+        localCompleteResponseCount,
+        syncedResponseCount,
+        totalResponsesCount,
+        saveTimings,
+        backgroundAudio,
+        recordGps,
+        allowIncomplete,
+        allowJump,
+        allowPrevious,
+        skipInvalid
+    )
+}
 
 data class LanguageEntity(
-        val code: String = "",
-        val langName: String = "",
+    val code: String = "",
+    val langName: String = "",
 ) {
+    fun toLanguage() = Language(code, langName)
+
     constructor() : this("", "")
 }
 
 data class LanguagesEntity(
-        val defaultLanguageEntity: LanguageEntity? = LanguageEntity(),
-        val additionalLanguagesEntity: List<LanguageEntity>? = emptyList(),
+    val defaultLanguageEntity: LanguageEntity = LanguageEntity(),
+    val additionalLanguagesEntity: List<LanguageEntity> = emptyList(),
 )
 
 data class PublishInfoEntity(
-        val version: Int = 0,
-        val subVersion: Int = 0,
-        val timeLastModified: String = PublishInfo.LAST_MODIFIED_INITIAL,
+    val version: Int = 0,
+    val subVersion: Int = 0,
+    val timeLastModified: String = PublishInfo.LAST_MODIFIED_INITIAL,
 ) {
     constructor() : this(0, 0, PublishInfo.LAST_MODIFIED_INITIAL)
 }

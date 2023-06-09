@@ -33,7 +33,10 @@ class SurveyListItemView @JvmOverloads constructor(
         onInfoClicked: (SurveyData) -> Unit
     ) {
         val isPlayEnabled =
-            !surveyData.newVersionAvailable && !surveyData.quotaExceeded() && surveyData.surveyStatus == SurveyStatus.ACTIVE
+            !surveyData.newVersionAvailable
+                      && surveyData.publishInfo.version > 0
+                      && !surveyData.quotaExceeded()
+                      && surveyData.surveyStatus == SurveyStatus.ACTIVE
         val isSyncOfflineEnabled = surveyData.newVersionAvailable
         val isResponsesEnabled = surveyData.localResponsesCount > 0
         binding.localResponseCount.text = surveyData.localResponsesCount.let { count ->
