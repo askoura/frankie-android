@@ -24,7 +24,8 @@ class MainViewModel(
     private val _state = MutableStateFlow(State())
     val state = _state.asStateFlow()
 
-    private val _downloadState = MutableStateFlow(DownloadState(isInProgress = false))
+    private val _downloadState: MutableStateFlow<DownloadState> =
+        MutableStateFlow(DownloadState.Idle)
     val downloadState = _downloadState.asStateFlow()
     fun fetchSurveyList(triggeredByUser: Boolean) {
         viewModelScope.launch {
@@ -51,20 +52,23 @@ class MainViewModel(
     fun syncSurveyForOffline(surveyData: SurveyData) {
         viewModelScope.launch {
             downloadManager.downloadSurveyFiles(surveyData).collect { result ->
-                if (result.isSuccess) {
-                    val downloadState = result.getOrThrow()
-                    if (!downloadState.isInProgress && downloadState.surveyData != null) {
-                        val newList = _state.value.surveyList.map {
-                            if (it.id == downloadState.surveyData.id) downloadState.surveyData else it
-                        }
-                        _state.update { _state.value.copy(isLoading = false, surveyList = newList) }
-                        _downloadState.update { DownloadState(isInProgress = false) }
-                    } else {
-                        _downloadState.value = downloadState
+                when (result) {
+                    is DownloadState.Loading,
+                    is DownloadState.Idle -> {
+                        _downloadState.value = result
                     }
 
-                } else {
-                    processError(result.exceptionOrNull()!!)
+                    is DownloadState.Error -> {
+                        processError(result.throwable)
+                    }
+
+                    is DownloadState.Result -> {
+                        val newList = _state.value.surveyList.map {
+                            if (it.id == result.surveyData.id) result.surveyData else it
+                        }
+                        _state.update { _state.value.copy(isLoading = false, surveyList = newList) }
+                        _downloadState.update { DownloadState.Idle }
+                    }
                 }
             }
         }

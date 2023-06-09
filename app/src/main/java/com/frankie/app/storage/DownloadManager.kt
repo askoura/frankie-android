@@ -1,7 +1,6 @@
 package com.frankie.app.storage
 
 import android.content.Context
-import com.frankie.app.api.survey.FileData
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.business.survey.SurveyRepository
 import com.frankie.app.ui.common.FileUtils.getResourceFile
@@ -19,7 +18,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 interface DownloadManager {
-    suspend fun downloadSurveyFiles(surveyData: SurveyData): Flow<Result<DownloadState>>
+    suspend fun downloadSurveyFiles(surveyData: SurveyData): Flow<DownloadState>
 }
 
 class DownloadManagerImpl(
@@ -27,10 +26,11 @@ class DownloadManagerImpl(
     private val surveyRepository: SurveyRepository
 ) : DownloadManager {
 
-    override suspend fun downloadSurveyFiles(surveyData: SurveyData): Flow<Result<DownloadState>> {
-        var state = DownloadState(surveyData.name)
+    override suspend fun downloadSurveyFiles(surveyData: SurveyData): Flow<DownloadState> {
+        val surveyName = surveyData.name
+        var downloadedFiles = 0
         return flow {
-            emit(Result.success(state))
+            emit(DownloadState.Loading(surveyName = surveyData.name))
             val design = surveyRepository.surveyDesign(surveyData)
             val validationOutput = jacksonKtMapper.treeToValue(
                 design.validationJsonOutput,
@@ -40,30 +40,32 @@ class DownloadManagerImpl(
                 surveyData.id,
                 design.validationJsonOutput.toString()
             ).collect()
-            state = state.updateTotalFilesCount(design.files.size)
-            emit(Result.success(state))
+            val loadingState = DownloadState.Loading(
+                surveyName = surveyName,
+                totalFilesCount = design.files.size
+            )
+            emit(loadingState)
             design.files.forEach { file ->
-                state = state.updateCurrentFile(file)
-                emit(Result.success(state))
+                val newStateWithFile = loadingState.copy(
+                    currentFileName = file.name,
+                    downloadedFileCount = downloadedFiles
+                )
+                emit(newStateWithFile)
                 val flow = surveyRepository.getSurveyFile(surveyData.id, file.name)
                 saveFile(flow, getResourceFile(appContext, file.name, surveyData.id)).collect {
-                    if (it.isFailure)
-                        emit(Result.failure(it.exceptionOrNull()!!))
+//                    if (it.isFailure)
+//                        emit(Result.failure(it.exceptionOrNull()!!))
                 }
-                state = state.incrementDownloadedFileCount()
-                emit(Result.success(state))
+                downloadedFiles++
             }
             val updatedSurveyData =
                 surveyData.copy(newVersionAvailable = false, publishInfo = design.publishInfo)
             val fileQuestions = validationOutput.schema.filter { it.dataType == DataType.FILE }
                 .map { it.componentCode }
             surveyRepository.saveSurveyToDB(updatedSurveyData, fileQuestions)
-
-            state = state.updateSurveyData(updatedSurveyData)
-            state = state.updateIsInProgress(false)
-            emit(Result.success(state))
+            emit(DownloadState.Result(updatedSurveyData))
         }.catch {
-            emit(Result.failure(it))
+            emit(DownloadState.Error(it))
         }.flowOn(Dispatchers.IO)
     }
 
@@ -119,26 +121,16 @@ class DownloadManagerImpl(
 
 }
 
-data class DownloadState(
-    val surveyName: String = "",
-    val isInProgress: Boolean = true,
-    val surveyData: SurveyData? = null,
-    val totalFilesCount: Int = 0,
-    val downloadedFileCount: Int = 0,
-    val currentFileName: String = ""
-) {
-    fun updateIsInProgress(isInProgress: Boolean) = copy(isInProgress = isInProgress)
-    fun updateTotalFilesCount(totalFilesCount: Int) = copy(totalFilesCount = totalFilesCount)
-    fun updateCurrentFile(fileData: FileData): DownloadState {
-        return copy(currentFileName = fileData.name)
-    }
+sealed class DownloadState {
+    data class Loading(
+        val surveyName: String,
+        val totalFilesCount: Int = 0,
+        val downloadedFileCount: Int = 0,
+        val currentFileName: String = ""
+    ) : DownloadState()
 
-    fun incrementDownloadedFileCount(): DownloadState {
-        return copy(downloadedFileCount = downloadedFileCount + 1)
-    }
-
-    fun updateSurveyData(surveyData: SurveyData): DownloadState {
-        return copy(surveyData = surveyData)
-    }
+    data class Result(val surveyData: SurveyData) : DownloadState()
+    data class Error(val throwable: Throwable) : DownloadState()
+    object Idle : DownloadState()
 }
 

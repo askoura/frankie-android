@@ -127,15 +127,16 @@ class MainFragment : Fragment() {
 
     private fun processDownloadState(downloadState: DownloadState) {
         downloadState.run {
-            if (!isInProgress) {
+            if (downloadState !is DownloadState.Loading) {
                 showProgressDialog(false)
             } else {
                 val title = getString(R.string.progress_dialog_title)
-                val body = if (totalFilesCount > 0 && currentFileName.isNotBlank()) {
-                    "Downloading: ${downloadState.currentFileName.take(10)} (${downloadedFileCount + 1} of $totalFilesCount)"
-                } else {
-                    "Downloading..."
-                }
+                val body =
+                    if (downloadState.totalFilesCount > 0 && downloadState.currentFileName.isNotBlank()) {
+                        "Downloading: ${downloadState.currentFileName.take(10)} (${downloadState.downloadedFileCount + 1} of ${downloadState.totalFilesCount})"
+                    } else {
+                        "Downloading..."
+                    }
                 showProgressDialog(true, title, body)
             }
         }
