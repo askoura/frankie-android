@@ -1,7 +1,6 @@
 package com.frankie.app.storage
 
 import android.content.Context
-import android.util.Log
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.business.survey.SurveyRepository
 import com.frankie.app.ui.common.FileUtils.getResourceFile
@@ -24,8 +23,7 @@ interface DownloadManager {
 }
 
 class DownloadManagerImpl(
-    private val appContext: Context,
-    private val surveyRepository: SurveyRepository
+    private val appContext: Context, private val surveyRepository: SurveyRepository
 ) : DownloadManager {
 
     override suspend fun downloadSurveyFiles(surveyData: SurveyData): Flow<DownloadState> {
@@ -35,19 +33,17 @@ class DownloadManagerImpl(
             emit(DownloadState.Loading(surveyName = surveyData.name))
             val design = surveyRepository.surveyDesign(surveyData)
             val validationOutput = jacksonKtMapper.treeToValue(
-                design.validationJsonOutput,
-                ValidationOutput::class.java
+                design.validationJsonOutput, ValidationOutput::class.java
             )
             saveValidationJsonOutput(
-                surveyData.id,
-                design.validationJsonOutput.toString()
+                surveyData.id, design.validationJsonOutput.toString()
             ).collect()
             val loadingState = DownloadState.Loading(
-                surveyName = surveyName,
-                totalFilesCount = design.files.size
+                surveyName = surveyName, totalFilesCount = design.files.size
             )
             emit(loadingState)
             val totalBytesToDownload = design.files.sumOf { it.size }.toFloat()
+            var someFilesFailed = false
             var downloadPercent = 0
             var currentDownloadedSize = 0
             design.files.forEachIndexed { index, file ->
@@ -61,50 +57,59 @@ class DownloadManagerImpl(
                 emit(newStateWithFile)
                 val flow = surveyRepository.getSurveyFile(surveyData.id, file.name)
                 saveFile(
-                    flow,
-                    getResourceFile(appContext, file.name, surveyData.id)
+                    flow, getResourceFile(appContext, file.name, surveyData.id)
                 ).collect { fileSaveState ->
-                    if (fileSaveState is FileSaveState.Progress) {
-                        currentDownloadedSize = design.files.take(index)
-                            .sumOf { it.size } + fileSaveState.bytesDownloaded
-                        downloadPercent =
-                            (currentDownloadedSize / totalBytesToDownload * 100).roundToInt()
-                        emit(
-                            newStateWithFile.copy(
-                                currentDownloadedSize = currentDownloadedSize,
-                                downloadPercent = downloadPercent,
+                    when (fileSaveState) {
+                        is FileSaveState.Progress -> {
+                            currentDownloadedSize = design.files.take(index)
+                                .sumOf { it.size } + fileSaveState.bytesDownloaded
+                            downloadPercent =
+                                (currentDownloadedSize / totalBytesToDownload * 100).roundToInt()
+                            emit(
+                                newStateWithFile.copy(
+                                    currentDownloadedSize = currentDownloadedSize,
+                                    downloadPercent = downloadPercent,
+                                )
                             )
-                        )
-                    } else if (fileSaveState is FileSaveState.Done) {
-                        currentDownloadedSize = design.files.take(index + 1).sumOf { it.size }
-                        downloadPercent =
-                            (currentDownloadedSize / totalBytesToDownload * 100).roundToInt()
-                        emit(
-                            newStateWithFile.copy(
-                                currentDownloadedSize = currentDownloadedSize,
-                                downloadPercent = (downloadPercent / 5f).roundToInt() * 5
+                        }
+
+                        is FileSaveState.Done -> {
+                            currentDownloadedSize = design.files.take(index + 1).sumOf { it.size }
+                            downloadPercent =
+                                (currentDownloadedSize / totalBytesToDownload * 100).roundToInt()
+                            emit(
+                                newStateWithFile.copy(
+                                    currentDownloadedSize = currentDownloadedSize,
+                                    downloadPercent = (downloadPercent / 5f).roundToInt() * 5
+                                )
                             )
-                        )
+                        }
+
+                        is FileSaveState.Error -> {
+                            someFilesFailed = true
+                        }
                     }
-//                    if (it.isFailure)
-//                        emit(Result.failure(it.exceptionOrNull()!!))
+
                 }
                 downloadedFiles++
             }
-            val updatedSurveyData =
-                surveyData.copy(newVersionAvailable = false, publishInfo = design.publishInfo)
-            val fileQuestions = validationOutput.schema.filter { it.dataType == DataType.FILE }
-                .map { it.componentCode }
-            surveyRepository.saveSurveyToDB(updatedSurveyData, fileQuestions)
-            emit(DownloadState.Result(updatedSurveyData))
+            if (downloadedFiles == 0) {
+                emit(DownloadState.Error(Exception()))
+            } else {
+                val updatedSurveyData =
+                    surveyData.copy(newVersionAvailable = false, publishInfo = design.publishInfo)
+                val fileQuestions = validationOutput.schema.filter { it.dataType == DataType.FILE }
+                    .map { it.componentCode }
+                surveyRepository.saveSurveyToDB(updatedSurveyData, fileQuestions)
+                emit(DownloadState.Result(updatedSurveyData, someFilesFailed))
+            }
         }.catch {
             emit(DownloadState.Error(it))
         }.flowOn(Dispatchers.IO)
     }
 
     private suspend fun saveValidationJsonOutput(
-        surveyId: String,
-        validationOutput: String
+        surveyId: String, validationOutput: String
     ): Flow<Result<Unit>> {
         return flow {
             val file = getValidationJsonFile(appContext, surveyId)
@@ -116,8 +121,7 @@ class DownloadManagerImpl(
     }
 
     private suspend fun saveFile(
-        flow: Flow<Result<SurveyRepository.DataStream>>,
-        file: File
+        flow: Flow<Result<SurveyRepository.DataStream>>, file: File
     ): Flow<FileSaveState> {
         var downloadedSoFar = 0
         return flow {
@@ -152,6 +156,8 @@ class DownloadManagerImpl(
                     }
                 }
             }
+        }.catch {
+            emit(FileSaveState.Error(it))
         }.flowOn(Dispatchers.IO)
     }
 
@@ -174,7 +180,7 @@ sealed class DownloadState {
         val currentDownloadedSize: Int = 0,
     ) : DownloadState()
 
-    data class Result(val surveyData: SurveyData) : DownloadState()
+    data class Result(val surveyData: SurveyData, val someFilesFailed: Boolean) : DownloadState()
     data class Error(val throwable: Throwable) : DownloadState()
     object Idle : DownloadState()
 }

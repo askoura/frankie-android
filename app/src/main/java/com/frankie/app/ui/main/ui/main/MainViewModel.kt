@@ -60,6 +60,7 @@ class MainViewModel(
 
                     is DownloadState.Error -> {
                         processError(result.throwable)
+                        _downloadState.value = result
                     }
 
                     is DownloadState.Result -> {
