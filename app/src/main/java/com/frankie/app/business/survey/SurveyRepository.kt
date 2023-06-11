@@ -1,5 +1,6 @@
 package com.frankie.app.business.survey
 
+import android.util.Log
 import com.frankie.app.api.survey.Language
 import com.frankie.app.api.survey.PublishInfo
 import com.frankie.app.api.survey.SurveyDesign
@@ -75,7 +76,7 @@ class SurveyRepositoryImpl(
     override fun getOfflineSurveyList(): Flow<Result<List<SurveyData>>> {
         return flow {
             val userId = sessionManager.getUserIdOrThrow()
-            emit(Result.success(surveyDao.getAllSurveyData().map {
+            emit(Result.success(surveyDao.getAllSurveyData(sessionManager.getUserIdOrThrow()).map {
                 it.toSurveyData(
                     responseDao.countByUserAndSurvey(userId, it.id),
                     responseDao.countCompleteByUserAndSurvey(userId, it.id)
@@ -107,8 +108,7 @@ class SurveyRepositoryImpl(
         resourceId: String
     ): Flow<Result<SurveyRepository.DataStream>> {
         return flow {
-            val responseBody = service.getSurveyFile(surveyId, resourceId)
-            responseBody.byteStream().use { inputStream ->
+            service.getSurveyFile(surveyId, resourceId).byteStream().use { inputStream ->
                 val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
                 var bytes = inputStream.read(buffer)
                 while (bytes >= 0) {

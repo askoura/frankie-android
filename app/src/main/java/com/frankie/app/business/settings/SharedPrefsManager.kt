@@ -42,7 +42,6 @@ class SharedPrefsManagerImpl(context: Context) : SharedPrefsManager {
         const val PREFS_NAME = "frankie_prefs"
         const val KEY_ACTIVE_TOKEN = "active_token"
         const val KEY_REFRESH_TOKEN = "refresh_token"
-        const val KEY_SUB_DOMAIN = "subdomain"
         const val KEY_USER_ID = "user_id"
     }
 }

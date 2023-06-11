@@ -44,7 +44,7 @@ class SurveyListItemView @JvmOverloads constructor(
         }
         binding.completeLocalResponseCount.text =
             surveyData.localCompleteResponsesCount.let { count ->
-                context.getString(R.string.local_total_responses_count, count)
+                context.getString(R.string.local_complete_responses_count, count)
             }
         binding.startDate.text = surveyData.startDate.let { localDateTime ->
             if (localDateTime == null) {

@@ -18,8 +18,11 @@
     <string name="error_login_description">Please enter valid credentials</string>
     <string name="validation_email_error">Please enter valid email</string>
     <string name="validation_psw_error">Password minimum length is 8</string>
-    <string name="progress_dialog_title">Please wait</string>
-    <string name="progress_dialog_description">Downloading…</string>
+    <string name="syncing_survey_title">Syncing %s</string>
+    <string name="syncing_survey_file_order">Downloading %1$d/%2$d</string>
+    <string name="syncing_survey_file_download_progress">%1$d KB of %2$d KB (%3$d)%%</string>
+    <string name="fetching_surveys_message">Fetching Surveys…</string>
+    <string name="no_surveys_message">No Surveys assigned Available… Please check Network and make sure you are assigned some surveys and refresh later</string>
     <string name="chrome_version_not_supported">Chrome version not supported</string>
     <string name="response_start_date">Start Date: %s</string>
     <string name="response_submit_date">Submit Date: %s</string>
@@ -28,7 +31,7 @@
     <string name="canceled">Cancelled</string>
     <string name="press_back_to_exit">\"Press back again to exit.</string>
     <string name="local_responses_count">Local Responses: %d</string>
-    <string name="local_total_responses_count">Local Total Responses: %d</string>
+    <string name="local_complete_responses_count">Local Complete Responses: %d</string>
     <string name="unlimited_survey_quota">No Survey Quota</string>
     <string name="survey_quota">Survey Quota: %d</string>
     <string name="unlimited_user_quota">Unlimited User Quota</string>
@@ -37,4 +40,6 @@
     <string name="start_date">Start Date: %s</string>
     <string name="no_end_date">No End Date</string>
     <string name="end_date">End Date: %s</string>
+    <string name="kilobytes">%.2f KB</string>
+    <string name="megabytes">%.2f MB</string>
 </resources>

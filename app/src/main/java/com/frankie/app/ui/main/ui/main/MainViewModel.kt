@@ -20,8 +20,8 @@ class MainViewModel(
     private val downloadManager: DownloadManager,
     errorProcessor: ErrorProcessor
 ) : ViewModel(), ErrorProcessor by errorProcessor {
-    private val _firstLoad = MutableStateFlow(false)
-    private val _state = MutableStateFlow(State())
+    private val _firstLoad = MutableStateFlow(true)
+    private val _state = MutableStateFlow(State(isLoading = true))
     val state = _state.asStateFlow()
 
     private val _downloadState: MutableStateFlow<DownloadState> =
@@ -37,15 +37,15 @@ class MainViewModel(
             ).collect { result ->
                 if (result.isSuccess) {
                     _state.update {
-                        _state.value.copy(isLoading = false, surveyList = result.getOrThrow())
+                        _state.value.copy(surveyList = result.getOrThrow())
                     }
                 } else {
-                    _state.update { _state.value.copy(isLoading = false) }
                     if (triggeredByUser || _firstLoad.value) {
                         processError(result.exceptionOrNull()!!)
                     }
                 }
             }
+            _state.update { _state.value.copy(isLoading = false) }
         }
     }
 
@@ -79,7 +79,7 @@ class MainViewModel(
     }
 
     data class State(
-        val isLoading: Boolean = false,
+        val isLoading: Boolean,
         val surveyList: List<SurveyData> = emptyList(),
     )
 
