@@ -26,11 +26,12 @@ class SurveyListItemView @JvmOverloads constructor(
     }
 
     fun bind(
-        surveyData: SurveyData,
-        onSyncClicked: (SurveyData) -> Unit,
-        onPlayClicked: (SurveyData) -> Unit,
-        onResponsesClicked: (SurveyData) -> Unit,
-        onInfoClicked: (SurveyData) -> Unit
+            surveyData: SurveyData,
+            onSyncClicked: (SurveyData) -> Unit,
+            onPlayClicked: (SurveyData) -> Unit,
+            onResponsesClicked: (SurveyData) -> Unit,
+            onInfoClicked: (SurveyData) -> Unit,
+            onUploadClicked: (SurveyData) -> Unit
     ) {
         val isPlayEnabled =
             !surveyData.newVersionAvailable && !surveyData.quotaExceeded() && surveyData.surveyStatus == SurveyStatus.ACTIVE
@@ -94,5 +95,6 @@ class SurveyListItemView @JvmOverloads constructor(
         binding.play.setOnClickListener { onPlayClicked(surveyData) }
         binding.responses.setOnClickListener { onResponsesClicked(surveyData) }
         binding.info.setOnClickListener { onInfoClicked(surveyData) }
+        binding.upload.setOnClickListener { onUploadClicked(surveyData) }
     }
 }

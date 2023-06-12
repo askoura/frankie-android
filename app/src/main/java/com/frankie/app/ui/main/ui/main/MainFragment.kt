@@ -15,11 +15,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.frankie.app.R
-import com.frankie.app.ui.survey.SurveyActivity
 import com.frankie.app.databinding.FragmentMainBinding
 import com.frankie.app.ui.common.error.ErrorDisplayManager
 import com.frankie.app.ui.login.LoginActivity
 import com.frankie.app.ui.responses.ResponsesActivity
+import com.frankie.app.ui.survey.SurveyActivity
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.getViewModel
@@ -79,23 +79,26 @@ class MainFragment : Fragment() {
         adapter = SurveyListAdapter(onSyncClicked = { surveyData ->
             viewModel.syncSurveyForOffline(surveyData)
         },
-            onPlayClicked = { surveyData ->
-                startActivity(
-                    SurveyActivity.createIntent(
-                        requireContext(),
-                        surveyData
+                onPlayClicked = { surveyData ->
+                    startActivity(
+                            SurveyActivity.createIntent(
+                                    requireContext(),
+                                    surveyData
+                            )
                     )
-                )
-            },
-            onResponsesClicked = { surveyData ->
-                startActivity(
-                    ResponsesActivity.createIntent(
-                        requireContext(),
-                        surveyData
+                },
+                onResponsesClicked = { surveyData ->
+                    startActivity(
+                            ResponsesActivity.createIntent(
+                                    requireContext(),
+                                    surveyData
+                            )
                     )
-                )
-            },
-            onInfoClicked = { })
+                },
+                onInfoClicked = { },
+                onUploadClicked = { survey ->
+                    viewModel.uploadSurveyResponses(survey.id)
+                })
         binding.recycler.adapter = adapter
         binding.recycler.layoutManager = LinearLayoutManager(binding.root.context)
 

@@ -4,12 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
-import com.frankie.app.db.JSONOConverter
-import com.frankie.app.db.LocalDateConverter
-import com.frankie.app.db.NavigationIndexConverter
-import com.frankie.app.db.ResponseEventListConverter
-import com.frankie.app.db.SurveyLangConverter
 import com.frankie.app.db.survey.SurveyDataEntity
 import com.frankie.expressionmanager.model.NavigationIndex
 import com.frankie.expressionmanager.model.ResponseEvent
@@ -28,27 +22,31 @@ import java.time.LocalDateTime
 )
 
 data class Response(
-    @PrimaryKey
-    val id: String,
+        @PrimaryKey
+        val id: String,
 
-    @ColumnInfo(name = "navigation_index")
-    val navigationIndex: NavigationIndex,
+        @ColumnInfo(name = "navigation_index")
+        val navigationIndex: NavigationIndex,
 
-    @ColumnInfo(name = "is_synced")
-    val isSynced: Boolean,
+        @ColumnInfo(name = "is_synced")
+        val isSynced: Boolean,
 
-    val lang: SurveyLang,
+        val lang: SurveyLang,
 
-    val surveyId: String,
+        val surveyId: String,
 
-    val startDate: LocalDateTime,
+        val startDate: LocalDateTime,
 
-    val submitDate: LocalDateTime?,
+        val submitDate: LocalDateTime?,
 
-    val userId: String,
+        val userId: String,
 
-    @ColumnInfo(name = "response_values")
-    val values: Map<String, Any>,
+        @ColumnInfo(name = "response_values")
+        val values: Map<String, Any>,
 
-    val events: List<ResponseEvent>
-)
+        val events: List<ResponseEvent>
+) {
+    companion object {
+        const val STORED_FILENAME_KEY = "stored_filename"
+    }
+}
