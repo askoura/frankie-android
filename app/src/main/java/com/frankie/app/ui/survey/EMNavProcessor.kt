@@ -133,8 +133,9 @@ class EMNavProcessor constructor(
                 }
             },
             validationJsonOutput = FileUtils.getValidationJson(getActivity(), survey.id)!!,
+            useCaseInput = navigationUseCaseInput,
             skipInvalid = survey.skipInvalid,
-            useCaseInput = navigationUseCaseInput
+            surveyMode = SurveyMode.OFFLINE
         )
         val script = navigationUseCaseWrapperImpl.getNavigationScript()
         (webView.context as Activity).runOnUiThread {

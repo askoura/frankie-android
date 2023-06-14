@@ -93,16 +93,12 @@ class DownloadManagerImpl(
                 }
                 downloadedFiles++
             }
-            if (downloadedFiles == 0) {
-                emit(DownloadState.Error(Exception()))
-            } else {
-                val updatedSurveyData =
-                    surveyData.copy(newVersionAvailable = false, publishInfo = design.publishInfo)
-                val fileQuestions = validationOutput.schema.filter { it.dataType == DataType.FILE }
-                    .map { it.componentCode }
-                surveyRepository.saveSurveyToDB(updatedSurveyData, fileQuestions)
-                emit(DownloadState.Result(updatedSurveyData, someFilesFailed))
-            }
+            val updatedSurveyData =
+                surveyData.copy(newVersionAvailable = false, publishInfo = design.publishInfo)
+            val fileQuestions = validationOutput.schema.filter { it.dataType == DataType.FILE }
+                .map { it.componentCode }
+            surveyRepository.saveSurveyToDB(updatedSurveyData, fileQuestions)
+            emit(DownloadState.Result(updatedSurveyData, someFilesFailed))
         }.catch {
             emit(DownloadState.Error(it))
         }.flowOn(Dispatchers.IO)

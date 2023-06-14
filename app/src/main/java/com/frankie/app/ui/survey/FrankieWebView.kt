@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.net.Uri
+import android.provider.OpenableColumns
 import android.util.AttributeSet
 import android.util.Log
 import android.webkit.*
@@ -33,29 +34,20 @@ class FrankieWebView
     val surveyActivity: SurveyActivity? get() = context as? SurveyActivity
 
 
-    private var filePathCallback: ValueCallback<Array<Uri>>? = null
     private var saverUri: Uri? = null
-    private var photoKey: String? = null
-    private var barcodeKey: String? = null
-    private var videoKey: String? = null
+    private var operationKey: String? = null
+    private var maxSizeKb: Int? = null
+    private var acceptedTypes: String? = null
 
-    val fileSelectedCallback = ValueCallback<Uri?> { value ->
-        saverUri = value
-        photoKey = null
-        videoKey = null
-        value?.let {
-            filePathCallback?.onReceiveValue(arrayOf(value))
-        } ?: filePathCallback?.onReceiveValue(null)
-    }
 
     fun resetFileUploadVariables() {
-        filePathCallback = null
         saverUri = null
-        photoKey = null
-        videoKey = null
+        maxSizeKb = null
+        operationKey = null
+        acceptedTypes = null
     }
 
-    private lateinit var emNavProcessor:EMNavProcessor
+    private lateinit var emNavProcessor: EMNavProcessor
     private lateinit var survey: SurveyData
     private var responseId: String? = null
 
@@ -168,7 +160,7 @@ class FrankieWebView
 
         @JavascriptInterface
         fun capturePhoto(key: String) {
-            photoKey = key
+            operationKey = key
             val uuid = UUID.randomUUID()
             val file = FileUtils.getResponseFile(context, uuid.toString(), survey.id)
             saverUri = FileProvider
@@ -177,16 +169,24 @@ class FrankieWebView
         }
 
         @JavascriptInterface
-        fun scanBarcode(key: String) {
-            barcodeKey = key
+        fun scanBarcode(key: String, maxSizeInKb: Int) {
+            operationKey = key
             surveyActivity?.scanBarcode()
         }
 
 
         @JavascriptInterface
-        fun captureVideo(key: String) {
-            videoKey = key
+        fun captureVideo(key: String, maxSizeInKb: Int) {
+            operationKey = key
             surveyActivity?.takeVideo()
+        }
+
+        @JavascriptInterface
+        fun selectFile(key: String, accepted: String, maxSizeInKb: Int) {
+            operationKey = key
+            surveyActivity?.pickFromGallery(accepted)
+            maxSizeKb = if (maxSizeInKb > 0) maxSizeInKb else null
+            acceptedTypes = accepted.ifEmpty { null }
         }
 
         @JavascriptInterface
@@ -233,19 +233,6 @@ class FrankieWebView
         settings.setSupportZoom(false)
 
         webViewClient = frankieWebViewClient
-        webChromeClient = object : WebChromeClient() {
-            override fun onShowFileChooser(
-                webView: WebView?,
-                filePathCallback: ValueCallback<Array<Uri>>?,
-                fileChooserParams: FileChooserParams?
-            ): Boolean {
-                filePathCallback?.let {
-                    this@FrankieWebView.filePathCallback = it
-                    surveyActivity?.pickFromGallery()
-                    return true
-                } ?: return false
-            }
-        }
     }
 
 
@@ -308,14 +295,14 @@ class FrankieWebView
         try {
             stream = context.contentResolver.openInputStream(saverUri!!)
             val result = emNavProcessor.saveFileResponse(
-                fileName = "capured-image.jpg",
+                fileName = "captured-image.jpg",
                 uuid = UUID.fromString(saverUri.toString().substringAfterLast("/")),
                 fileSize = stream!!.readBytes().size.toLong(),
-                key = photoKey!!
+                key = operationKey!!
             )
             (context as Activity).runOnUiThread {
                 loadUrl(
-                    "javascript:onPhotoCatpured$photoKey(${
+                    "javascript:onPhotoCaptured$operationKey(${
                         jacksonKtMapper.writeValueAsString(
                             result
                         )
@@ -332,7 +319,7 @@ class FrankieWebView
 
     fun onBarcodeScanned(contents: String) {
         (context as Activity).runOnUiThread {
-            loadUrl("javascript:onBarcodeScanned$barcodeKey(\"$contents\")")
+            loadUrl("javascript:onBarcodeScanned$operationKey(\"$contents\")")
         }
     }
 
@@ -341,13 +328,13 @@ class FrankieWebView
         try {
             stream = context.contentResolver.openInputStream(contentUri!!)
             val result = emNavProcessor.uploadFile(
-                key = videoKey!!,
-                fileName = "capured-video.mp4",
+                key = operationKey!!,
+                fileName = "captured-video.mp4",
                 inputStream = stream!!
             )
             (context as Activity).runOnUiThread {
                 loadUrl(
-                    "javascript:onVideoCatpured$videoKey(${
+                    "javascript:onVideoCaptured$operationKey(${
                         jacksonKtMapper.writeValueAsString(
                             result
                         )
@@ -357,6 +344,24 @@ class FrankieWebView
 
         } finally {
             stream?.close()
+        }
+
+        resetFileUploadVariables()
+    }
+
+    fun onFileSelected(uri: Uri) {
+        try {
+            val cursor = context.contentResolver.query(uri, null, null, null, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                val displayName =
+                    cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                val size = cursor.getLong(cursor.getColumnIndex(OpenableColumns.SIZE))
+                val fileType = context.contentResolver.getType(uri);
+                loadUrl("javascript:onFileSelected$operationKey(\"$displayName\", $size, \"$fileType\")")
+                cursor.close();
+            }
+        } catch (e: Exception) {
         }
 
         resetFileUploadVariables()
