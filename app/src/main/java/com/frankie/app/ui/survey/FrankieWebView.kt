@@ -181,10 +181,8 @@ class FrankieWebView
                 val intent = Intent(Intent.ACTION_VIEW)
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 val file = FileUtils.getResponseFile(context, fileName, survey.id)
-                Log.d("blah", fileName)
                 val uri = FileProvider
                     .getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", file)
-                Log.d("blah", fileName)
                 intent.setDataAndType(uri, "*/*")
                 context.startActivity(intent)
             }
