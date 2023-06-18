@@ -26,7 +26,6 @@ data class SurveyDataEntity(
     val usage: String = "",
     val quota: Int,
     val userQuota: Int,
-    val navigationMode: NavigationMode,
     @Embedded val publishInfoEntity: PublishInfoEntity = PublishInfoEntity(),
     val newVersionAvailable: Boolean,
     val totalResponsesCount: Int,
@@ -34,11 +33,7 @@ data class SurveyDataEntity(
     val syncedResponseCount: Int,
     val saveTimings: Boolean,
     val backgroundAudio: Boolean,
-    val recordGps: Boolean,
-    val allowIncomplete: Boolean,
-    val allowJump: Boolean,
-    val allowPrevious: Boolean,
-    val skipInvalid: Boolean
+    val recordGps: Boolean
 ) {
     fun toSurveyData(
         localResponseCount: Int,
@@ -56,7 +51,6 @@ data class SurveyDataEntity(
         usage,
         quota,
         userQuota,
-        navigationMode,
         publishInfoEntity.toPublishInfo(),
         false,
         localResponseCount,
@@ -66,10 +60,6 @@ data class SurveyDataEntity(
         saveTimings,
         backgroundAudio,
         recordGps,
-        allowIncomplete,
-        allowJump,
-        allowPrevious,
-        skipInvalid
     )
 }
 

@@ -3,6 +3,7 @@ package com.frankie.app.ui.survey
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.util.AttributeSet
@@ -113,7 +114,7 @@ class FrankieWebView
             override fun onError(error: Throwable) {
                 // TODO("Report Error to MainActivity")
             }
-        }, survey.navigationMode)
+        })
     }
 
     private val androidJavascriptInterface = object {
@@ -145,7 +146,7 @@ class FrankieWebView
                     override fun onError(error: Throwable) {
                         // TODO("Report Error to MainActivity")
                     }
-                }, survey.navigationMode)
+                })
             } else {
                 navigate(
                     mapper,
@@ -172,6 +173,21 @@ class FrankieWebView
         fun scanBarcode(key: String, maxSizeInKb: Int) {
             operationKey = key
             surveyActivity?.scanBarcode()
+        }
+
+        @JavascriptInterface
+        fun previewFileUpload(fileName: String, nameWithExt: String) {
+            (context as Activity).runOnUiThread {
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                val file = FileUtils.getResponseFile(context, fileName, survey.id)
+                Log.d("blah", fileName)
+                val uri = FileProvider
+                    .getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", file)
+                Log.d("blah", fileName)
+                intent.setDataAndType(uri, "*/*")
+                context.startActivity(intent)
+            }
         }
 
 
@@ -351,20 +367,23 @@ class FrankieWebView
 
     fun onFileSelected(uri: Uri) {
         try {
-            val cursor = context.contentResolver.query(uri, null, null, null, null);
+            val cursor = context.contentResolver.query(uri, null, null, null, null)
 
             if (cursor != null && cursor.moveToFirst()) {
                 val displayName =
-                    cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                    cursor.getString(
+                        cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    )
                 val size = cursor.getLong(cursor.getColumnIndex(OpenableColumns.SIZE))
-                val fileType = context.contentResolver.getType(uri);
+                val fileType = context.contentResolver.getType(uri)
+                saverUri = uri
+                cursor.close()
                 loadUrl("javascript:onFileSelected$operationKey(\"$displayName\", $size, \"$fileType\")")
-                cursor.close();
             }
         } catch (e: Exception) {
+            resetFileUploadVariables()
         }
 
-        resetFileUploadVariables()
     }
 
 

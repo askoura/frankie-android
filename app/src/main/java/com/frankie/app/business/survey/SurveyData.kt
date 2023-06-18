@@ -5,7 +5,6 @@ import com.frankie.app.api.survey.Language
 import com.frankie.app.api.survey.PublishInfo
 import com.frankie.app.api.survey.Survey
 import com.frankie.app.business.fromUtc
-import com.frankie.expressionmanager.model.NavigationMode
 import com.frankie.expressionmanager.model.SurveyLang
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDateTime
@@ -24,7 +23,6 @@ data class SurveyData(
     val usage: String,
     val surveyQuota: Int,
     val userQuota: Int,
-    val navigationMode: NavigationMode,
     val publishInfo: PublishInfo,
     val newVersionAvailable: Boolean,
     val localResponsesCount: Int,
@@ -34,10 +32,6 @@ data class SurveyData(
     val saveTimings: Boolean,
     val backgroundAudio: Boolean,
     val recordGps: Boolean,
-    val allowIncomplete: Boolean,
-    val allowJump: Boolean,
-    val allowPrevious: Boolean,
-    val skipInvalid: Boolean,
 ) : Parcelable {
 
     private val scheduled: Boolean
@@ -89,7 +83,6 @@ data class SurveyData(
                 survey.usage,
                 survey.surveyQuota,
                 survey.userQuota,
-                survey.navigationMode,
                 currentPublishInfo,
                 newVersionAvailable,
                 responsesCount,
@@ -99,10 +92,6 @@ data class SurveyData(
                 survey.saveTimings,
                 survey.backgroundAudio,
                 survey.recordGps,
-                survey.allowIncomplete,
-                survey.allowJump,
-                survey.allowPrevious,
-                survey.skipInvalid
 
             )
         }

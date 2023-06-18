@@ -149,7 +149,6 @@ private fun SurveyData.toSurveyDataEntity(fileQuestions: List<String> = emptyLis
         usage = this.usage,
         quota = this.surveyQuota,
         userQuota = this.userQuota,
-        navigationMode = this.navigationMode,
         publishInfoEntity = this.publishInfo.toPublishInfoEntity(),
         newVersionAvailable = this.newVersionAvailable,
         saveTimings = this.saveTimings,
@@ -157,10 +156,6 @@ private fun SurveyData.toSurveyDataEntity(fileQuestions: List<String> = emptyLis
         recordGps = this.recordGps,
         totalResponsesCount = this.totalResponseCount,
         syncedResponseCount = this.syncedResponseCount,
-        allowIncomplete = this.allowIncomplete,
-        allowJump = this.allowJump,
-        allowPrevious = this.allowPrevious,
-        skipInvalid = this.skipInvalid,
         fileQuestions = fileQuestions
     )
 }

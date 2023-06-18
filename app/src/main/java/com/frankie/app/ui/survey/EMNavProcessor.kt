@@ -50,13 +50,11 @@ class EMNavProcessor constructor(
     }
 
     fun start(
-        navListener: NavigationListener,
-        navigationMode: NavigationMode
+        navListener: NavigationListener
     ) {
         val navigationUseCaseInput = NavigationUseCaseInput(
             navigationInfo = NavigationInfo(
                 navigationDirection = NavigationDirection.Start,
-                navigationMode = navigationMode,
                 navigationIndex = null
             ),
             defaultLang = survey.defaultLanguage.toSurveyLang(),
@@ -75,7 +73,7 @@ class EMNavProcessor constructor(
                         responseId = responseId!!,
                         lang = survey.defaultLanguage.toSurveyLang(),
                         additionalLang = survey.additionalLanguages.map { it.toSurveyLang() },
-                        navProps = survey.toNavProps()
+                        saveTimings = survey.saveTimings
                     )
                 navListener.onSuccess(result)
             }
@@ -84,8 +82,7 @@ class EMNavProcessor constructor(
 
     fun navigate(
         useCaseInput: NavigateRequest,
-        navListener: NavigationListener,
-        navigationMode: NavigationMode
+        navListener: NavigationListener
     ) {
         var response: Response
         responseId = useCaseInput.responseId!!
@@ -99,7 +96,6 @@ class EMNavProcessor constructor(
             },
             navigationInfo = NavigationInfo(
                 navigationDirection = useCaseInput.navigationDirection!!,
-                navigationMode = navigationMode,
                 navigationIndex = response.navigationIndex
             ),
             defaultLang = survey.defaultLanguage.toSurveyLang(),
@@ -113,7 +109,7 @@ class EMNavProcessor constructor(
                         responseId = responseId!!,
                         lang = lang,
                         additionalLang = survey.allLang.toMutableList().apply { remove(lang) },
-                        navProps = survey.toNavProps()
+                        saveTimings = survey.saveTimings
                     )
                 updateResponse(response, lang, navigationJsonOutput, useCaseInput.events)
                 navListener.onSuccess(result)
@@ -126,15 +122,16 @@ class EMNavProcessor constructor(
         onSuccess: (NavigationJsonOutput) -> Unit,
         onError: (Throwable) -> Unit
     ) {
+        val validationJsonOutput = FileUtils.getValidationJson(getActivity(), survey.id)!!
         val navigationUseCaseWrapperImpl = NavigationUseCaseWrapperImpl(
             object : ScriptEngine {
                 override fun executeScript(method: String, script: String): String {
                     throw java.lang.IllegalStateException("Should not resort to Script engine")
                 }
             },
-            validationJsonOutput = FileUtils.getValidationJson(getActivity(), survey.id)!!,
+            validationJsonOutput = validationJsonOutput,
             useCaseInput = navigationUseCaseInput,
-            skipInvalid = survey.skipInvalid,
+            skipInvalid = validationJsonOutput.surveyNavigationData().skipInvalid,
             surveyMode = SurveyMode.OFFLINE
         )
         val script = navigationUseCaseWrapperImpl.getNavigationScript()
@@ -311,7 +308,7 @@ fun NavigationJsonOutput.with(
     responseId: UUID,
     lang: SurveyLang,
     additionalLang: List<SurveyLang>,
-    navProps: NavProps
+    saveTimings: Boolean
 )
           : ApiNavigationOutput {
     return ApiNavigationOutput(
@@ -321,7 +318,7 @@ fun NavigationJsonOutput.with(
         responseId,
         lang,
         additionalLang,
-        navProps
+        saveTimings
     )
 }
 
@@ -332,14 +329,5 @@ data class ApiNavigationOutput(
     val responseId: UUID,
     val lang: SurveyLang,
     val additionalLang: List<SurveyLang>?,
-    val navProps: NavProps
+    val saveTimings: Boolean
 )
-
-data class NavProps(
-    val allowIncomplete: Boolean = true,
-    val allowJump: Boolean = true,
-    val allowPrevious: Boolean = true,
-    val saveTimings: Boolean = true
-)
-
-fun SurveyData.toNavProps() = NavProps(allowIncomplete, allowJump, allowPrevious, saveTimings)

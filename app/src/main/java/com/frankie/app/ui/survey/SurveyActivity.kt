@@ -260,13 +260,15 @@ class SurveyActivity : AppCompatActivity() {
         }
     }
 
-    fun pickFromGallery(type: String?) {
+    fun pickFromGallery(mimeTypes: String?) {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false)
-            type?.let {
-                setType(type)
-                putExtra(Intent.EXTRA_MIME_TYPES, type.split(",").toTypedArray())
+            if (mimeTypes.isNullOrBlank()) {
+                type = "*/*"
+            } else {
+                type = mimeTypes
+                putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes.split(",").toTypedArray())
             }
         }
         try {
