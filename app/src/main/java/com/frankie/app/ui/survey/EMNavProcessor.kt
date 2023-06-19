@@ -12,6 +12,7 @@ import com.frankie.app.business.settings.SharedPrefsManagerImpl
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.db.FrankieDb
 import com.frankie.app.db.model.Response
+import com.frankie.app.db.model.Response.Companion.STORED_FILENAME_KEY
 import com.frankie.app.ui.common.FileUtils
 import com.frankie.expressionmanager.ext.ScriptUtils
 import com.frankie.expressionmanager.model.*
@@ -265,7 +266,7 @@ class EMNavProcessor constructor(
             put("$key.value", responseUploadFile)
         }
         CoroutineScope(Dispatchers.IO).launch {
-            (response.values["$key.value"] as? Map<*, *>)?.get("stored_filename")?.let {
+            (response.values["$key.value"] as? Map<*, *>)?.get(STORED_FILENAME_KEY)?.let {
                 val file = FileUtils.getResponseFile(getActivity(), it.toString(), survey.id)
                 if (file.exists()) {
                     Log.d(TAG, "deleting old file: $it")

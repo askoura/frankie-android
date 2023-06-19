@@ -5,7 +5,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
 import androidx.room.Transaction
-import androidx.room.TypeConverters
 import com.frankie.app.db.model.Response
 import com.frankie.expressionmanager.model.NavigationIndex
 import com.frankie.expressionmanager.model.ResponseEvent
@@ -63,7 +62,7 @@ interface ResponseDao {
             startDate = response.startDate,
             submitDate = response.submitDate,
             navigationIndex = response.navigationIndex,
-            events = newEvents
+                events = newEvents
         )
     }
 
@@ -73,4 +72,7 @@ interface ResponseDao {
 
     @Query("SELECT COUNT(*) FROM response WHERE userId = :userId AND surveyId = :surveyId AND submitDate IS NOT NULL")
     suspend fun countCompleteByUserAndSurvey(userId: String, surveyId: String): Int
+
+    @Query("UPDATE response SET is_synced = 1 WHERE id = :responseId")
+    suspend fun markResponseAsSynced(responseId: String)
 }

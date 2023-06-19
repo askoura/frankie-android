@@ -5,6 +5,7 @@ import com.frankie.app.api.survey.Language
 import com.frankie.app.api.survey.PublishInfo
 import com.frankie.app.api.survey.SurveyDesign
 import com.frankie.app.api.survey.SurveyService
+import com.frankie.app.api.survey.UploadResponseRequestData
 import com.frankie.app.db.ResponseDao
 import com.frankie.app.db.permission.PermissionDao
 import com.frankie.app.db.survey.LanguageEntity
@@ -17,11 +18,22 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import java.io.File
 
 interface SurveyRepository {
+
+    fun getSurveyDbEntity(surveyId: String): Flow<Result<SurveyDataEntity?>>
     fun getSurveyList(): Flow<Result<List<SurveyData>>>
     fun getOfflineSurveyList(): Flow<Result<List<SurveyData>>>
     fun getSurveyFile(surveyId: String, resourceId: String): Flow<Result<DataStream>>
+
+    fun uploadSurveyResponseFile(surveyId: String, file: File): Flow<Result<Unit>>
+
+    fun uploadSurveyResponse(surveyId: String,
+                             responseId: String,
+                             uploadResponseRequestData: UploadResponseRequestData): Flow<Result<Unit>>
 
     suspend fun saveSurveyToDB(surveyData: SurveyData, fileQuestions: List<String>)
 
@@ -40,14 +52,22 @@ class SurveyRepositoryImpl(
     private val permissionDao: PermissionDao,
     private val sessionManager: SessionManager
 ) : SurveyRepository {
+
+    override fun getSurveyDbEntity(surveyId: String): Flow<Result<SurveyDataEntity?>> = flow {
+        val survey = surveyDao.getSurveyDataById(surveyId)
+        emit(Result.success(survey))
+    }.catch {
+        emit(Result.failure(it))
+    }.flowOn(Dispatchers.IO)
+
     override fun getSurveyList(): Flow<Result<List<SurveyData>>> {
         return flow {
             val surveyList = service.getSurveyList().map { survey ->
                 val design = service.getSurveyDesign(survey.id, PublishInfo())
                 val savedSurvey = surveyDao.getSurveyDataById(survey.id)
                 val count = responseDao.countByUserAndSurvey(
-                    surveyId = survey.id,
-                    userId = sessionManager.getUserIdOrThrow()
+                        surveyId = survey.id,
+                        userId = sessionManager.getUserIdOrThrow()
                 )
                 val responseCount = responseDao.countCompleteByUserAndSurvey(
                     surveyId = survey.id,
@@ -131,7 +151,22 @@ class SurveyRepositoryImpl(
         }.flowOn(Dispatchers.IO)
     }
 
+    override fun uploadSurveyResponseFile(surveyId: String, file: File): Flow<Result<Unit>> = flow {
+        val multipartBody = MultipartBody.Part.create(file.asRequestBody())
+        service.uploadSurveyFile(surveyId, multipartBody)
+        emit(Result.success(Unit))
+    }.catch {
+        emit(Result.failure(it))
+    }.flowOn(Dispatchers.IO)
 
+    override fun uploadSurveyResponse(surveyId: String,
+                                      responseId: String,
+                                      uploadResponseRequestData: UploadResponseRequestData): Flow<Result<Unit>> = flow {
+        service.uploadSurveyResponse(surveyId, responseId, uploadResponseRequestData)
+        emit(Result.success(Unit))
+    }.catch {
+        emit(Result.failure(it))
+    }.flowOn(Dispatchers.IO)
 }
 
 private fun SurveyData.toSurveyDataEntity(fileQuestions: List<String> = emptyList()): SurveyDataEntity {
@@ -159,6 +194,7 @@ private fun SurveyData.toSurveyDataEntity(fileQuestions: List<String> = emptyLis
         fileQuestions = fileQuestions
     )
 }
+
 
 fun PublishInfo.toPublishInfoEntity(): PublishInfoEntity {
     return PublishInfoEntity(version, subVersion, lastModified)

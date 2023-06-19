@@ -81,23 +81,26 @@ class MainFragment : Fragment() {
         adapter = SurveyListAdapter(onSyncClicked = { surveyData ->
             viewModel.syncSurveyForOffline(surveyData)
         },
-            onPlayClicked = { surveyData ->
-                startActivity(
-                    SurveyActivity.createIntent(
-                        requireContext(),
-                        surveyData
+                onPlayClicked = { surveyData ->
+                    startActivity(
+                            SurveyActivity.createIntent(
+                                    requireContext(),
+                                    surveyData
+                            )
                     )
-                )
-            },
-            onResponsesClicked = { surveyData ->
-                startActivity(
-                    ResponsesActivity.createIntent(
-                        requireContext(),
-                        surveyData
+                },
+                onResponsesClicked = { surveyData ->
+                    startActivity(
+                            ResponsesActivity.createIntent(
+                                    requireContext(),
+                                    surveyData
+                            )
                     )
-                )
-            },
-            onInfoClicked = { })
+                },
+                onInfoClicked = { },
+                onUploadClicked = { survey ->
+                    viewModel.uploadSurveyResponses(survey.id)
+                })
         binding.recycler.adapter = adapter
         binding.recycler.layoutManager = LinearLayoutManager(binding.root.context)
 
