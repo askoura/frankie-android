@@ -30,7 +30,6 @@ import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.databinding.ActivitySurveyBinding
 import com.frankie.expressionmanager.model.*
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -79,9 +78,6 @@ class SurveyActivity : AppCompatActivity() {
         binding.webview.loadSurvey(survey, responseIdExtra)
 
         locationCallback = object : LocationCallback() {
-            override fun onLocationAvailability(p0: LocationAvailability) {
-                super.onLocationAvailability(p0)
-            }
 
             override fun onLocationResult(locationResult: LocationResult) {
                 super.onLocationResult(locationResult)
@@ -122,11 +118,6 @@ class SurveyActivity : AppCompatActivity() {
         }
     }
 
-
-    override fun onPause() {
-        super.onPause()
-
-    }
 
     override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
         outState.putBoolean(REQUESTING_LOCATION_UPDATES_KEY, requestingLocationUpdates)
@@ -269,11 +260,16 @@ class SurveyActivity : AppCompatActivity() {
         }
     }
 
-    fun pickFromGallery() {
+    fun pickFromGallery(mimeTypes: String?) {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false)
-            type = "image/*"
+            if (mimeTypes.isNullOrBlank()) {
+                type = "*/*"
+            } else {
+                type = mimeTypes
+                putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes.split(",").toTypedArray())
+            }
         }
         try {
             galleryLauncher.launch(intent)
@@ -346,7 +342,7 @@ class SurveyActivity : AppCompatActivity() {
 
     private fun processGalleryResult(data: Intent?) {
         data?.data?.let { uri ->
-            binding.webview.fileSelectedCallback.onReceiveValue(uri)
+            binding.webview.onFileSelected(uri)
         }
     }
 

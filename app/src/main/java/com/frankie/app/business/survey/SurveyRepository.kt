@@ -1,5 +1,6 @@
 package com.frankie.app.business.survey
 
+import android.util.Log
 import com.frankie.app.api.survey.Language
 import com.frankie.app.api.survey.PublishInfo
 import com.frankie.app.api.survey.SurveyDesign
@@ -25,6 +26,7 @@ interface SurveyRepository {
 
     fun getSurveyDbEntity(surveyId: String): Flow<Result<SurveyDataEntity?>>
     fun getSurveyList(): Flow<Result<List<SurveyData>>>
+    fun getOfflineSurveyList(): Flow<Result<List<SurveyData>>>
     fun getSurveyFile(surveyId: String, resourceId: String): Flow<Result<DataStream>>
 
     fun uploadSurveyResponseFile(surveyId: String, file: File): Flow<Result<Unit>>
@@ -91,6 +93,18 @@ class SurveyRepositoryImpl(
         }.flowOn(Dispatchers.IO)
     }
 
+    override fun getOfflineSurveyList(): Flow<Result<List<SurveyData>>> {
+        return flow {
+            val userId = sessionManager.getUserIdOrThrow()
+            emit(Result.success(surveyDao.getAllSurveyData(sessionManager.getUserIdOrThrow()).map {
+                it.toSurveyData(
+                    responseDao.countByUserAndSurvey(userId, it.id),
+                    responseDao.countCompleteByUserAndSurvey(userId, it.id)
+                )
+            }))
+        }
+    }
+
     override suspend fun saveSurveyToDB(surveyData: SurveyData, fileQuestions: List<String>) {
         surveyDao.insert(surveyData.toSurveyDataEntity(fileQuestions))
     }
@@ -114,8 +128,7 @@ class SurveyRepositoryImpl(
         resourceId: String
     ): Flow<Result<SurveyRepository.DataStream>> {
         return flow {
-            val responseBody = service.getSurveyFile(surveyId, resourceId)
-            responseBody.byteStream().use { inputStream ->
+            service.getSurveyFile(surveyId, resourceId).byteStream().use { inputStream ->
                 val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
                 var bytes = inputStream.read(buffer)
                 while (bytes >= 0) {
@@ -156,7 +169,7 @@ class SurveyRepositoryImpl(
     }.flowOn(Dispatchers.IO)
 }
 
-private fun SurveyData.toSurveyDataEntity(fileQuestions:List<String> = emptyList()): SurveyDataEntity {
+private fun SurveyData.toSurveyDataEntity(fileQuestions: List<String> = emptyList()): SurveyDataEntity {
     return SurveyDataEntity(
         id = this.id,
         creationDate = this.creationDate,
@@ -171,7 +184,6 @@ private fun SurveyData.toSurveyDataEntity(fileQuestions:List<String> = emptyList
         usage = this.usage,
         quota = this.surveyQuota,
         userQuota = this.userQuota,
-        navigationMode = this.navigationMode,
         publishInfoEntity = this.publishInfo.toPublishInfoEntity(),
         newVersionAvailable = this.newVersionAvailable,
         saveTimings = this.saveTimings,
@@ -179,10 +191,6 @@ private fun SurveyData.toSurveyDataEntity(fileQuestions:List<String> = emptyList
         recordGps = this.recordGps,
         totalResponsesCount = this.totalResponseCount,
         syncedResponseCount = this.syncedResponseCount,
-        allowIncomplete = this.allowIncomplete,
-        allowJump = this.allowJump,
-        allowPrevious = this.allowPrevious,
-        skipInvalid = this.skipInvalid,
         fileQuestions = fileQuestions
     )
 }

@@ -1,12 +1,14 @@
 package com.frankie.app.ui.common
 
 import android.content.Context
+import android.webkit.MimeTypeMap
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.frankie.expressionmanager.model.jacksonKtMapper
 import com.frankie.expressionmanager.usecase.ValidationJsonOutput
 import java.io.File
 import java.net.URLDecoder
 import java.net.URLEncoder
+
 
 object FileUtils {
 
@@ -56,6 +58,11 @@ object FileUtils {
                 it.readText()
             }, jacksonTypeRef<ValidationJsonOutput>()
         )
+    }
+
+    fun getMimeType(fileName: String): String? {
+        val extension = MimeTypeMap.getFileExtensionFromUrl(fileName)
+        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
     }
 
     enum class FileType(private val folderName: String) {

@@ -1,7 +1,7 @@
 package com.frankie.app.ui.main.ui.main
 
-import android.app.ProgressDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -15,8 +15,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.frankie.app.R
+import com.frankie.app.business.ByteSize
+import com.frankie.app.business.formatBytes
 import com.frankie.app.databinding.FragmentMainBinding
+import com.frankie.app.storage.DownloadState
 import com.frankie.app.ui.common.error.ErrorDisplayManager
+import com.frankie.app.ui.common.visibleOrGone
 import com.frankie.app.ui.login.LoginActivity
 import com.frankie.app.ui.responses.ResponsesActivity
 import com.frankie.app.ui.survey.SurveyActivity
@@ -35,8 +39,6 @@ class MainFragment : Fragment() {
     companion object {
         fun newInstance() = MainFragment()
     }
-
-    private var progressDialog: ProgressDialog? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -60,7 +62,7 @@ class MainFragment : Fragment() {
                     }
 
                     R.id.refresh -> {
-                        viewModel.fetchSurveyList()
+                        viewModel.fetchSurveyList(true)
                         true
                     }
 
@@ -104,8 +106,21 @@ class MainFragment : Fragment() {
 
         lifecycleScope.launch {
             viewModel.state.collect { state ->
-                adapter.submitList(state.surveyList)
-                showProgressDialog(state.isLoading)
+                if (!state.isLoading && state.surveyList.isEmpty()) {
+                    binding.noSurveysAvailable.visibleOrGone(true)
+                    binding.fetchingSurveysProgress.visibleOrGone(false)
+                    binding.recycler.visibleOrGone(false)
+                } else {
+                    binding.noSurveysAvailable.visibleOrGone(false)
+                    binding.fetchingSurveysProgress.visibleOrGone(state.isLoading)
+                    binding.recycler.visibleOrGone(true)
+                    adapter.submitList(state.surveyList)
+                }
+            }
+        }
+        lifecycleScope.launch {
+            viewModel.downloadState.collect { downloadState ->
+                processDownloadState(downloadState)
             }
         }
 
@@ -118,23 +133,45 @@ class MainFragment : Fragment() {
         return binding.root
     }
 
-    // TODO find better way to show progress
-    private fun showProgressDialog(show: Boolean) {
-        if (progressDialog != null && progressDialog!!.isShowing) {
-            progressDialog?.dismiss()
+    private fun processDownloadState(downloadState: DownloadState) {
+        downloadState.run {
+            binding.syncingProgressContainer.visibleOrGone(downloadState is DownloadState.Loading)
+            if (downloadState !is DownloadState.Loading) {
+                return@run
+            } else {
+                binding.syncingSurveyTitle.text =
+                    getString(R.string.syncing_survey_title, downloadState.surveyName)
+                binding.syncingSurveyFileOrder.visibleOrGone(downloadState.totalFilesCount > 0)
+                binding.syncCurrentSize.visibleOrGone(downloadState.totalSize > 0)
+                binding.syncTotalSize.visibleOrGone(downloadState.totalSize > 0)
+                formatBytes(downloadState.totalSize).let { formatted->
+                    binding.syncTotalSize.text = getString(
+                        if (formatted.byteSize == ByteSize.MEGA) R.string.megabytes else R.string.kilobytes,
+                        formatted.value
+                    )
+                }
+                formatBytes(downloadState.currentDownloadedSize).let { formatted->
+                    binding.syncCurrentSize.text = getString(
+                        if (formatted.byteSize == ByteSize.MEGA) R.string.megabytes else R.string.kilobytes,
+                        formatted.value
+                    )
+                }
+                binding.syncingSurveyFileOrder.text = getString(
+                    R.string.syncing_survey_file_order,
+                    downloadState.downloadedFileCount + 1,
+                    downloadState.totalFilesCount
+                )
+                binding.syncingProgress.max = 100
+                binding.syncingProgress.post {
+                    binding.syncingProgress.progress = downloadState.downloadPercent
+                }
+            }
         }
-        if (show) {
-            progressDialog = ProgressDialog.show(
-                binding.root.context,
-                getString(R.string.progress_dialog_title),
-                getString(R.string.progress_dialog_description),
-                true
-            )
-        }
+
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.fetchSurveyList()
+        viewModel.fetchSurveyList(false)
     }
 }

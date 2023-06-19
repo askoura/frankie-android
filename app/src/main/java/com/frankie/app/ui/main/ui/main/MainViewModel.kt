@@ -7,9 +7,11 @@ import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.business.survey.SurveyRepository
 import com.frankie.app.business.survey.UploadSurveyResponsesUseCase
 import com.frankie.app.storage.DownloadManager
+import com.frankie.app.storage.DownloadState
 import com.frankie.app.ui.common.error.ErrorProcessor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -20,37 +22,56 @@ class MainViewModel(
         private val uploadSurveyResponsesUseCase: UploadSurveyResponsesUseCase,
         errorProcessor: ErrorProcessor
 ) : ViewModel(), ErrorProcessor by errorProcessor {
-    private val _state = MutableStateFlow(State())
+    private val _firstLoad = MutableStateFlow(true)
+    private val _state = MutableStateFlow(State(isLoading = true))
     val state = _state.asStateFlow()
-    fun fetchSurveyList() {
+
+    private val _downloadState: MutableStateFlow<DownloadState> =
+        MutableStateFlow(DownloadState.Idle)
+    val downloadState = _downloadState.asStateFlow()
+    fun fetchSurveyList(triggeredByUser: Boolean) {
         viewModelScope.launch {
-            _state.update { _state.value.copy(isLoading = true) }
-            surveyRepository.getSurveyList().collect { result ->
+            _state.update { _state.value.copy(isLoading = _firstLoad.value || triggeredByUser) }
+            _firstLoad.value = false
+            merge(
+                surveyRepository.getSurveyList(),
+                surveyRepository.getOfflineSurveyList()
+            ).collect { result ->
                 if (result.isSuccess) {
                     _state.update {
-                        _state.value.copy(isLoading = false, surveyList = result.getOrThrow())
+                        _state.value.copy(surveyList = result.getOrThrow())
                     }
                 } else {
-                    _state.update { _state.value.copy(isLoading = false) }
-                    processError(result.exceptionOrNull()!!)
+                    if (triggeredByUser || _firstLoad.value) {
+                        processError(result.exceptionOrNull()!!)
+                    }
                 }
             }
+            _state.update { _state.value.copy(isLoading = false) }
         }
     }
 
     fun syncSurveyForOffline(surveyData: SurveyData) {
         viewModelScope.launch {
-            _state.update { _state.value.copy(isLoading = true) }
             downloadManager.downloadSurveyFiles(surveyData).collect { result ->
-                _state.update { _state.value.copy(isLoading = false) }
-                if (result.isSuccess) {
-                    val newSurvey = result.getOrNull()
-                    val newList = _state.value.surveyList.map {
-                        if (it.id == surveyData.id) newSurvey ?: it else it
+                when (result) {
+                    is DownloadState.Loading,
+                    is DownloadState.Idle -> {
+                        _downloadState.value = result
                     }
-                    _state.update { _state.value.copy(isLoading = false, surveyList = newList) }
-                } else {
-                    processError(result.exceptionOrNull()!!)
+
+                    is DownloadState.Error -> {
+                        processError(result.throwable)
+                        _downloadState.value = result
+                    }
+
+                    is DownloadState.Result -> {
+                        val newList = _state.value.surveyList.map {
+                            if (it.id == result.surveyData.id) result.surveyData else it
+                        }
+                        _state.update { _state.value.copy(isLoading = false, surveyList = newList) }
+                        _downloadState.update { DownloadState.Idle }
+                    }
                 }
             }
         }
@@ -73,8 +94,8 @@ class MainViewModel(
     }
 
     data class State(
-            val isLoading: Boolean = false,
-            val surveyList: List<SurveyData> = emptyList(),
+        val isLoading: Boolean,
+        val surveyList: List<SurveyData> = emptyList(),
     )
 
 }

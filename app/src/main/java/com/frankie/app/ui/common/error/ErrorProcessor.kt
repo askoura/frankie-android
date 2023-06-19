@@ -36,7 +36,7 @@ class ErrorProcessorImpl : ErrorProcessor {
             is InterruptedIOException,
             is NoRouteToHostException,
             is SSLException -> {
-                ProcessedError.GeneralError
+                ProcessedError.NetworkError
             }
 
             else -> {
@@ -73,5 +73,6 @@ class ErrorProcessorImpl : ErrorProcessor {
 sealed class ProcessedError(val titleRes: Int, val messageRes: Int) {
     object AuthError : ProcessedError(R.string.error_auth_title, R.string.error_auth_description)
     object GeneralError : ProcessedError(R.string.error_general_title, R.string.error_general_description)
+    object NetworkError : ProcessedError(R.string.error_network_title, R.string.error_network_description)
     object LoginError : ProcessedError(R.string.error_login_title, R.string.error_login_description)
 }

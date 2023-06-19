@@ -34,7 +34,10 @@ class SurveyListItemView @JvmOverloads constructor(
             onUploadClicked: (SurveyData) -> Unit
     ) {
         val isPlayEnabled =
-            !surveyData.newVersionAvailable && !surveyData.quotaExceeded() && surveyData.surveyStatus == SurveyStatus.ACTIVE
+            !surveyData.newVersionAvailable
+                      && surveyData.publishInfo.version > 0
+                      && !surveyData.quotaExceeded()
+                      && surveyData.surveyStatus == SurveyStatus.ACTIVE
         val isSyncOfflineEnabled = surveyData.newVersionAvailable
         val isResponsesEnabled = surveyData.localResponsesCount > 0
         binding.localResponseCount.text = surveyData.localResponsesCount.let { count ->
@@ -42,7 +45,7 @@ class SurveyListItemView @JvmOverloads constructor(
         }
         binding.completeLocalResponseCount.text =
             surveyData.localCompleteResponsesCount.let { count ->
-                context.getString(R.string.local_total_responses_count, count)
+                context.getString(R.string.local_complete_responses_count, count)
             }
         binding.startDate.text = surveyData.startDate.let { localDateTime ->
             if (localDateTime == null) {
