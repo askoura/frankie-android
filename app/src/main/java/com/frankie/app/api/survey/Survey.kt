@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.frankie.expressionmanager.model.DATE_TIME_UTC_FORMAT
 import com.frankie.expressionmanager.model.ResponseEvent
+import com.frankie.expressionmanager.model.SurveyLang
 import com.frankie.expressionmanager.model.toSurveyLang
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDateTime
@@ -51,7 +52,7 @@ data class Language(
 
 data class UploadResponseRequestData(
         val versionId: Int,
-        val lang: String? = null,
+        val lang: SurveyLang,
         val events: List<ResponseEvent> = listOf(),
         val values: Map<String, Any> = mapOf()
 )

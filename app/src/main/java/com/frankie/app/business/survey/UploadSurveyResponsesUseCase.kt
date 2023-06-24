@@ -29,7 +29,6 @@ class UploadSurveyResponsesUseCaseImpl(
         val surveyDbEntity = surveyRepository.getSurveyDbEntity(surveyId).single().getOrThrow()
                 ?: throw Exception("Survey not found")
         val publishInfo = surveyDbEntity.publishInfoEntity
-                ?: throw Exception("survey version not found")
         val fileQuestions = surveyDbEntity.fileQuestions.map { "${it}.value" }
         responses.forEachIndexed { index, response ->
             val voiceRecordingFilenames = response.events.filterIsInstance<ResponseEvent.VoiceRecording>().map { it.fileName }
@@ -48,7 +47,7 @@ class UploadSurveyResponsesUseCaseImpl(
 
             // 2. upload response row
             val uploadData = UploadResponseRequestData(versionId = publishInfo.version,
-                    lang = response.lang.code,
+                    lang = response.lang,
                     events = response.events,
                     values = response.values)
             surveyRepository.uploadSurveyResponse(surveyId, response.id, uploadData)
