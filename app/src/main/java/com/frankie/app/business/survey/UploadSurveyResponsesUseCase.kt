@@ -8,6 +8,7 @@ import com.frankie.app.ui.common.FileUtils
 import com.frankie.expressionmanager.model.ResponseEvent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.single
 
@@ -39,7 +40,7 @@ class UploadSurveyResponsesUseCaseImpl(
             allFilenames.forEach { filename ->
                 val file = FileUtils.getResponseFile(appContext, filename, surveyId)
                 if (file.exists()) {
-                    surveyRepository.uploadSurveyResponseFile(surveyId, file)
+                    surveyRepository.uploadSurveyResponseFile(surveyId, file).collect()
                 } else {
                     // TODO: report file missing
                 }
@@ -50,7 +51,7 @@ class UploadSurveyResponsesUseCaseImpl(
                     lang = response.lang,
                     events = response.events,
                     values = response.values)
-            surveyRepository.uploadSurveyResponse(surveyId, response.id, uploadData)
+            surveyRepository.uploadSurveyResponse(surveyId, response.id, uploadData).collect()
 
             // 3. mark response as synced
             responseRepository.markResponseAsSynced(response.id)

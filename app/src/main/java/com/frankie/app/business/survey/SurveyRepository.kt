@@ -1,6 +1,5 @@
 package com.frankie.app.business.survey
 
-import android.util.Log
 import com.frankie.app.api.survey.Language
 import com.frankie.app.api.survey.PublishInfo
 import com.frankie.app.api.survey.SurveyDesign
@@ -13,6 +12,9 @@ import com.frankie.app.db.survey.LanguagesEntity
 import com.frankie.app.db.survey.PublishInfoEntity
 import com.frankie.app.db.survey.SurveyDao
 import com.frankie.app.db.survey.SurveyDataEntity
+import com.frankie.expressionmanager.model.DataType
+import com.frankie.expressionmanager.model.jacksonKtMapper
+import com.frankie.expressionmanager.usecase.ValidationOutput
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -74,17 +76,23 @@ class SurveyRepositoryImpl(
                     userId = sessionManager.getUserIdOrThrow()
                 )
                 val newVersionAvailable = savedSurvey?.publishInfoEntity?.toPublishInfo()
-                    ?.let { it != design.publishInfo }
-                    ?: true
-                SurveyData.fromSurveyAndDesign(
-                    survey,
-                    savedSurvey?.publishInfoEntity?.toPublishInfo() ?: PublishInfo(),
-                    newVersionAvailable,
-                    count,
-                    responseCount
+                        ?.let { it != design.publishInfo }
+                        ?: true
+                val survey = SurveyData.fromSurveyAndDesign(
+                        survey,
+                        savedSurvey?.publishInfoEntity?.toPublishInfo() ?: PublishInfo(),
+                        newVersionAvailable,
+                        count,
+                        responseCount
                 )
+                val fileQuestions = jacksonKtMapper.treeToValue(design.validationJsonOutput, ValidationOutput::class.java)
+                        .schema.filter { it.dataType == DataType.FILE }
+                        .map { it.componentCode }
+
+                saveSurveyToDB(survey, fileQuestions)
+                survey
             }
-            saveSurveysToDB(surveyList)
+
             savePermissionsToDB(surveyList)
 
             emit(Result.success(surveyList))
@@ -99,7 +107,7 @@ class SurveyRepositoryImpl(
             emit(Result.success(surveyDao.getAllSurveyData(sessionManager.getUserIdOrThrow()).map {
                 it.toSurveyData(
                     responseDao.countByUserAndSurvey(userId, it.id),
-                    responseDao.countCompleteByUserAndSurvey(userId, it.id)
+                        responseDao.countCompleteByUserAndSurvey(userId, it.id)
                 )
             }))
         }
@@ -109,14 +117,14 @@ class SurveyRepositoryImpl(
         surveyDao.insert(surveyData.toSurveyDataEntity(fileQuestions))
     }
 
-    private suspend fun saveSurveysToDB(surveyList: List<SurveyData>) {
-        surveyDao.insertAll(surveyList.map { it.toSurveyDataEntity() })
+    private suspend fun saveSurveysToDB(surveyList: List<SurveyDataEntity>) {
+        surveyDao.insertAll(surveyList)
     }
 
     private suspend fun savePermissionsToDB(surveyList: List<SurveyData>) {
         permissionDao.updateUserPermissions(
-            sessionManager.getUserIdOrThrow(),
-            surveyList.map { it.id })
+                sessionManager.getUserIdOrThrow(),
+                surveyList.map { it.id })
     }
 
     override suspend fun surveyDesign(surveyData: SurveyData): SurveyDesign {
@@ -152,11 +160,9 @@ class SurveyRepositoryImpl(
     }
 
     override fun uploadSurveyResponseFile(surveyId: String, file: File): Flow<Result<Unit>> = flow {
-        val multipartBody = MultipartBody.Part.create(file.asRequestBody())
+        val multipartBody = MultipartBody.Part.createFormData("file", file.name, file.asRequestBody())
         service.uploadSurveyFile(surveyId, multipartBody)
         emit(Result.success(Unit))
-    }.catch {
-        emit(Result.failure(it))
     }.flowOn(Dispatchers.IO)
 
     override fun uploadSurveyResponse(surveyId: String,
@@ -164,8 +170,6 @@ class SurveyRepositoryImpl(
                                       uploadResponseRequestData: UploadResponseRequestData): Flow<Result<Unit>> = flow {
         service.uploadSurveyResponse(surveyId, responseId, uploadResponseRequestData)
         emit(Result.success(Unit))
-    }.catch {
-        emit(Result.failure(it))
     }.flowOn(Dispatchers.IO)
 }
 
