@@ -163,6 +163,8 @@ class SurveyRepositoryImpl(
         val multipartBody = MultipartBody.Part.createFormData("file", file.name, file.asRequestBody())
         service.uploadSurveyFile(surveyId, multipartBody)
         emit(Result.success(Unit))
+    }.catch {
+        emit(Result.failure(it))
     }.flowOn(Dispatchers.IO)
 
     override fun uploadSurveyResponse(surveyId: String,
@@ -170,6 +172,8 @@ class SurveyRepositoryImpl(
                                       uploadResponseRequestData: UploadResponseRequestData): Flow<Result<Unit>> = flow {
         service.uploadSurveyResponse(surveyId, responseId, uploadResponseRequestData)
         emit(Result.success(Unit))
+    }.catch {
+        emit(Result.failure(it))
     }.flowOn(Dispatchers.IO)
 }
 

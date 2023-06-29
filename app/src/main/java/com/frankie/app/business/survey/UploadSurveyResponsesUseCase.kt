@@ -8,7 +8,6 @@ import com.frankie.app.ui.common.FileUtils
 import com.frankie.expressionmanager.model.ResponseEvent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.single
 
@@ -40,33 +39,35 @@ class UploadSurveyResponsesUseCaseImpl(
             allFilenames.forEach { filename ->
                 val file = FileUtils.getResponseFile(appContext, filename, surveyId)
                 if (file.exists()) {
-                    surveyRepository.uploadSurveyResponseFile(surveyId, file).collect()
+                    val result = surveyRepository.uploadSurveyResponseFile(surveyId, file).single()
+                    if (result.isSuccess) {
+                        // 2. delete file after upload
+                        try {
+                            file.delete()
+                        } catch (e: Exception) {
+                            reportError(e)
+                            e.printStackTrace()
+                        }
+                    } else {
+                        reportError(result.exceptionOrNull())
+                    }
                 } else {
-                    // TODO: report file missing
+                    reportError(IllegalStateException("File not found: $filename"))
+                    return@forEachIndexed
                 }
             }
 
-            // 2. upload response row
+            // 3. upload response row
             val uploadData = UploadResponseRequestData(versionId = publishInfo.version,
                     lang = response.lang,
                     events = response.events,
                     values = response.values)
-            surveyRepository.uploadSurveyResponse(surveyId, response.id, uploadData).collect()
-
-            // 3. mark response as synced
-            responseRepository.markResponseAsSynced(response.id)
-
-            // 4. delete files
-            allFilenames.forEach { filename ->
-                val file = FileUtils.getResponseFile(appContext, filename, surveyId)
-                if (file.exists()) {
-                    try {
-                        file.delete()
-                    } catch (e: Exception) {
-                        // TODO: report file deletion error
-                        e.printStackTrace()
-                    }
-                }
+            val result = surveyRepository.uploadSurveyResponse(surveyId, response.id, uploadData).single()
+            if (result.isSuccess) {
+                // 4. mark response as synced
+                responseRepository.markResponseAsSynced(response.id).single()
+            } else {
+                reportError(result.exceptionOrNull())
             }
 
             emit(Result.success((index + 1).toFloat() / responses.size))
@@ -75,4 +76,8 @@ class UploadSurveyResponsesUseCaseImpl(
         emit(Result.failure(it))
     }
 
+}
+
+private fun reportError(throwable: Throwable?) {
+    // TODO: report error
 }
