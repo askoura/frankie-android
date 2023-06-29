@@ -61,7 +61,11 @@ class UploadSurveyResponsesUseCaseImpl(
             val uploadData = UploadResponseRequestData(versionId = publishInfo.version,
                     lang = response.lang,
                     events = response.events,
-                    values = response.values)
+                    values = response.values,
+                    startDate = response.startDate,
+                    submitDate = response.submitDate,
+                    userId = response.userId,
+                    navigationIndex = response.navigationIndex)
             val result = surveyRepository.uploadSurveyResponse(surveyId, response.id, uploadData).single()
             if (result.isSuccess) {
                 // 4. mark response as synced

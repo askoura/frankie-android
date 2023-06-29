@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.frankie.expressionmanager.model.DATE_TIME_UTC_FORMAT
+import com.frankie.expressionmanager.model.NavigationIndex
 import com.frankie.expressionmanager.model.ResponseEvent
 import com.frankie.expressionmanager.model.SurveyLang
 import com.frankie.expressionmanager.model.toSurveyLang
@@ -54,5 +55,9 @@ data class UploadResponseRequestData(
         val versionId: Int,
         val lang: SurveyLang,
         val events: List<ResponseEvent> = listOf(),
-        val values: Map<String, Any> = mapOf()
+        val values: Map<String, Any> = mapOf(),
+        val startDate: LocalDateTime,
+        val submitDate: LocalDateTime?,
+        val userId: String,
+        val navigationIndex: NavigationIndex
 )
