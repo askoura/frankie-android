@@ -32,9 +32,12 @@ class ResponseItemView @JvmOverloads constructor(
         binding.edit.isEnabled = responseItem.editEnabled
         binding.edit.setEnabledTint(context, responseItem.editEnabled)
         binding.edit.setOnClickListener { onResumeClicked(response) }
-        binding.delete.visibility = if (response.submitDate == null) VISIBLE else GONE
+        binding.delete.visibility =
+            if (response.submitDate == null || response.isSynced) VISIBLE else GONE
         binding.delete.setOnClickListener { onDeleteClicked(response) }
         binding.header.text = response.id
+        binding.syncedStatus.text =
+            context.getString(R.string.response_sync_status, response.isSynced)
         binding.startDate.text =
             context.getString(R.string.response_start_date, response.startDate.toString())
         binding.submitDate.text =

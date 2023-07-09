@@ -31,11 +31,13 @@ interface SurveyRepository {
     fun getOfflineSurveyList(): Flow<Result<List<SurveyData>>>
     fun getSurveyFile(surveyId: String, resourceId: String): Flow<Result<DataStream>>
 
-    fun uploadSurveyResponseFile(surveyId: String, file: File): Flow<Result<Unit>>
+    fun uploadSurveyResponseFile(surveyId: String, fileName: String, file: File): Flow<Result<Unit>>
 
-    fun uploadSurveyResponse(surveyId: String,
-                             responseId: String,
-                             uploadResponseRequestData: UploadResponseRequestData): Flow<Result<Unit>>
+    fun uploadSurveyResponse(
+        surveyId: String,
+        responseId: String,
+        uploadResponseRequestData: UploadResponseRequestData
+    ): Flow<Result<Unit>>
 
     suspend fun saveSurveyToDB(surveyData: SurveyData, fileQuestions: List<String>)
 
@@ -68,29 +70,37 @@ class SurveyRepositoryImpl(
                 val design = service.getSurveyDesign(survey.id, PublishInfo())
                 val savedSurvey = surveyDao.getSurveyDataById(survey.id)
                 val count = responseDao.countByUserAndSurvey(
-                        surveyId = survey.id,
-                        userId = sessionManager.getUserIdOrThrow()
+                    surveyId = survey.id,
+                    userId = sessionManager.getUserIdOrThrow()
                 )
                 val responseCount = responseDao.countCompleteByUserAndSurvey(
                     surveyId = survey.id,
                     userId = sessionManager.getUserIdOrThrow()
                 )
-                val newVersionAvailable = savedSurvey?.publishInfoEntity?.toPublishInfo()
-                        ?.let { it != design.publishInfo }
-                        ?: true
-                val survey = SurveyData.fromSurveyAndDesign(
-                        survey,
-                        savedSurvey?.publishInfoEntity?.toPublishInfo() ?: PublishInfo(),
-                        newVersionAvailable,
-                        count,
-                        responseCount
+                val syncedCount = responseDao.countSyncedByUserAndSurvey(
+                    surveyId = survey.id,
+                    userId = sessionManager.getUserIdOrThrow()
                 )
-                val fileQuestions = jacksonKtMapper.treeToValue(design.validationJsonOutput, ValidationOutput::class.java)
-                        .schema.filter { it.dataType == DataType.FILE }
-                        .map { it.componentCode }
+                val newVersionAvailable = savedSurvey?.publishInfoEntity?.toPublishInfo()
+                    ?.let { it != design.publishInfo }
+                    ?: true
+                val surveyData = SurveyData.fromSurveyAndDesign(
+                    survey,
+                    savedSurvey?.publishInfoEntity?.toPublishInfo() ?: PublishInfo(),
+                    newVersionAvailable,
+                    count,
+                    responseCount,
+                    syncedCount
+                )
+                val fileQuestions = jacksonKtMapper.treeToValue(
+                    design.validationJsonOutput,
+                    ValidationOutput::class.java
+                )
+                    .schema.filter { it.dataType == DataType.FILE }
+                    .map { it.componentCode }
 
-                saveSurveyToDB(survey, fileQuestions)
-                survey
+                saveSurveyToDB(surveyData, fileQuestions)
+                surveyData
             }
 
             savePermissionsToDB(surveyList)
@@ -107,7 +117,8 @@ class SurveyRepositoryImpl(
             emit(Result.success(surveyDao.getAllSurveyData(sessionManager.getUserIdOrThrow()).map {
                 it.toSurveyData(
                     responseDao.countByUserAndSurvey(userId, it.id),
-                        responseDao.countCompleteByUserAndSurvey(userId, it.id)
+                    responseDao.countCompleteByUserAndSurvey(userId, it.id),
+                    responseDao.countSyncedByUserAndSurvey(userId, it.id)
                 )
             }))
         }
@@ -117,14 +128,10 @@ class SurveyRepositoryImpl(
         surveyDao.insert(surveyData.toSurveyDataEntity(fileQuestions))
     }
 
-    private suspend fun saveSurveysToDB(surveyList: List<SurveyDataEntity>) {
-        surveyDao.insertAll(surveyList)
-    }
-
     private suspend fun savePermissionsToDB(surveyList: List<SurveyData>) {
         permissionDao.updateUserPermissions(
-                sessionManager.getUserIdOrThrow(),
-                surveyList.map { it.id })
+            sessionManager.getUserIdOrThrow(),
+            surveyList.map { it.id })
     }
 
     override suspend fun surveyDesign(surveyData: SurveyData): SurveyDesign {
@@ -159,17 +166,24 @@ class SurveyRepositoryImpl(
         }.flowOn(Dispatchers.IO)
     }
 
-    override fun uploadSurveyResponseFile(surveyId: String, file: File): Flow<Result<Unit>> = flow {
-        val multipartBody = MultipartBody.Part.createFormData("file", file.name, file.asRequestBody())
-        service.uploadSurveyFile(surveyId, multipartBody)
+    override fun uploadSurveyResponseFile(
+        surveyId: String,
+        fileName: String,
+        file: File
+    ): Flow<Result<Unit>> = flow {
+        val multipartBody =
+            MultipartBody.Part.createFormData("file", file.name, file.asRequestBody())
+        service.uploadSurveyFile(surveyId, fileName, multipartBody)
         emit(Result.success(Unit))
     }.catch {
         emit(Result.failure(it))
     }.flowOn(Dispatchers.IO)
 
-    override fun uploadSurveyResponse(surveyId: String,
-                                      responseId: String,
-                                      uploadResponseRequestData: UploadResponseRequestData): Flow<Result<Unit>> = flow {
+    override fun uploadSurveyResponse(
+        surveyId: String,
+        responseId: String,
+        uploadResponseRequestData: UploadResponseRequestData
+    ): Flow<Result<Unit>> = flow {
         service.uploadSurveyResponse(surveyId, responseId, uploadResponseRequestData)
         emit(Result.success(Unit))
     }.catch {

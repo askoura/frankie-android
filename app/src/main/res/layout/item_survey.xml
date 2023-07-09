@@ -89,6 +89,7 @@
         app:layout_constraintStart_toEndOf="@id/icon"
         app:layout_constraintTop_toBottomOf="@id/user_quota"
         tools:text="Local: 22" />
+
     <TextView
         android:id="@+id/complete_local_response_count"
         android:layout_width="0dp"
@@ -104,21 +105,23 @@
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/upload"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginHorizontal="8dp"
+        android:foreground="?android:selectableItemBackground"
         android:padding="8dp"
         android:src="@android:drawable/stat_sys_upload"
         android:tint="@color/tint"
+        app:layout_constraintBottom_toBottomOf="@id/info"
         app:layout_constraintEnd_toStartOf="@id/info"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/info"
-        app:layout_constraintBottom_toBottomOf="@id/info" />
+        app:layout_constraintTop_toTopOf="@id/info" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
+        android:foreground="?android:selectableItemBackground"
         android:padding="8dp"
         android:src="@drawable/ic_outline_info_24"
         android:tint="@color/tint"
@@ -131,6 +134,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
+        android:foreground="?android:selectableItemBackground"
         android:padding="8dp"
         android:src="@drawable/baseline_table_rows_24"
         android:tint="@color/tint"
@@ -143,6 +147,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
+        android:foreground="?android:selectableItemBackground"
         android:padding="8dp"
         android:src="@drawable/ic_baseline_sync_24"
         android:tint="@color/tint"
@@ -155,6 +160,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
+        android:foreground="?android:selectableItemBackground"
         android:padding="8dp"
         android:src="@drawable/ic_baseline_play_circle_outline_24"
         android:tint="@color/tint"

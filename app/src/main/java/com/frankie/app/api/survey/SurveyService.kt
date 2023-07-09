@@ -28,8 +28,9 @@ interface SurveyService {
     suspend fun getSurveyFile(@Path("surveyId") surveyId: String, @Path("resourceId") resourceId: String): ResponseBody
 
     @Multipart
-    @POST("survey/{surveyId}/offline/response/upload")
+    @POST("survey/{surveyId}/offline/response/upload/{fileName}")
     suspend fun uploadSurveyFile(@Path("surveyId") surveyId: String,
+                                 @Path("fileName") fileName: String,
                                  @Part file: MultipartBody.Part): Response<Unit>
 
     @POST("survey/{surveyId}/response/{responseId}/upload")

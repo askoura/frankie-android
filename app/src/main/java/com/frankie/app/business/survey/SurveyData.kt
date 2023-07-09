@@ -27,6 +27,7 @@ data class SurveyData(
     val newVersionAvailable: Boolean,
     val localResponsesCount: Int,
     val localCompleteResponsesCount: Int,
+    val localSyncedResponsesCount: Int,
     val syncedResponseCount: Int,
     val totalResponseCount: Int,
     val saveTimings: Boolean,
@@ -52,13 +53,13 @@ data class SurveyData(
             }
         }
 
-    fun quotaExceeded(completeResponsesCount: Int? = null): Boolean {
+    fun quotaExceeded(completeSyncedResponsesCount: Int? = null): Boolean {
         val userQuotaExceeded =
-            userQuota > -1 && ((completeResponsesCount
-                ?: localCompleteResponsesCount) + syncedResponseCount >= userQuota)
+            userQuota > -1 && ((completeSyncedResponsesCount
+                ?: (localCompleteResponsesCount - localSyncedResponsesCount)) + syncedResponseCount >= userQuota)
         val totalQuotaExceeded =
-            surveyQuota > -1 && ((completeResponsesCount
-                ?: localCompleteResponsesCount) + totalResponseCount >= surveyQuota)
+            surveyQuota > -1 && ((completeSyncedResponsesCount
+                ?: (localCompleteResponsesCount - localSyncedResponsesCount)) + totalResponseCount >= surveyQuota)
         return userQuotaExceeded || totalQuotaExceeded
     }
 
@@ -68,7 +69,8 @@ data class SurveyData(
             currentPublishInfo: PublishInfo,
             newVersionAvailable: Boolean,
             responsesCount: Int,
-            completeResponsesCount: Int
+            completeResponsesCount: Int,
+            syncedResponsesCount: Int
         ): SurveyData {
             return SurveyData(
                 id = survey.id,
@@ -87,13 +89,14 @@ data class SurveyData(
                 newVersionAvailable,
                 responsesCount,
                 completeResponsesCount,
+                syncedResponsesCount,
                 survey.syncedResponseCount,
                 survey.totalResponseCount,
                 survey.saveTimings,
                 survey.backgroundAudio,
                 survey.recordGps,
 
-            )
+                )
         }
     }
 }

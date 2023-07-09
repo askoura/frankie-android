@@ -47,12 +47,20 @@
         app:constraint_referenced_ids="edit, header" />
 
     <TextView
-        android:id="@+id/start_date"
+        android:id="@+id/synced_status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintEnd_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/barrier"
+        tools:text="Synced:" />
+    <TextView
+        android:id="@+id/start_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/synced_status"
         tools:text="start Date:" />
 
     <TextView
