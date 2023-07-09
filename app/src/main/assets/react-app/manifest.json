@@ -1,25 +1,431 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
-  "icons": [
-    {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    },
-    {
-      "src": "logo192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "logo512.png",
-      "type": "image/png",
-      "sizes": "512x512"
-    }
-  ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "Logo.css": {
+    "file": "assets/Logo-67003e8a.css",
+    "src": "Logo.css"
+  },
+  "_DateUtils-a37c0640.js": {
+    "file": "assets/DateUtils-a37c0640.js"
+  },
+  "_Delete-58ce6a4e.js": {
+    "file": "assets/Delete-58ce6a4e.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_Logo.module-c4ee83ed.js": {
+    "css": [
+      "assets/Logo-67003e8a.css"
+    ],
+    "file": "assets/Logo.module-c4ee83ed.js"
+  },
+  "_Stack-191cebc4.js": {
+    "file": "assets/Stack-191cebc4.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_UserService-0ad19e14.js": {
+    "file": "assets/UserService-0ad19e14.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_VisibilityOff-2a4fb6be.js": {
+    "file": "assets/VisibilityOff-2a4fb6be.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_index-3e3a1a0b.js": {
+    "file": "assets/index-3e3a1a0b.js",
+    "imports": [
+      "index.html",
+      "_index-42704ce5.js",
+      "_Logo.module-c4ee83ed.js"
+    ]
+  },
+  "_index-42704ce5.js": {
+    "file": "assets/index-42704ce5.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_index-44cd111b.js": {
+    "css": [
+      "assets/index-54060cda.css"
+    ],
+    "file": "assets/index-44cd111b.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_index-6d8d00e3.js": {
+    "css": [
+      "assets/index-9cbd1de5.css"
+    ],
+    "file": "assets/index-6d8d00e3.js",
+    "imports": [
+      "index.html",
+      "_index-42704ce5.js",
+      "_index-caf3b1ab.js"
+    ]
+  },
+  "_index-caf3b1ab.js": {
+    "file": "assets/index-caf3b1ab.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_index-f64cad5f.js": {
+    "css": [
+      "assets/index-db8b3d24.css"
+    ],
+    "file": "assets/index-f64cad5f.js",
+    "imports": [
+      "index.html",
+      "_Logo.module-c4ee83ed.js",
+      "_index-caf3b1ab.js",
+      "_survey-6e5225d4.js",
+      "_roles-32b0c89d.js",
+      "_DateUtils-a37c0640.js",
+      "_Stack-191cebc4.js",
+      "_index-44cd111b.js",
+      "_UserService-0ad19e14.js"
+    ],
+    "isDynamicEntry": true
+  },
+  "_roles-32b0c89d.js": {
+    "file": "assets/roles-32b0c89d.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_survey-6e5225d4.js": {
+    "css": [
+      "assets/survey-df6a68ec.css"
+    ],
+    "file": "assets/survey-6e5225d4.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "index.css": {
+    "file": "assets/index-54060cda.css",
+    "src": "index.css"
+  },
+  "index.html": {
+    "css": [
+      "assets/index-52577bbb.css"
+    ],
+    "dynamicImports": [
+      "src/pages/Page404/index.jsx",
+      "src/pages/manage/Signup/index.jsx",
+      "src/pages/manage/ConfirmSignup/index.jsx",
+      "src/pages/manage/ForgotPassword/index.jsx",
+      "src/pages/manage/ResetPassword/index.jsx",
+      "src/pages/manage/Dashboard/index.jsx",
+      "_index-f64cad5f.js",
+      "src/pages/manage/ResponsesSurvey/index.jsx",
+      "src/pages/manage/ResponseEvent/index.jsx",
+      "src/pages/manage/Login/index.jsx",
+      "src/pages/manage/ManageUsers/index.jsx",
+      "src/pages/manage/AddEditUser/index.jsx",
+      "src/pages/manage/Profile/index.jsx",
+      "src/pages/manage/CreateSurvey/index.jsx",
+      "src/pages/DesignSurvey/index.jsx"
+    ],
+    "file": "assets/index-ad8f0a8b.js",
+    "isEntry": true,
+    "src": "index.html"
+  },
+  "src/pages/DesignSurvey/index.css": {
+    "file": "assets/index-88c2db98.css",
+    "src": "src/pages/DesignSurvey/index.css"
+  },
+  "src/pages/DesignSurvey/index.jsx": {
+    "css": [
+      "assets/index-88c2db98.css"
+    ],
+    "file": "assets/index-a7f37a72.js",
+    "imports": [
+      "index.html",
+      "_index-f64cad5f.js",
+      "_index-caf3b1ab.js",
+      "_Delete-58ce6a4e.js",
+      "_survey-6e5225d4.js",
+      "_index-3e3a1a0b.js",
+      "_Logo.module-c4ee83ed.js",
+      "_roles-32b0c89d.js",
+      "_DateUtils-a37c0640.js",
+      "_Stack-191cebc4.js",
+      "_index-44cd111b.js",
+      "_UserService-0ad19e14.js",
+      "_index-42704ce5.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/DesignSurvey/index.jsx"
+  },
+  "src/pages/Page404/index.css": {
+    "file": "assets/index-baf20498.css",
+    "src": "src/pages/Page404/index.css"
+  },
+  "src/pages/Page404/index.jsx": {
+    "css": [
+      "assets/index-baf20498.css"
+    ],
+    "file": "assets/index-0a871fff.js",
+    "imports": [
+      "index.html"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/Page404/index.jsx"
+  },
+  "src/pages/manage/AddEditUser/index.css": {
+    "file": "assets/index-429f3045.css",
+    "src": "src/pages/manage/AddEditUser/index.css"
+  },
+  "src/pages/manage/AddEditUser/index.jsx": {
+    "css": [
+      "assets/index-429f3045.css"
+    ],
+    "file": "assets/index-d098d679.js",
+    "imports": [
+      "index.html",
+      "_index-3e3a1a0b.js",
+      "_UserService-0ad19e14.js",
+      "_Logo.module-c4ee83ed.js",
+      "_index-caf3b1ab.js",
+      "_roles-32b0c89d.js",
+      "_index-42704ce5.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/AddEditUser/index.jsx"
+  },
+  "src/pages/manage/ConfirmSignup/index.css": {
+    "file": "assets/index-ac50e4e9.css",
+    "src": "src/pages/manage/ConfirmSignup/index.css"
+  },
+  "src/pages/manage/ConfirmSignup/index.jsx": {
+    "css": [
+      "assets/index-ac50e4e9.css"
+    ],
+    "file": "assets/index-b1e506e7.js",
+    "imports": [
+      "index.html",
+      "_index-42704ce5.js",
+      "_index-6d8d00e3.js",
+      "_index-caf3b1ab.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/ConfirmSignup/index.jsx"
+  },
+  "src/pages/manage/CreateSurvey/index.css": {
+    "file": "assets/index-97981d38.css",
+    "src": "src/pages/manage/CreateSurvey/index.css"
+  },
+  "src/pages/manage/CreateSurvey/index.jsx": {
+    "css": [
+      "assets/index-97981d38.css"
+    ],
+    "file": "assets/index-5d42ed61.js",
+    "imports": [
+      "index.html",
+      "_index-3e3a1a0b.js",
+      "_index-caf3b1ab.js",
+      "_Logo.module-c4ee83ed.js",
+      "_DateUtils-a37c0640.js",
+      "_survey-6e5225d4.js",
+      "_Stack-191cebc4.js",
+      "_index-42704ce5.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/CreateSurvey/index.jsx"
+  },
+  "src/pages/manage/Dashboard/index.css": {
+    "file": "assets/index-f25733b5.css",
+    "src": "src/pages/manage/Dashboard/index.css"
+  },
+  "src/pages/manage/Dashboard/index.jsx": {
+    "css": [
+      "assets/index-f25733b5.css"
+    ],
+    "file": "assets/index-1135d3e3.js",
+    "imports": [
+      "index.html",
+      "_UserService-0ad19e14.js",
+      "_Logo.module-c4ee83ed.js",
+      "_roles-32b0c89d.js",
+      "_Stack-191cebc4.js",
+      "_DateUtils-a37c0640.js",
+      "_index-3e3a1a0b.js",
+      "_index-caf3b1ab.js",
+      "_index-42704ce5.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/Dashboard/index.jsx"
+  },
+  "src/pages/manage/ForgotPassword/index.css": {
+    "file": "assets/index-a1a6d03e.css",
+    "src": "src/pages/manage/ForgotPassword/index.css"
+  },
+  "src/pages/manage/ForgotPassword/index.jsx": {
+    "css": [
+      "assets/index-a1a6d03e.css"
+    ],
+    "file": "assets/index-75dd2589.js",
+    "imports": [
+      "index.html",
+      "_index-42704ce5.js",
+      "_index-6d8d00e3.js",
+      "_index-caf3b1ab.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/ForgotPassword/index.jsx"
+  },
+  "src/pages/manage/Login/index.css": {
+    "file": "assets/index-a01e6bd9.css",
+    "src": "src/pages/manage/Login/index.css"
+  },
+  "src/pages/manage/Login/index.jsx": {
+    "css": [
+      "assets/index-a01e6bd9.css"
+    ],
+    "file": "assets/index-806e3ea5.js",
+    "imports": [
+      "index.html",
+      "_index-42704ce5.js",
+      "_index-6d8d00e3.js",
+      "_VisibilityOff-2a4fb6be.js",
+      "_Stack-191cebc4.js",
+      "_index-caf3b1ab.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/Login/index.jsx"
+  },
+  "src/pages/manage/ManageUsers/index.css": {
+    "file": "assets/index-5036f481.css",
+    "src": "src/pages/manage/ManageUsers/index.css"
+  },
+  "src/pages/manage/ManageUsers/index.jsx": {
+    "css": [
+      "assets/index-5036f481.css"
+    ],
+    "file": "assets/index-9324ce7a.js",
+    "imports": [
+      "index.html",
+      "_index-3e3a1a0b.js",
+      "_UserService-0ad19e14.js",
+      "_index-44cd111b.js",
+      "_index-caf3b1ab.js",
+      "_index-42704ce5.js",
+      "_Logo.module-c4ee83ed.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/ManageUsers/index.jsx"
+  },
+  "src/pages/manage/Profile/index.css": {
+    "file": "assets/index-ab9d92a0.css",
+    "src": "src/pages/manage/Profile/index.css"
+  },
+  "src/pages/manage/Profile/index.jsx": {
+    "css": [
+      "assets/index-ab9d92a0.css"
+    ],
+    "file": "assets/index-d8cbb64a.js",
+    "imports": [
+      "index.html",
+      "_index-3e3a1a0b.js",
+      "_index-caf3b1ab.js",
+      "_UserService-0ad19e14.js",
+      "_index-42704ce5.js",
+      "_Logo.module-c4ee83ed.js",
+      "_Stack-191cebc4.js",
+      "_VisibilityOff-2a4fb6be.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/Profile/index.jsx"
+  },
+  "src/pages/manage/ResetPassword/index.css": {
+    "file": "assets/index-9097f465.css",
+    "src": "src/pages/manage/ResetPassword/index.css"
+  },
+  "src/pages/manage/ResetPassword/index.jsx": {
+    "css": [
+      "assets/index-9097f465.css"
+    ],
+    "file": "assets/index-0ff7f016.js",
+    "imports": [
+      "index.html",
+      "_index-42704ce5.js",
+      "_index-6d8d00e3.js",
+      "_VisibilityOff-2a4fb6be.js",
+      "_index-caf3b1ab.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/ResetPassword/index.jsx"
+  },
+  "src/pages/manage/ResponseEvent/index.css": {
+    "file": "assets/index-7b78e83a.css",
+    "src": "src/pages/manage/ResponseEvent/index.css"
+  },
+  "src/pages/manage/ResponseEvent/index.jsx": {
+    "css": [
+      "assets/index-7b78e83a.css"
+    ],
+    "file": "assets/index-2354cab4.js",
+    "imports": [
+      "index.html",
+      "_index-3e3a1a0b.js",
+      "_index-caf3b1ab.js",
+      "_DateUtils-a37c0640.js",
+      "_index-42704ce5.js",
+      "_Logo.module-c4ee83ed.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/ResponseEvent/index.jsx"
+  },
+  "src/pages/manage/ResponsesSurvey/index.css": {
+    "file": "assets/index-d4a91764.css",
+    "src": "src/pages/manage/ResponsesSurvey/index.css"
+  },
+  "src/pages/manage/ResponsesSurvey/index.jsx": {
+    "css": [
+      "assets/index-d4a91764.css"
+    ],
+    "file": "assets/index-c7fd347c.js",
+    "imports": [
+      "index.html",
+      "_Delete-58ce6a4e.js",
+      "_index-3e3a1a0b.js",
+      "_index-caf3b1ab.js",
+      "_DateUtils-a37c0640.js",
+      "_index-42704ce5.js",
+      "_Logo.module-c4ee83ed.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/ResponsesSurvey/index.jsx"
+  },
+  "src/pages/manage/Signup/index.css": {
+    "file": "assets/index-69d98b86.css",
+    "src": "src/pages/manage/Signup/index.css"
+  },
+  "src/pages/manage/Signup/index.jsx": {
+    "css": [
+      "assets/index-69d98b86.css"
+    ],
+    "file": "assets/index-d39fe3cb.js",
+    "imports": [
+      "index.html",
+      "_index-42704ce5.js",
+      "_index-6d8d00e3.js",
+      "_VisibilityOff-2a4fb6be.js",
+      "_index-caf3b1ab.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/Signup/index.jsx"
+  },
+  "survey.css": {
+    "file": "assets/survey-df6a68ec.css",
+    "src": "survey.css"
+  }
 }

@@ -1,0 +1,136 @@
+._mainContainer_6puh5_1 {
+  margin: auto;
+  min-width: 300px;
+}
+
+._blockItem_6puh5_6 {
+  flex: 1;
+  display: flex;
+  gap: 15px;
+  flex-direction: column;
+}
+
+._errorText_6puh5_13 {
+  color: #eb5757 !important;
+}
+
+._saveNameButton_6puh5_17 {
+  vertical-align: bottom;
+}._wrapper_ar1uh_1 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #ffffff;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+._action_ar1uh_12 {
+  text-align: end;
+  margin-top: 16px;
+}
+
+._errorText_ar1uh_17 {
+  color: #eb5757 !important;
+}
+._mainContainer_1naef_1 {
+  max-width: 800px;
+  min-width: 300px;
+  padding: 16px;
+}
+
+._loadingWrapper_1naef_7 {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  padding-top: 100px;
+}
+._savingProgress_zztu3_1 {
+  margin: 0px 8px !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+._mainContainer_1d68k_1 {
+  margin: auto;
+  min-width: 300px;
+}
+
+._linkCopy_1d68k_6 {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+._socialSharing_1d68k_12,
+._defaultUrl_1d68k_13 {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+._socialLink_1d68k_19 {
+  display: flex;
+  gap: 15px;
+}
+
+._iconShareFb_1d68k_24 {
+  fill: #3c5997 !important;
+}
+._iconShareTw_1d68k_27 {
+  fill: #05aced !important;
+}
+
+._iconShareLn_1d68k_31 {
+  fill: #027fb1 !important;
+}
+._mainContainer_g22zs_1 {
+  margin: auto;
+  min-width: 300px;
+}
+
+._formControlCheckBox_g22zs_6 {
+  display: flex;
+  flex-direction: column;
+}
+._mainContainer_g22zs_1 {
+  margin: auto;
+  min-width: 300px;
+}
+
+._formControlCheckBox_g22zs_6 {
+  display: flex;
+  flex-direction: column;
+}
+._wrapper_1um7m_1 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #ffffff;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 20px;
+  min-width: 300px;
+}
+
+._action_1um7m_13 {
+  text-align: center;
+  margin-top: 16px;
+}
+
+._userBlock_1um7m_18 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+._mainContainer_mjjng_1 {
+  margin: auto;
+  min-width: 300px;
+}
+._mainContainer_1cgmo_1 {
+  margin: auto;
+  min-width: 300px;
+  min-height: 50px;
+}
