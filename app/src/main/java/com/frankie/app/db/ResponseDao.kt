@@ -73,6 +73,9 @@ interface ResponseDao {
     @Query("SELECT COUNT(*) FROM response WHERE userId = :userId AND surveyId = :surveyId AND submitDate IS NOT NULL")
     suspend fun countCompleteByUserAndSurvey(userId: String, surveyId: String): Int
 
+    @Query("SELECT COUNT(*) FROM response WHERE userId = :userId AND surveyId = :surveyId AND is_synced = 1")
+    suspend fun countSyncedByUserAndSurvey(userId: String, surveyId: String): Int
+
     @Query("UPDATE response SET is_synced = 1 WHERE id = :responseId")
     suspend fun markResponseAsSynced(responseId: String)
 }

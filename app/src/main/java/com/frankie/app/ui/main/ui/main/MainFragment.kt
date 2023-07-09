@@ -1,7 +1,6 @@
 package com.frankie.app.ui.main.ui.main
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -81,26 +80,26 @@ class MainFragment : Fragment() {
         adapter = SurveyListAdapter(onSyncClicked = { surveyData ->
             viewModel.syncSurveyForOffline(surveyData)
         },
-                onPlayClicked = { surveyData ->
-                    startActivity(
-                            SurveyActivity.createIntent(
-                                    requireContext(),
-                                    surveyData
-                            )
+            onPlayClicked = { surveyData ->
+                startActivity(
+                    SurveyActivity.createIntent(
+                        requireContext(),
+                        surveyData
                     )
-                },
-                onResponsesClicked = { surveyData ->
-                    startActivity(
-                            ResponsesActivity.createIntent(
-                                    requireContext(),
-                                    surveyData
-                            )
+                )
+            },
+            onResponsesClicked = { surveyData ->
+                startActivity(
+                    ResponsesActivity.createIntent(
+                        requireContext(),
+                        surveyData
                     )
-                },
-                onInfoClicked = { },
-                onUploadClicked = { survey ->
-                    viewModel.uploadSurveyResponses(survey.id)
-                })
+                )
+            },
+            onInfoClicked = { },
+            onUploadClicked = { survey ->
+                viewModel.uploadSurveyResponses(survey.id)
+            })
         binding.recycler.adapter = adapter
         binding.recycler.layoutManager = LinearLayoutManager(binding.root.context)
 
@@ -144,13 +143,13 @@ class MainFragment : Fragment() {
                 binding.syncingSurveyFileOrder.visibleOrGone(downloadState.totalFilesCount > 0)
                 binding.syncCurrentSize.visibleOrGone(downloadState.totalSize > 0)
                 binding.syncTotalSize.visibleOrGone(downloadState.totalSize > 0)
-                formatBytes(downloadState.totalSize).let { formatted->
+                formatBytes(downloadState.totalSize).let { formatted ->
                     binding.syncTotalSize.text = getString(
                         if (formatted.byteSize == ByteSize.MEGA) R.string.megabytes else R.string.kilobytes,
                         formatted.value
                     )
                 }
-                formatBytes(downloadState.currentDownloadedSize).let { formatted->
+                formatBytes(downloadState.currentDownloadedSize).let { formatted ->
                     binding.syncCurrentSize.text = getString(
                         if (formatted.byteSize == ByteSize.MEGA) R.string.megabytes else R.string.kilobytes,
                         formatted.value

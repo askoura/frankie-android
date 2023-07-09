@@ -1,5 +1,7 @@
 package com.frankie.app.api
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.frankie.app.BuildConfig
 import com.frankie.app.business.auth.RefreshTokenUseCase
 import com.frankie.app.business.survey.SessionManager
@@ -56,8 +58,8 @@ object RetrofitProvider {
     }
 
     private fun getRetrofit(httpClient: OkHttpClient) = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(JacksonConverterFactory.create())
+            .baseUrl(BASE_URL)
+            .addConverterFactory(JacksonConverterFactory.create(ObjectMapper().registerModule(JavaTimeModule())))
         .client(httpClient)
         .build()
 

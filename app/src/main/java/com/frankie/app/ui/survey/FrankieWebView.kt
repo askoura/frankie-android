@@ -82,13 +82,22 @@ class FrankieWebView
                         data.byteInputStream()
                     )
                 } else {
-                    val data =
-                        context.assets.open(url.replace(CUSTOM_DOMAIN, "$REACT_APP_BUILD_FOLDER/"))
-                    return WebResourceResponse(
-                        getMimeTypeFromExtension(extension),
-                        "utf-8",
-                        data
-                    )
+                    return try {
+                        val data =
+                            context.assets.open(
+                                url.replace(
+                                    CUSTOM_DOMAIN,
+                                    "$REACT_APP_BUILD_FOLDER/"
+                                )
+                            )
+                        WebResourceResponse(
+                            getMimeTypeFromExtension(extension),
+                            "utf-8",
+                            data
+                        )
+                    } catch (e: FileNotFoundException) {
+                        null
+                    }
                 }
             } else {
                 null

@@ -24,6 +24,7 @@
     <string name="fetching_surveys_message">Fetching Surveys…</string>
     <string name="no_surveys_message">No Surveys assigned Available… Please check Network and make sure you are assigned some surveys and refresh later</string>
     <string name="chrome_version_not_supported">Chrome version not supported</string>
+    <string name="response_sync_status">Synced: %b</string>
     <string name="response_start_date">Start Date: %s</string>
     <string name="response_submit_date">Submit Date: %s</string>
     <string name="response_lang">Language: %s</string>

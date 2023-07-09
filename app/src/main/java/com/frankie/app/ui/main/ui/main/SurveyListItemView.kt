@@ -39,6 +39,7 @@ class SurveyListItemView @JvmOverloads constructor(
                       && !surveyData.quotaExceeded()
                       && surveyData.surveyStatus == SurveyStatus.ACTIVE
         val isSyncOfflineEnabled = surveyData.newVersionAvailable
+        val isUploadEnabled = surveyData.localCompleteResponsesCount > surveyData.localSyncedResponsesCount
         val isResponsesEnabled = surveyData.localResponsesCount > 0
         binding.localResponseCount.text = surveyData.localResponsesCount.let { count ->
             context.getString(R.string.local_responses_count, count)
@@ -90,10 +91,12 @@ class SurveyListItemView @JvmOverloads constructor(
         binding.name.text = surveyData.name
         binding.play.isEnabled = isPlayEnabled
         binding.sync.isEnabled = isSyncOfflineEnabled
+        binding.upload.isEnabled = isUploadEnabled
         binding.responses.isEnabled = isResponsesEnabled
         binding.play.setEnabledTint(context, isPlayEnabled)
         binding.responses.setEnabledTint(context, isResponsesEnabled)
         binding.sync.setEnabledTint(context, isSyncOfflineEnabled)
+        binding.upload.setEnabledTint(context, isUploadEnabled)
         binding.sync.setOnClickListener { onSyncClicked(surveyData) }
         binding.play.setOnClickListener { onPlayClicked(surveyData) }
         binding.responses.setOnClickListener { onResponsesClicked(surveyData) }

@@ -48,5 +48,6 @@ data class Response(
 ) {
     companion object {
         const val STORED_FILENAME_KEY = "stored_filename"
+        const val ACTUAL_FILENAME_KEY = "filename"
     }
 }

@@ -37,7 +37,8 @@ data class SurveyDataEntity(
 ) {
     fun toSurveyData(
         localResponseCount: Int,
-        localCompleteResponseCount: Int
+        localCompleteResponseCount: Int,
+        localSyncedResponseCount: Int
     ): SurveyData = SurveyData(
         id,
         creationDate,
@@ -55,6 +56,7 @@ data class SurveyDataEntity(
         false,
         localResponseCount,
         localCompleteResponseCount,
+        localSyncedResponseCount,
         syncedResponseCount,
         totalResponsesCount,
         saveTimings,

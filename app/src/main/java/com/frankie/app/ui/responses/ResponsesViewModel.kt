@@ -19,7 +19,7 @@ class ResponsesViewModel(private val responsesRepository: ResponseRepository) : 
         viewModelScope.launch {
             responsesRepository.getResponses(surveyData.id).collect { result ->
                 val newList = result.getOrThrow()
-                val count = newList.count { it.submitDate != null }
+                val count = newList.count { it.submitDate != null && it.isSynced }
                 val quotaExceeded = surveyData.quotaExceeded(count)
                 _responses.update {
                     newList.map { ResponseItem(it, editEnabled = !quotaExceeded) }
@@ -33,7 +33,8 @@ class ResponsesViewModel(private val responsesRepository: ResponseRepository) : 
             responsesRepository.deleteResponse(responseId).collect {
                 _responses.update { responses ->
                     val list = responses.filter { it.responses.id != responseId }
-                    val count = list.count { it.responses.submitDate != null }
+                    val count =
+                        list.count { it.responses.submitDate != null && it.responses.isSynced }
                     val quotaExceeded = surveyData.quotaExceeded(count)
                     list.map { it.copy(editEnabled = !quotaExceeded) }
                 }
