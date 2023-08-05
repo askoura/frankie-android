@@ -98,7 +98,7 @@ class MainFragment : Fragment() {
             },
             onInfoClicked = { },
             onUploadClicked = { survey ->
-                viewModel.uploadSurveyResponses(survey.id)
+                viewModel.uploadSurveyResponses()
             })
         binding.recycler.adapter = adapter
         binding.recycler.layoutManager = LinearLayoutManager(binding.root.context)

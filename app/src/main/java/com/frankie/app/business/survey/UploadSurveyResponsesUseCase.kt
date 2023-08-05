@@ -7,23 +7,41 @@ import com.frankie.app.db.model.Response.Companion.ACTUAL_FILENAME_KEY
 import com.frankie.app.db.model.Response.Companion.STORED_FILENAME_KEY
 import com.frankie.app.ui.common.FileUtils
 import com.frankie.expressionmanager.model.ResponseEvent
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.single
 
+
 interface UploadSurveyResponsesUseCase {
-    operator fun invoke(surveyId: String): Flow<Result<Float>>
+    operator fun invoke(): Flow<Result<Unit>>
+
 }
 
 class UploadSurveyResponsesUseCaseImpl(
     private val appContext: Context,
     private val responseRepository: ResponseRepository,
-    private val surveyRepository: SurveyRepository,
+    private val surveyRepository: SurveyRepository
 ) : UploadSurveyResponsesUseCase {
 
-    override fun invoke(surveyId: String): Flow<Result<Float>> = flow {
+    override fun invoke() = flow {
+        val result = surveyRepository.getSurveyList().single()
+        if (result.isSuccess) {
+            result.getOrThrow().filter { it.surveyStatus == SurveyStatus.ACTIVE }.forEach {
+                uploadSurvey(it.id)
+            }
+            emit(Result.success(Unit))
+        } else {
+            emit(Result.failure(result.exceptionOrNull() ?: Exception("Unknown error")))
+        }
+    }.catch {
+        emit(Result.failure(it))
+    }.flowOn(Dispatchers.IO)
+
+    suspend fun uploadSurvey(surveyId: String) {
         // 1. upload files
         val responses = responseRepository.getResponses(surveyId)
             .single().getOrThrow()
@@ -32,7 +50,7 @@ class UploadSurveyResponsesUseCaseImpl(
             ?: throw Exception("Survey not found")
         val publishInfo = surveyDbEntity.publishInfoEntity
         val fileQuestions = surveyDbEntity.fileQuestions.map { "${it}.value" }
-        responses.forEachIndexed { index, response ->
+        responses.forEach { response ->
             val voiceRecordingFilenames =
                 response.events.filterIsInstance<ResponseEvent.VoiceRecording>()
                     .mapIndexed { index, it ->
@@ -70,7 +88,6 @@ class UploadSurveyResponsesUseCaseImpl(
                     }
                 } else {
                     reportError(IllegalStateException("File not found: $filename"))
-                    return@forEachIndexed
                 }
             }
 
@@ -93,17 +110,13 @@ class UploadSurveyResponsesUseCaseImpl(
             } else {
                 reportError(result.exceptionOrNull())
             }
-
-            emit(Result.success((index + 1).toFloat() / responses.size))
         }
-    }.catch {
-        emit(Result.failure(it))
     }
 
-}
+    private fun reportError(throwable: Throwable?) {
+        // TODO: report error
+    }
 
-private fun reportError(throwable: Throwable?) {
-    // TODO: report error
-}
+    data class FileUploadInfo(val storedFileName: String, val originalFileName: String)
 
-data class FileUploadInfo(val storedFileName: String, val originalFileName: String)
+}

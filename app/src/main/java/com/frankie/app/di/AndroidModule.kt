@@ -1,8 +1,11 @@
 package com.frankie.app.di
 
 import android.content.Context
+import androidx.work.WorkManager
 import com.frankie.app.business.settings.SharedPrefsManager
 import com.frankie.app.business.settings.SharedPrefsManagerImpl
+import com.frankie.app.business.survey.BackgroundSync
+import com.frankie.app.business.survey.BackgroundSyncImpl
 import com.frankie.app.business.survey.SessionManager
 import com.frankie.app.business.survey.SessionManagerImpl
 import com.frankie.app.db.FrankieDb
@@ -22,6 +25,8 @@ val androidModule = module {
     single { get<FrankieDb>().surveyDataDao() }
     single { get<FrankieDb>().permissionDao() }
     single { get<FrankieDb>().responseDao() }
+    single { WorkManager.getInstance(get()) }
+    single<BackgroundSync> { BackgroundSyncImpl(get()) }
     factory<ErrorProcessor> { ErrorProcessorImpl() }
     factory<ErrorDisplayManager> { (context: Context) -> ErrorDisplayManagerImpl(context, get()) }
 }

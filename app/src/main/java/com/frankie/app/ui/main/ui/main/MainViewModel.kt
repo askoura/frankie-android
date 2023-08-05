@@ -3,9 +3,9 @@ package com.frankie.app.ui.main.ui.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.frankie.app.business.auth.LogoutUseCase
+import com.frankie.app.business.survey.BackgroundSync
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.business.survey.SurveyRepository
-import com.frankie.app.business.survey.UploadSurveyResponsesUseCase
 import com.frankie.app.storage.DownloadManager
 import com.frankie.app.storage.DownloadState
 import com.frankie.app.ui.common.error.ErrorProcessor
@@ -16,11 +16,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-        private val surveyRepository: SurveyRepository,
-        private val logoutUseCase: LogoutUseCase,
-        private val downloadManager: DownloadManager,
-        private val uploadSurveyResponsesUseCase: UploadSurveyResponsesUseCase,
-        errorProcessor: ErrorProcessor
+    private val surveyRepository: SurveyRepository,
+    private val logoutUseCase: LogoutUseCase,
+    private val downloadManager: DownloadManager,
+    private val backgroundSync: BackgroundSync,
+    errorProcessor: ErrorProcessor
 ) : ViewModel(), ErrorProcessor by errorProcessor {
     private val _firstLoad = MutableStateFlow(true)
     private val _state = MutableStateFlow(State(isLoading = true))
@@ -77,15 +77,9 @@ class MainViewModel(
         }
     }
 
-    fun uploadSurveyResponses(surveyId: String) {
+    fun uploadSurveyResponses() {
         viewModelScope.launch {
-            uploadSurveyResponsesUseCase(surveyId).collect { result ->
-                if (result.isSuccess) {
-
-                } else {
-                    processError(result.exceptionOrNull()!!)
-                }
-            }
+            backgroundSync.startSurveySync()
         }
     }
 
