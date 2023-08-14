@@ -1,9 +1,11 @@
 package com.frankie.app.business.survey
 
 import android.content.Context
+import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -13,11 +15,19 @@ class UploadSurveyWorker(
     params: WorkerParameters
 ) : CoroutineWorker(context, params), KoinComponent {
 
-    private val backgroundSync: BackgroundSync by inject()
+    private val uploadSurveyResponsesUseCase: UploadSurveyResponsesUseCase by inject()
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-        backgroundSync.startSurveySync()
-        Result.success()
+        Log.e("UploadSurvey", "StartingWork")
+        val result = uploadSurveyResponsesUseCase().single()
+        if (result.isSuccess) {
+            Log.e("UploadSurvey", "Result is not null")
+            Result.success()
+        } else {
+            Log.e("UploadSurvey", "Result is null")
+            Result.failure()
+        }
+
     }
 
 }
