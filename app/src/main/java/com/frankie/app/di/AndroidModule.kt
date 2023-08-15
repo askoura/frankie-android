@@ -2,6 +2,8 @@ package com.frankie.app.di
 
 import android.content.Context
 import androidx.work.WorkManager
+import com.frankie.app.EventBus
+import com.frankie.app.EventBusImpl
 import com.frankie.app.business.settings.SharedPrefsManager
 import com.frankie.app.business.settings.SharedPrefsManagerImpl
 import com.frankie.app.business.survey.BackgroundSync
@@ -19,6 +21,7 @@ import org.koin.dsl.module
 
 val androidModule = module {
     single(named("appContext")) { androidContext() }
+    single<EventBus> { EventBusImpl() }
     single<SharedPrefsManager> { SharedPrefsManagerImpl(get()) }
     single<SessionManager> { SessionManagerImpl(get()) }
     single { FrankieDb.getDatabase(get(named("appContext"))) }

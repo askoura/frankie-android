@@ -2,6 +2,8 @@ package com.frankie.app.ui.main.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.frankie.app.AppEvent
+import com.frankie.app.EventBus
 import com.frankie.app.business.auth.LogoutUseCase
 import com.frankie.app.business.survey.BackgroundSync
 import com.frankie.app.business.survey.SurveyData
@@ -11,6 +13,7 @@ import com.frankie.app.storage.DownloadState
 import com.frankie.app.ui.common.error.ErrorProcessor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -20,6 +23,7 @@ class MainViewModel(
     private val logoutUseCase: LogoutUseCase,
     private val downloadManager: DownloadManager,
     private val backgroundSync: BackgroundSync,
+    private val eventBus: EventBus,
     errorProcessor: ErrorProcessor
 ) : ViewModel(), ErrorProcessor by errorProcessor {
     private val _firstLoad = MutableStateFlow(true)
@@ -29,6 +33,15 @@ class MainViewModel(
     private val _downloadState: MutableStateFlow<DownloadState> =
         MutableStateFlow(DownloadState.Idle)
     val downloadState = _downloadState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            eventBus.events.filter { it is AppEvent.ResponsesUploaded }.collect {
+                fetchSurveyList(false)
+            }
+        }
+    }
+
     fun fetchSurveyList(triggeredByUser: Boolean) {
         viewModelScope.launch {
             _state.update { _state.value.copy(isLoading = _firstLoad.value || triggeredByUser) }

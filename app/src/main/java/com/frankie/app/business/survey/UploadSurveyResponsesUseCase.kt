@@ -1,6 +1,8 @@
 package com.frankie.app.business.survey
 
 import android.content.Context
+import com.frankie.app.AppEvent
+import com.frankie.app.EventBus
 import com.frankie.app.api.survey.UploadResponseRequestData
 import com.frankie.app.business.responses.ResponseRepository
 import com.frankie.app.db.model.Response.Companion.ACTUAL_FILENAME_KEY
@@ -24,7 +26,8 @@ interface UploadSurveyResponsesUseCase {
 class UploadSurveyResponsesUseCaseImpl(
     private val appContext: Context,
     private val responseRepository: ResponseRepository,
-    private val surveyRepository: SurveyRepository
+    private val surveyRepository: SurveyRepository,
+    private val eventBus: EventBus
 ) : UploadSurveyResponsesUseCase {
 
     override fun invoke() = flow {
@@ -34,6 +37,7 @@ class UploadSurveyResponsesUseCaseImpl(
                 uploadSurvey(it.id)
             }
             emit(Result.success(Unit))
+            eventBus.emitEvent(AppEvent.ResponsesUploaded)
         } else {
             emit(Result.failure(result.exceptionOrNull() ?: Exception("Unknown error")))
         }
@@ -41,7 +45,7 @@ class UploadSurveyResponsesUseCaseImpl(
         emit(Result.failure(it))
     }.flowOn(Dispatchers.IO)
 
-    suspend fun uploadSurvey(surveyId: String) {
+    private suspend fun uploadSurvey(surveyId: String) {
         // 1. upload files
         val responses = responseRepository.getResponses(surveyId)
             .single().getOrThrow()
