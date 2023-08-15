@@ -58,22 +58,20 @@ class EMNavProcessor constructor(
                 navigationDirection = NavigationDirection.Start,
                 navigationIndex = null
             ),
-            defaultLang = survey.defaultLanguage.toSurveyLang(),
-            lang = survey.defaultLanguage.toSurveyLang(),
         )
         navigationUseCase(
             navigationUseCaseInput,
-            onSuccess = { navigationJsonOutput ->
+            onSuccess = { navigationJsonOutput, lang, additionalLang ->
                 responseId = UUID.randomUUID()
                 saveResponse(
-                    survey.defaultLanguage.toSurveyLang(),
+                    navigationJsonOutput.survey.defaultLang(),
                     navigationJsonOutput
                 )
                 val result = navigationJsonOutput
                     .with(
                         responseId = responseId!!,
-                        lang = survey.defaultLanguage.toSurveyLang(),
-                        additionalLang = survey.additionalLanguages.map { it.toSurveyLang() },
+                        lang = lang,
+                        additionalLang = additionalLang,
                         saveTimings = survey.saveTimings
                     )
                 navListener.onSuccess(result)
@@ -90,7 +88,7 @@ class EMNavProcessor constructor(
         runBlocking {
             response = frankieDb.responseDao().get(responseId.toString())
         }
-        val lang = useCaseInput.lang?.toSurveyLang() ?: response.lang
+        val lang = useCaseInput.lang ?: response.lang
         val navigationUseCaseInput = NavigationUseCaseInput(
             values = response.values.toMutableMap().apply {
                 putAll(useCaseInput.values)
@@ -99,20 +97,19 @@ class EMNavProcessor constructor(
                 navigationDirection = useCaseInput.navigationDirection!!,
                 navigationIndex = response.navigationIndex
             ),
-            defaultLang = survey.defaultLanguage.toSurveyLang(),
-            lang = lang,
+            lang = lang
         )
         navigationUseCase(
             navigationUseCaseInput,
-            onSuccess = { navigationJsonOutput ->
+            onSuccess = { navigationJsonOutput, language, additionalLang ->
                 val result = navigationJsonOutput
                     .with(
                         responseId = responseId!!,
-                        lang = lang,
-                        additionalLang = survey.allLang.toMutableList().apply { remove(lang) },
+                        lang = language,
+                        additionalLang = additionalLang,
                         saveTimings = survey.saveTimings
                     )
-                updateResponse(response, lang, navigationJsonOutput, useCaseInput.events)
+                updateResponse(response, language.code, navigationJsonOutput, useCaseInput.events)
                 navListener.onSuccess(result)
             }
         ) { navListener.onError(it) }
@@ -120,10 +117,19 @@ class EMNavProcessor constructor(
 
     private fun navigationUseCase(
         navigationUseCaseInput: NavigationUseCaseInput,
-        onSuccess: (NavigationJsonOutput) -> Unit,
+        onSuccess: (NavigationJsonOutput, SurveyLang, List<SurveyLang>) -> Unit,
         onError: (Throwable) -> Unit
     ) {
         val validationJsonOutput = FileUtils.getValidationJson(getActivity(), survey.id)!!
+        val lang = validationJsonOutput.survey.availableLangByCode(navigationUseCaseInput.lang)
+        val additionalLang =
+            mutableListOf(validationJsonOutput.survey.defaultSurveyLang()).apply {
+                addAll(
+                    validationJsonOutput.survey.additionalLang()
+                )
+            }.filter {
+                it.code != lang.code
+            }
         val navigationUseCaseWrapperImpl = NavigationUseCaseWrapperImpl(
             object : ScriptEngine {
                 override fun executeScript(method: String, script: String): String {
@@ -143,7 +149,7 @@ class EMNavProcessor constructor(
                         onSuccess(
                             navigationUseCaseWrapperImpl.processNavigationResult(
                                 value
-                            )
+                            ), lang, additionalLang
                         )
                     } catch (e: Exception) {
                         onError(e)
@@ -154,7 +160,7 @@ class EMNavProcessor constructor(
     }
 
     private fun saveResponse(
-        surveyLang: SurveyLang,
+        surveyLang: String,
         result: NavigationJsonOutput
     ) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -178,7 +184,7 @@ class EMNavProcessor constructor(
 
     private fun updateResponse(
         response: Response,
-        surveyLang: SurveyLang,
+        surveyLang: String,
         result: NavigationJsonOutput,
         events: List<ResponseEvent.Value>
     ) {

@@ -1,14 +1,11 @@
 package com.frankie.app.business.survey
 
-import com.frankie.app.api.survey.Language
 import com.frankie.app.api.survey.PublishInfo
 import com.frankie.app.api.survey.SurveyDesign
 import com.frankie.app.api.survey.SurveyService
 import com.frankie.app.api.survey.UploadResponseRequestData
 import com.frankie.app.db.ResponseDao
 import com.frankie.app.db.permission.PermissionDao
-import com.frankie.app.db.survey.LanguageEntity
-import com.frankie.app.db.survey.LanguagesEntity
 import com.frankie.app.db.survey.PublishInfoEntity
 import com.frankie.app.db.survey.SurveyDao
 import com.frankie.app.db.survey.SurveyDataEntity
@@ -199,9 +196,6 @@ private fun SurveyData.toSurveyDataEntity(fileQuestions: List<String> = emptyLis
         endDate = this.endDate,
         startDate = this.startDate,
         name = this.name,
-        languagesEntity = LanguagesEntity(
-            defaultLanguage.toLanguageEntity(),
-            additionalLanguages.map { it.toLanguageEntity() }),
         status = this.status,
         usage = this.usage,
         quota = this.surveyQuota,
@@ -224,9 +218,5 @@ fun PublishInfo.toPublishInfoEntity(): PublishInfoEntity {
 
 fun PublishInfoEntity.toPublishInfo(): PublishInfo {
     return PublishInfo(version, subVersion, timeLastModified)
-}
-
-fun Language.toLanguageEntity(): LanguageEntity {
-    return LanguageEntity(code, langName)
 }
 

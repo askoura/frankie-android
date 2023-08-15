@@ -31,8 +31,9 @@ data class Response(
         @ColumnInfo(name = "is_synced")
         val isSynced: Boolean,
 
-        val lang: SurveyLang,
+        val lang: String,
 
+        @ColumnInfo(index = true)
         val surveyId: String,
 
         val startDate: LocalDateTime,

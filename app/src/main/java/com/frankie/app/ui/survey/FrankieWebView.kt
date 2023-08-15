@@ -169,7 +169,7 @@ class FrankieWebView
         }
 
         @JavascriptInterface
-        fun capturePhoto(key: String) {
+        fun capturePhoto(key: String, maxSizeInKb: Int) {
             operationKey = key
             val uuid = UUID.randomUUID()
             val file = FileUtils.getResponseFile(context, uuid.toString(), survey.id)
@@ -179,7 +179,7 @@ class FrankieWebView
         }
 
         @JavascriptInterface
-        fun scanBarcode(key: String, maxSizeInKb: Int) {
+        fun scanBarcode(key: String) {
             operationKey = key
             surveyActivity?.scanBarcode()
         }
