@@ -1,6 +1,5 @@
 package com.frankie.app.business.survey
 
-import android.util.Log
 import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
@@ -25,8 +24,7 @@ class BackgroundSyncImpl(private val workManager: WorkManager) : BackgroundSync 
 //            .setBackoffCriteria(BackoffPolicy.LINEAR, Duration.ofMinutes(5))
             .setConstraints(constraints)
             .build()
-        Log.e("UploadSurvey", "enqueue work")
-        workManager.enqueueUniqueWork("sync_task", ExistingWorkPolicy.KEEP, workRequest)
+        workManager.enqueueUniqueWork("upload_task", ExistingWorkPolicy.KEEP, workRequest)
     }
 }
 

@@ -1,7 +1,6 @@
 package com.frankie.app.business.survey
 
 import android.content.Context
-import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.Dispatchers
@@ -18,16 +17,12 @@ class UploadSurveyWorker(
     private val uploadSurveyResponsesUseCase: UploadSurveyResponsesUseCase by inject()
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-        Log.e("UploadSurvey", "StartingWork")
         val result = uploadSurveyResponsesUseCase().single()
         if (result.isSuccess) {
-            Log.e("UploadSurvey", "Result is not null")
             Result.success()
         } else {
-            Log.e("UploadSurvey", "Result is null")
             Result.failure()
         }
-
     }
 
 }
