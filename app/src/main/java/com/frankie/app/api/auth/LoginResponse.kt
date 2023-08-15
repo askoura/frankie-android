@@ -10,6 +10,5 @@ data class LoginResponse @JsonCreator constructor(
         @JsonProperty("accessToken") val activeToken: String,
         @JsonProperty("refreshToken") val refreshToken: String,
         @JsonProperty("email") val email: String,
-        @JsonProperty("subdomain") val subdomain: String,
         @JsonProperty("roles") val roles: List<String>,
 )
