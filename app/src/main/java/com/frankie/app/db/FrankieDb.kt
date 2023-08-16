@@ -10,7 +10,6 @@ import com.frankie.app.db.permission.PermissionDao
 import com.frankie.app.db.permission.PermissionEntity
 import com.frankie.app.db.survey.SurveyDao
 import com.frankie.app.db.survey.SurveyDataEntity
-import com.frankie.app.db.survey.SurveyTypeConverters
 
 
 @Database(
@@ -23,7 +22,6 @@ import com.frankie.app.db.survey.SurveyTypeConverters
     exportSchema = false
 )
 @TypeConverters(
-    SurveyTypeConverters::class,
     JSONOConverter::class,
     SurveyLangConverter::class,
     NavigationIndexConverter::class,

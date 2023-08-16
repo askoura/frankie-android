@@ -42,7 +42,7 @@ class ResponseItemView @JvmOverloads constructor(
             context.getString(R.string.response_start_date, response.startDate.toString())
         binding.submitDate.text =
             context.getString(R.string.response_submit_date, response.submitDate.toString())
-        binding.lang.text = context.getString(R.string.response_lang, response.lang.code)
+        binding.lang.text = context.getString(R.string.response_lang, response.lang)
         binding.content.text =
             response.values.entries.filter { it.value.toString().isNotBlank() }
                 .joinToString(separator = "\n",

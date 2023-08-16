@@ -1,7 +1,6 @@
 package com.frankie.app.business.survey
 
 import android.os.Parcelable
-import com.frankie.app.api.survey.Language
 import com.frankie.app.api.survey.PublishInfo
 import com.frankie.app.api.survey.Survey
 import com.frankie.app.business.fromUtc
@@ -17,8 +16,6 @@ data class SurveyData(
     val startDate: LocalDateTime?,
     val endDate: LocalDateTime?,
     val name: String,
-    val defaultLanguage: Language,
-    val additionalLanguages: List<Language>,
     val status: String,
     val usage: String,
     val surveyQuota: Int,
@@ -40,10 +37,6 @@ data class SurveyData(
     private val expired: Boolean
         get() = endDate != null && endDate.isBefore(LocalDateTime.now())
 
-    val allLang: List<SurveyLang>
-        get() = mutableListOf(defaultLanguage.toSurveyLang()).apply {
-            addAll(additionalLanguages.map { it.toSurveyLang() })
-        }
     val surveyStatus: SurveyStatus
         get() {
             return when {
@@ -79,8 +72,6 @@ data class SurveyData(
                 survey.startDate?.fromUtc(),
                 survey.endDate?.fromUtc(),
                 survey.name,
-                survey.defaultLanguage,
-                survey.additionalLanguages,
                 survey.status,
                 survey.usage,
                 survey.surveyQuota,

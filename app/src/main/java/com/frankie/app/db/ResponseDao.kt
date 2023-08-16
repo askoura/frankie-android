@@ -8,7 +8,6 @@ import androidx.room.Transaction
 import com.frankie.app.db.model.Response
 import com.frankie.expressionmanager.model.NavigationIndex
 import com.frankie.expressionmanager.model.ResponseEvent
-import com.frankie.expressionmanager.model.SurveyLang
 import java.time.LocalDateTime
 
 
@@ -38,7 +37,7 @@ interface ResponseDao {
     )
     suspend fun update(
         values: Map<String, Any>,
-        lang: SurveyLang,
+        lang: String,
         startDate: LocalDateTime,
         submitDate: LocalDateTime?,
         events: List<ResponseEvent>,
@@ -62,7 +61,7 @@ interface ResponseDao {
             startDate = response.startDate,
             submitDate = response.submitDate,
             navigationIndex = response.navigationIndex,
-                events = newEvents
+            events = newEvents
         )
     }
 

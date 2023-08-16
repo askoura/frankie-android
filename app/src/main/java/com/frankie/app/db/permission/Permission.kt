@@ -1,5 +1,6 @@
 package com.frankie.app.db.permission
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -20,5 +21,6 @@ import com.frankie.app.db.survey.SurveyDataEntity
 data class PermissionEntity(
         @PrimaryKey(autoGenerate = true) val id: Long = 0,
         val userId: String,
+        @ColumnInfo(index = true)
         val surveyId: String
 )

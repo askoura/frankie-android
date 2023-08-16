@@ -1,0 +1,38 @@
+._mainContainer_1vylk_1 {
+  margin: auto;
+  padding-right: 16px;
+  padding-left: 16px;
+  min-width: 300px;
+}
+
+._content_1vylk_8 {
+  margin-top: 30px;
+}
+
+._loadingWrapper_1vylk_12 {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  padding-top: 50px;
+}._byRoleWrap_1dxko_1 {
+  margin-top: 10px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+._surveyHeader_1yxw9_1 {
+  padding: 5px;
+  color: #fff;
+  text-transform: capitalize;
+}
+
+._contentCard_1yxw9_7 {
+  padding: 5px;
+}
+
+._actionBtn_1yxw9_11 {
+  margin-top: 30px;
+  display: flex;
+  justify-content: space-between;
+}
