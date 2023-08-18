@@ -31,13 +31,12 @@ class UploadSurveyResponsesUseCaseImpl(
 ) : UploadSurveyResponsesUseCase {
 
     override fun invoke() = flow {
-        val result = surveyRepository.getSurveyList().single()
+        val result = surveyRepository.getOfflineSurveyList().single()
         if (result.isSuccess) {
             result.getOrThrow().filter { it.surveyStatus == SurveyStatus.ACTIVE }.forEach {
                 uploadSurvey(it.id)
             }
             emit(Result.success(Unit))
-            eventBus.emitEvent(AppEvent.ResponsesUploaded)
         } else {
             emit(Result.failure(result.exceptionOrNull() ?: Exception("Unknown error")))
         }
@@ -114,6 +113,7 @@ class UploadSurveyResponsesUseCaseImpl(
             } else {
                 reportError(result.exceptionOrNull())
             }
+            eventBus.emitEvent(AppEvent.ResponsesUploaded)
         }
     }
 

@@ -37,19 +37,24 @@ class MainViewModel(
     init {
         viewModelScope.launch {
             eventBus.events.filter { it is AppEvent.ResponsesUploaded }.collect {
-                fetchSurveyList(false)
+                fetchSurveyList(triggeredByUser = false, offlineOnly = true)
             }
         }
     }
 
-    fun fetchSurveyList(triggeredByUser: Boolean) {
+    fun fetchSurveyList(triggeredByUser: Boolean, offlineOnly: Boolean = false) {
         viewModelScope.launch {
             _state.update { _state.value.copy(isLoading = _firstLoad.value || triggeredByUser) }
             _firstLoad.value = false
-            merge(
-                surveyRepository.getSurveyList(),
+            val source = if (offlineOnly) {
                 surveyRepository.getOfflineSurveyList()
-            ).collect { result ->
+            } else {
+                merge(
+                    surveyRepository.getSurveyList(),
+                    surveyRepository.getOfflineSurveyList()
+                )
+            }
+            source.collect { result ->
                 if (result.isSuccess) {
                     _state.update {
                         _state.value.copy(surveyList = result.getOrThrow())
