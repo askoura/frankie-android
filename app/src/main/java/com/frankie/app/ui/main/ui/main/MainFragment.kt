@@ -97,8 +97,8 @@ class MainFragment : Fragment() {
                 )
             },
             onInfoClicked = { },
-            onUploadClicked = { survey ->
-                viewModel.uploadSurveyResponses(survey.id)
+            onUploadClicked = {
+                viewModel.uploadSurveyResponses()
             })
         binding.recycler.adapter = adapter
         binding.recycler.layoutManager = LinearLayoutManager(binding.root.context)
@@ -130,6 +130,11 @@ class MainFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.uploadSurveyResponses()
     }
 
     private fun processDownloadState(downloadState: DownloadState) {
