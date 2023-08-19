@@ -13,8 +13,8 @@ import com.frankie.app.storage.DownloadState
 import com.frankie.app.ui.common.error.ErrorProcessor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -36,8 +36,40 @@ class MainViewModel(
 
     init {
         viewModelScope.launch {
-            eventBus.events.filter { it is AppEvent.ResponsesUploaded }.collect {
-                fetchSurveyList(false)
+            eventBus.events.collect { event ->
+                when (event) {
+                    is AppEvent.UploadedSurveyResponse -> {
+                        _state.update {
+                            _state.value.copy(
+                                surveyList = _state.value.surveyList.toMutableList().apply {
+                                    val index = indexOfFirst { it.id == event.surveyId }
+                                    val value = surveyRepository.getOfflineSurvey(event.surveyId)
+                                        .single().getOrThrow()
+                                    set(index, value)
+                                })
+                        }
+                    }
+
+                    is AppEvent.UploadingResponse -> {
+                        if (!event.uploading) {
+                            _state.update {
+                                _state.value.copy(
+                                    surveyList = _state.value.surveyList.map {
+                                        it.copy(isSyncing = true)
+                                    })
+                            }
+                        }
+                    }
+
+                    is AppEvent.UploadingSurveyResponse -> {
+                        _state.update {
+                            _state.value.copy(
+                                surveyList = _state.value.surveyList.map {
+                                    it.copy(isSyncing = it.id == event.surveyId)
+                                })
+                        }
+                    }
+                }
             }
         }
     }
@@ -47,8 +79,8 @@ class MainViewModel(
             _state.update { _state.value.copy(isLoading = _firstLoad.value || triggeredByUser) }
             _firstLoad.value = false
             merge(
-                surveyRepository.getSurveyList(),
-                surveyRepository.getOfflineSurveyList()
+                surveyRepository.getOfflineSurveyList(),
+                surveyRepository.getSurveyList()
             ).collect { result ->
                 if (result.isSuccess) {
                     _state.update {
@@ -92,7 +124,11 @@ class MainViewModel(
 
     fun uploadSurveyResponses() {
         viewModelScope.launch {
-            backgroundSync.startSurveySync()
+            val canSync = surveyRepository.getOfflineSurveyList().single().getOrNull()
+                ?.any { it.localUnsyncedResponsesCount > 0 } ?: false
+            if (canSync) {
+                backgroundSync.startSurveySync()
+            }
         }
     }
 

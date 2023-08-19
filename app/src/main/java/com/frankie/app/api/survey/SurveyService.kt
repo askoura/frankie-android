@@ -36,6 +36,6 @@ interface SurveyService {
     @POST("survey/{surveyId}/response/{responseId}/upload")
     suspend fun uploadSurveyResponse(@Path("surveyId") surveyId: String,
                                      @Path("responseId") responseId: String,
-                                     @Body uploadResponseRequestData: UploadResponseRequestData): Response<Unit>
+                                     @Body uploadResponseRequestData: UploadResponseRequestData): Survey
 
 }

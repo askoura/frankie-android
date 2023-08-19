@@ -24,5 +24,7 @@ class EventBusImpl : EventBus {
 }
 
 sealed class AppEvent {
-    object ResponsesUploaded : AppEvent()
+    data class UploadingResponse(val uploading: Boolean) : AppEvent()
+    data class UploadingSurveyResponse(val surveyId: String) : AppEvent()
+    data class UploadedSurveyResponse(val surveyId: String) : AppEvent()
 }

@@ -31,21 +31,22 @@ class UploadSurveyResponsesUseCaseImpl(
 ) : UploadSurveyResponsesUseCase {
 
     override fun invoke() = flow {
-        val result = surveyRepository.getSurveyList().single()
-        if (result.isSuccess) {
-            result.getOrThrow().filter { it.surveyStatus == SurveyStatus.ACTIVE }.forEach {
+        eventBus.emitEvent(AppEvent.UploadingResponse(true))
+        surveyRepository.getOfflineSurveyList()
+            .single()
+            .getOrThrow()
+            .filter {
+                it.surveyStatus == SurveyStatus.ACTIVE && it.localUnsyncedResponsesCount > 0
+            }.forEach {
                 uploadSurvey(it.id)
             }
-            emit(Result.success(Unit))
-            eventBus.emitEvent(AppEvent.ResponsesUploaded)
-        } else {
-            emit(Result.failure(result.exceptionOrNull() ?: Exception("Unknown error")))
-        }
+        emit(Result.success(Unit))
     }.catch {
-        emit(Result.failure(it))
+        eventBus.emitEvent(AppEvent.UploadingResponse(false))
     }.flowOn(Dispatchers.IO)
 
     private suspend fun uploadSurvey(surveyId: String) {
+        eventBus.emitEvent(AppEvent.UploadingSurveyResponse(surveyId))
         // 1. upload files
         val responses = responseRepository.getResponses(surveyId)
             .single().getOrThrow()
@@ -111,6 +112,8 @@ class UploadSurveyResponsesUseCaseImpl(
             if (result.isSuccess) {
                 // 4. mark response as synced
                 responseRepository.markResponseAsSynced(response.id).collect()
+                surveyRepository.updateSurveyInDB(result.getOrThrow())
+                eventBus.emitEvent(AppEvent.UploadedSurveyResponse(surveyId))
             } else {
                 reportError(result.exceptionOrNull())
             }
