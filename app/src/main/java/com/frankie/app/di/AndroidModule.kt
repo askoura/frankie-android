@@ -11,6 +11,8 @@ import com.frankie.app.business.survey.BackgroundSyncImpl
 import com.frankie.app.business.survey.SessionManager
 import com.frankie.app.business.survey.SessionManagerImpl
 import com.frankie.app.db.FrankieDb
+import com.frankie.app.ui.common.ConnectivityChecker
+import com.frankie.app.ui.common.ConnectivityCheckerImpl
 import com.frankie.app.ui.common.error.ErrorDisplayManager
 import com.frankie.app.ui.common.error.ErrorDisplayManagerImpl
 import com.frankie.app.ui.common.error.ErrorProcessor
@@ -30,6 +32,7 @@ val androidModule = module {
     single { get<FrankieDb>().responseDao() }
     single { WorkManager.getInstance(get()) }
     single<BackgroundSync> { BackgroundSyncImpl(get()) }
-    factory<ErrorProcessor> { ErrorProcessorImpl() }
+    single<ConnectivityChecker> { ConnectivityCheckerImpl(get()) }
+    factory<ErrorProcessor> { ErrorProcessorImpl(get()) }
     factory<ErrorDisplayManager> { (context: Context) -> ErrorDisplayManagerImpl(context, get()) }
 }

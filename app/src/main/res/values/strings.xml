@@ -8,10 +8,13 @@
     <string name="login_button_login_loading">Please wait</string>
     <string name="error_general_title">Error</string>
     <string name="error_network_title">Network Error</string>
+    <string name="error_timeout_title">Timeout</string>
     <string name="error_general_description">Please try again later.</string>
     <string name="error_network_description">No Internet… Check your network</string>
+    <string name="error_timeout_description">Everything is taking longer than it should… Please try again later</string>
     <string name="error_auth_title">Session expired.</string>
     <string name="error_auth_description">Please sign in again.</string>
+    <string name="not_found_description">This resource is not found</string>
     <string name="error_recording_permission_missing_title">Critical permission denied</string>
     <string name="error_recording_permission_missing_desc">Access Location and Record Audio permissions must be granted to proceed. Please go to settings to grant app both permissions</string>
     <string name="error_login_title">Sign in failed!</string>
