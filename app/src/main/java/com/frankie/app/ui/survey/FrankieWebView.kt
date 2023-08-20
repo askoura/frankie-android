@@ -170,6 +170,7 @@ class FrankieWebView
 
         @JavascriptInterface
         fun capturePhoto(key: String, maxSizeInKb: Int) {
+            maxSizeKb = maxSizeInKb
             operationKey = key
             val uuid = UUID.randomUUID()
             val file = FileUtils.getResponseFile(context, uuid.toString(), survey.id)
@@ -200,6 +201,7 @@ class FrankieWebView
 
         @JavascriptInterface
         fun captureVideo(key: String, maxSizeInKb: Int) {
+            maxSizeKb = maxSizeInKb
             operationKey = key
             surveyActivity?.takeVideo()
         }
@@ -317,10 +319,15 @@ class FrankieWebView
         var stream: InputStream? = null
         try {
             stream = context.contentResolver.openInputStream(saverUri!!)
+            val size = stream!!.readBytes().size.toLong()
+            if (isSizeViolated(size)) {
+                resetFileUploadVariables()
+                return
+            }
             val result = emNavProcessor.saveFileResponse(
                 fileName = "captured-image.jpg",
                 uuid = UUID.fromString(saverUri.toString().substringAfterLast("/")),
-                fileSize = stream!!.readBytes().size.toLong(),
+                fileSize = size,
                 key = operationKey!!
             )
             (context as Activity).runOnUiThread {
@@ -350,10 +357,15 @@ class FrankieWebView
         var stream: InputStream? = null
         try {
             stream = context.contentResolver.openInputStream(contentUri!!)
+            val size = stream!!.readBytes().size.toLong()
+            if (isSizeViolated(size)) {
+                resetFileUploadVariables()
+                return
+            }
             val result = emNavProcessor.uploadFile(
                 key = operationKey!!,
                 fileName = "captured-video.mp4",
-                inputStream = stream!!
+                inputStream = stream
             )
             (context as Activity).runOnUiThread {
                 loadUrl(
@@ -372,6 +384,18 @@ class FrankieWebView
         resetFileUploadVariables()
     }
 
+    private fun isSizeViolated(size: Long): Boolean {
+        val sizeInKb = size / 1024
+        val sizeViolated = maxSizeKb?.let {
+            sizeInKb > it
+        } ?: false
+        if (sizeViolated) {
+            surveyActivity?.showMaxSizeValidation(sizeInKb.toInt(), maxSizeKb!!)
+        }
+        return sizeViolated
+    }
+
+    @SuppressLint("Range")
     fun onFileSelected(uri: Uri) {
         try {
             val cursor = context.contentResolver.query(uri, null, null, null, null)
@@ -382,6 +406,10 @@ class FrankieWebView
                         cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
                     )
                 val size = cursor.getLong(cursor.getColumnIndex(OpenableColumns.SIZE))
+                if (isSizeViolated(size)) {
+                    resetFileUploadVariables()
+                    return
+                }
                 val fileType = context.contentResolver.getType(uri)
                 saverUri = uri
                 cursor.close()

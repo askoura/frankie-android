@@ -102,7 +102,8 @@ class SurveyActivity : AppCompatActivity() {
         updateValuesFromBundle(savedInstanceState)
     }
 
-    private fun createLocationRequest() = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY,5000).build()
+    private fun createLocationRequest() =
+        LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000).build()
 
 
     private fun updateValuesFromBundle(savedInstanceState: Bundle?) {
@@ -382,6 +383,20 @@ class SurveyActivity : AppCompatActivity() {
                 android.R.string.ok
             ) { _, _ ->
                 this@SurveyActivity.finish()
+            }
+
+        }
+        builder.create().show()
+    }
+
+    fun showMaxSizeValidation(actual: Int, max: Int) {
+        val builder = AlertDialog.Builder(this)
+        builder.apply {
+            setTitle(R.string.max_size_exceeded)
+            setMessage(getString(R.string.max_size_exceeded_message, actual, max))
+            setNeutralButton(
+                android.R.string.ok
+            ) { _, _ ->
             }
 
         }
