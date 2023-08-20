@@ -3,7 +3,6 @@ package com.frankie.app.business.survey
 import android.os.Parcelable
 import com.frankie.app.api.survey.PublishInfo
 import com.frankie.app.api.survey.Survey
-import com.frankie.app.business.fromUtc
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDateTime
 
@@ -66,10 +65,10 @@ data class SurveyData(
         ): SurveyData {
             return SurveyData(
                 id = survey.id,
-                survey.creationDate.fromUtc(),
-                survey.lastModified.fromUtc(),
-                survey.startDate?.fromUtc(),
-                survey.endDate?.fromUtc(),
+                survey.creationDate,
+                survey.lastModified,
+                survey.startDate,
+                survey.endDate,
                 survey.name,
                 survey.status,
                 survey.usage,

@@ -113,7 +113,7 @@ class MainFragment : Fragment() {
                     binding.noSurveysAvailable.visibleOrGone(false)
                     binding.fetchingSurveysProgress.visibleOrGone(state.isLoading)
                     binding.recycler.visibleOrGone(true)
-                    adapter.submitList(state.surveyList)
+                    adapter.submitList(state.surveyList.sortedBy { it.creationDate })
                 }
             }
         }
@@ -135,6 +135,7 @@ class MainFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         viewModel.uploadSurveyResponses()
+        viewModel.fetchSurveyList(false)
     }
 
     private fun processDownloadState(downloadState: DownloadState) {
@@ -172,10 +173,5 @@ class MainFragment : Fragment() {
             }
         }
 
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.fetchSurveyList(false)
     }
 }

@@ -5,7 +5,6 @@ import retrofit2.Response
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
-import kotlin.math.roundToInt
 
 fun <T> Response<T>.getResult(): Result<T> {
     return if (isSuccessful) {
@@ -18,6 +17,12 @@ fun <T> Response<T>.getResult(): Result<T> {
 fun LocalDateTime.fromUtc(): LocalDateTime {
     return this.atZone(ZoneOffset.UTC)
         .withZoneSameInstant(ZoneId.systemDefault())
+        .toLocalDateTime();
+}
+
+fun LocalDateTime.toUtc(): LocalDateTime {
+    return this.atZone(ZoneId.systemDefault())
+        .withZoneSameInstant(ZoneOffset.UTC)
         .toLocalDateTime();
 }
 
