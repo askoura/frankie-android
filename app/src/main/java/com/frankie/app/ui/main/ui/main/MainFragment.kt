@@ -56,7 +56,7 @@ class MainFragment : Fragment() {
                 // Handle the menu selection
                 return when (menuItem.itemId) {
                     android.R.id.home -> {
-                        activity?.onBackPressed()
+                        activity?.onBackPressedDispatcher?.onBackPressed()
                         return true
                     }
 

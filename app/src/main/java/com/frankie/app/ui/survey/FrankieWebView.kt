@@ -138,7 +138,7 @@ class FrankieWebView
         @Suppress("unused")
         @JavascriptInterface
         fun onBackPressed() {
-            surveyActivity?.onBackPressed()
+            surveyActivity?.onBackPressedDispatcher?.onBackPressed()
         }
 
         @JavascriptInterface

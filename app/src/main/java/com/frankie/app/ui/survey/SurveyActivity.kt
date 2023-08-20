@@ -25,6 +25,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.lifecycle.coroutineScope
 import com.frankie.app.R
+import com.frankie.app.business.parcelable
 import com.frankie.app.business.responses.ResponseRepository
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.databinding.ActivitySurveyBinding
@@ -34,6 +35,7 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
@@ -58,7 +60,7 @@ class SurveyActivity : AppCompatActivity() {
 
 
     val survey: SurveyData
-        get() = intent.getParcelableExtra(EXTRA_SURVEY)
+        get() = intent.parcelable(EXTRA_SURVEY)
             ?: throw IllegalArgumentException("Survey is required")
 
 
@@ -100,11 +102,7 @@ class SurveyActivity : AppCompatActivity() {
         updateValuesFromBundle(savedInstanceState)
     }
 
-    private fun createLocationRequest() = LocationRequest.create().apply {
-        interval = 10000
-        fastestInterval = 5000
-        priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-    }
+    private fun createLocationRequest() = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY,5000).build()
 
 
     private fun updateValuesFromBundle(savedInstanceState: Bundle?) {
