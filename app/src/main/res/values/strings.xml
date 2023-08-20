@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Frankie</string>
+    <string name="app_name">Qlarr</string>
     <string name="title_activity_login">Sign in</string>
     <string name="title_activity_responses">Responses</string>
     <string name="login_hint_email">Email</string>
@@ -46,4 +46,6 @@
     <string name="end_date">End Date: %s</string>
     <string name="kilobytes">%.2f KB</string>
     <string name="megabytes">%.2f MB</string>
+    <string name="max_size_exceeded">Max Size Exceeded</string>
+    <string name="max_size_exceeded_message">This file(%1$dKB) exceeds max allowed size of %2$dKB</string>
 </resources>
