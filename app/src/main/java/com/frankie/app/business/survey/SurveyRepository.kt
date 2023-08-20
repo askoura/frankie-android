@@ -7,6 +7,7 @@ import com.frankie.app.api.survey.SurveyService
 import com.frankie.app.api.survey.UploadResponseRequestData
 import com.frankie.app.db.ResponseDao
 import com.frankie.app.db.permission.PermissionDao
+import com.frankie.app.db.permission.PermissionEntity
 import com.frankie.app.db.survey.PublishInfoEntity
 import com.frankie.app.db.survey.SurveyDao
 import com.frankie.app.db.survey.SurveyDataEntity
@@ -40,6 +41,7 @@ interface SurveyRepository {
     ): Flow<Result<Survey>>
 
     suspend fun saveSurveyToDB(surveyData: SurveyData, fileQuestions: List<String>)
+    suspend fun updateSurveyToDB(surveyData: SurveyData, fileQuestions: List<String>)
     suspend fun updateSurveyInDB(survey: Survey)
 
     suspend fun surveyDesign(surveyData: SurveyData): SurveyDesign
@@ -104,7 +106,7 @@ class SurveyRepositoryImpl(
                 surveyData
             }
 
-            savePermissionsToDB(surveyList)
+            deletePermissionsForUserNotInList(surveyList)
 
             emit(Result.success(surveyList))
         }.catch {
@@ -147,16 +149,26 @@ class SurveyRepositoryImpl(
 
     override suspend fun saveSurveyToDB(surveyData: SurveyData, fileQuestions: List<String>) {
         surveyDao.insert(surveyData.toSurveyDataEntity(fileQuestions))
+        permissionDao.insert(
+            PermissionEntity(
+                userId = sessionManager.getUserIdOrThrow(),
+                surveyId = surveyData.id
+            )
+        )
+    }
+
+    override suspend fun updateSurveyToDB(surveyData: SurveyData, fileQuestions: List<String>) {
+        surveyDao.update(surveyData.toSurveyDataEntity(fileQuestions))
     }
 
     override suspend fun updateSurveyInDB(survey: Survey) {
         surveyDao.getSurveyDataById(survey.id)?.let { surveyDataEntity ->
-            surveyDao.insert(surveyDataEntity.update(survey))
+            surveyDao.update(surveyDataEntity.update(survey))
         } ?: throw IllegalStateException("Survey not found with id: ${survey.id}")
     }
 
-    private suspend fun savePermissionsToDB(surveyList: List<SurveyData>) {
-        permissionDao.updateUserPermissions(
+    private suspend fun deletePermissionsForUserNotInList(surveyList: List<SurveyData>) {
+        permissionDao.deletePermissionsForUserNotInList(
             sessionManager.getUserIdOrThrow(),
             surveyList.map { it.id })
     }

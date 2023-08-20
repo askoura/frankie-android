@@ -4,11 +4,15 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 
 @Dao
 interface SurveyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(surveyDataEntity: SurveyDataEntity)
+
+    @Update
+    suspend fun update(surveyDataEntity: SurveyDataEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(surveyDataEntityList: List<SurveyDataEntity>)

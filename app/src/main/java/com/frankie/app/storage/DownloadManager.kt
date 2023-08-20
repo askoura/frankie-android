@@ -97,7 +97,7 @@ class DownloadManagerImpl(
                 surveyData.copy(newVersionAvailable = false, publishInfo = design.publishInfo)
             val fileQuestions = validationOutput.schema.filter { it.dataType == DataType.FILE }
                 .map { it.componentCode }
-            surveyRepository.saveSurveyToDB(updatedSurveyData, fileQuestions)
+            surveyRepository.updateSurveyToDB(updatedSurveyData, fileQuestions)
             emit(DownloadState.Result(updatedSurveyData, someFilesFailed))
         }.catch {
             emit(DownloadState.Error(it))
