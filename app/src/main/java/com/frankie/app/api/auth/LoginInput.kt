@@ -1,6 +1,10 @@
 package com.frankie.app.api.auth
 
 data class LoginInput(
-        val email: String,
-        val password: String
+    val email: String,
+    val password: String
+)
+data class GoogleSignInInput(
+    val credential: String,
+    val clientId: String
 )

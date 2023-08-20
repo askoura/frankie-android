@@ -5,12 +5,14 @@ import androidx.lifecycle.viewModelScope
 import com.frankie.app.AppEvent
 import com.frankie.app.EventBus
 import com.frankie.app.business.auth.LogoutUseCase
+import com.frankie.app.business.settings.SharedPrefsManager
 import com.frankie.app.business.survey.BackgroundSync
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.business.survey.SurveyRepository
 import com.frankie.app.storage.DownloadManager
 import com.frankie.app.storage.DownloadState
 import com.frankie.app.ui.common.error.ErrorProcessor
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.merge
@@ -21,6 +23,8 @@ import kotlinx.coroutines.launch
 class MainViewModel(
     private val surveyRepository: SurveyRepository,
     private val logoutUseCase: LogoutUseCase,
+    private val sharedPrefsManager: SharedPrefsManager,
+    private val googleSignInClient: GoogleSignInClient,
     private val downloadManager: DownloadManager,
     private val backgroundSync: BackgroundSync,
     private val eventBus: EventBus,
@@ -132,8 +136,11 @@ class MainViewModel(
         }
     }
 
-    fun logout() {
+    fun logout(onLogoutFinished: () -> Unit) {
         logoutUseCase()
+        googleSignInClient.signOut().addOnCompleteListener {
+            onLogoutFinished()
+        }
     }
 
     data class State(

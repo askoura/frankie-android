@@ -18,6 +18,15 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        debug {
+            storeFile file('../keystore/debug.keystore')
+            storePassword = 'KSr3#V^^heD7g1mIO!m9'
+            keyAlias 'debug'
+            keyPassword = 'Ow0%I!TUwDONAejpS^XF'
+        }
+    }
+
     buildTypes {
         release {
             debuggable false
@@ -57,6 +66,7 @@ dependencies {
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'com.google.android.gms:play-services-auth:20.6.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.9.0'
     implementation "com.google.android.gms:play-services-location:21.0.1"

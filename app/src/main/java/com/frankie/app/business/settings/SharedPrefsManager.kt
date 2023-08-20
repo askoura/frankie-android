@@ -8,6 +8,7 @@ interface SharedPrefsManager {
     var activeToken: String?
     var refreshToken: String?
     var userId: String?
+    fun clear()
 }
 
 class SharedPrefsManagerImpl(context: Context) : SharedPrefsManager {
@@ -28,6 +29,10 @@ class SharedPrefsManagerImpl(context: Context) : SharedPrefsManager {
     override var userId: String?
         get() = getString(KEY_USER_ID)
         set(value) = saveString(KEY_USER_ID, value)
+
+    override fun clear() {
+        editor.clear().apply()
+    }
 
     private fun saveString(key: String, value: String?) {
         editor.putString(key, value)

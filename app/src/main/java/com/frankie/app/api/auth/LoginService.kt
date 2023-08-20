@@ -10,6 +10,10 @@ interface LoginService {
     suspend fun login(
         @Body loginRequest: LoginInput
     ): Response<LoginResponse>
+    @POST("user/google_sign_in")
+    suspend fun googleSignIn(
+        @Body googleSignInInput: GoogleSignInInput
+    ): Response<LoginResponse>
 
     @GET("logout")
     suspend fun logout(): Response<Unit>

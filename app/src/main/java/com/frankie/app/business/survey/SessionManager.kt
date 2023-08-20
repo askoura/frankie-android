@@ -8,7 +8,6 @@ interface SessionManager {
     fun getRefreshToken(): String?
     fun getUserIdOrThrow(): String
     fun saveSession(loginResponse: LoginResponse)
-    fun clearTokens()
 }
 
 class SessionManagerImpl(private val sharedPrefsManager: SharedPrefsManager) : SessionManager {
@@ -17,18 +16,12 @@ class SessionManagerImpl(private val sharedPrefsManager: SharedPrefsManager) : S
 
     override fun getRefreshToken(): String? = sharedPrefsManager.refreshToken
     override fun getUserIdOrThrow(): String = sharedPrefsManager.userId
-            ?: throw IllegalStateException("User id is null")
+        ?: throw IllegalStateException("User id is null")
 
     override fun saveSession(loginResponse: LoginResponse) {
         sharedPrefsManager.userId = loginResponse.id
         sharedPrefsManager.activeToken = loginResponse.activeToken
         sharedPrefsManager.refreshToken = loginResponse.refreshToken
-    }
-
-    override fun clearTokens() {
-        sharedPrefsManager.userId = null
-        sharedPrefsManager.activeToken = null
-        sharedPrefsManager.refreshToken = null
     }
 
 }

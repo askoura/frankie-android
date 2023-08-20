@@ -16,6 +16,6 @@ val loginModule = module {
     single<LoginService> { provideRetrofit(get(), get()).create(LoginService::class.java) }
     single<LoginRepository> { LoginRepositoryImpl(get(), get()) }
     single<LoginInteractor> { LoginInteractorImpl(get()) }
-    single<LogoutUseCase> { LogoutUseCaseImpl(get()) }
+    single<LogoutUseCase> { LogoutUseCaseImpl(get(), get()) }
     viewModel { LoginViewModel(get(), get()) }
 }

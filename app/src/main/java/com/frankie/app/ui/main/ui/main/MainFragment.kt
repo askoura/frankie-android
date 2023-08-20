@@ -66,9 +66,10 @@ class MainFragment : Fragment() {
                     }
 
                     R.id.logout -> {
-                        viewModel.logout()
-                        startActivity(LoginActivity.createIntent(binding.root.context))
-                        activity?.finish()
+                        viewModel.logout {
+                            startActivity(LoginActivity.createIntent(binding.root.context))
+                            activity?.finish()
+                        }
                         true
                     }
 
