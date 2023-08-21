@@ -119,8 +119,8 @@ class AudioRecordingService : Service() {
         val event = ResponseEvent.VoiceRecording(
             uuid.toString(), LocalDateTime.now(ZoneOffset.UTC)
         )
-        CoroutineScope(Dispatchers.Main).launch {
-            responseRepository.addEvent(responseId, event).collect()
+        CoroutineScope(Dispatchers.IO).launch {
+            responseRepository.addEvent(responseId, event)
         }
         @Suppress("DEPRECATION")
         mediaRecorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)

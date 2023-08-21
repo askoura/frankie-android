@@ -5,12 +5,18 @@ import android.content.Context
 import androidx.appcompat.app.AlertDialog
 import com.frankie.app.business.auth.LogoutUseCase
 import com.frankie.app.ui.login.LoginActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 interface ErrorDisplayManager {
     fun displayError(processedError: ProcessedError)
 }
 
-class ErrorDisplayManagerImpl(private val context: Context, private val logoutUseCase: LogoutUseCase) : ErrorDisplayManager {
+class ErrorDisplayManagerImpl(
+    private val context: Context,
+    private val logoutUseCase: LogoutUseCase
+) : ErrorDisplayManager {
     private var dialog: AlertDialog? = null
 
     override fun displayError(processedError: ProcessedError) {
@@ -26,9 +32,11 @@ class ErrorDisplayManagerImpl(private val context: Context, private val logoutUs
             setPositiveButton(android.R.string.ok) { dialog, _ ->
                 dialog.dismiss()
                 if (isAuthError) {
-                    logoutUseCase()
-                    context.startActivity(LoginActivity.createIntent(context))
-                    (context as? Activity)?.finish()
+                    CoroutineScope(Dispatchers.IO).launch {
+                        logoutUseCase()
+                        context.startActivity(LoginActivity.createIntent(context))
+                        (context as? Activity)?.finish()
+                    }
                 }
             }
             setCancelable(!isAuthError)

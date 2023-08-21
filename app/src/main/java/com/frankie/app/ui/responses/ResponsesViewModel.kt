@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.frankie.app.business.responses.ResponseRepository
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.db.model.Response
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -16,9 +17,8 @@ class ResponsesViewModel(private val responsesRepository: ResponseRepository) : 
     val responses = _responses.asStateFlow()
 
     fun fetchResponses(surveyData: SurveyData) {
-        viewModelScope.launch {
-            responsesRepository.getResponses(surveyData.id).collect { result ->
-                val newList = result.getOrThrow()
+        viewModelScope.launch(Dispatchers.IO) {
+            responsesRepository.getResponses(surveyData.id).let { newList ->
                 val count = newList.count { it.submitDate != null && !it.isSynced }
                 val quotaExceeded = surveyData.quotaExceeded(count)
                 _responses.update {
@@ -29,8 +29,8 @@ class ResponsesViewModel(private val responsesRepository: ResponseRepository) : 
     }
 
     fun deleteResponse(surveyData: SurveyData, responseId: String) {
-        viewModelScope.launch {
-            responsesRepository.deleteResponse(responseId).collect {
+        viewModelScope.launch(Dispatchers.IO) {
+            responsesRepository.deleteResponse(responseId).let {
                 _responses.update { responses ->
                     val list = responses.filter { it.responses.id != responseId }
                     val count =

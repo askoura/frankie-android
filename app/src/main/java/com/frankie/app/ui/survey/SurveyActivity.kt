@@ -39,7 +39,7 @@ import com.google.android.gms.location.Priority
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import java.time.LocalDateTime
@@ -91,12 +91,10 @@ class SurveyActivity : AppCompatActivity() {
                     val event = ResponseEvent.Location(
                         it.longitude, it.latitude, LocalDateTime.now(ZoneOffset.UTC)
                     )
-                    lifecycle.coroutineScope.launch {
-                        responseRepository.addEvent(responseId, event).collect()
+                    lifecycle.coroutineScope.launch(Dispatchers.IO) {
+                        responseRepository.addEvent(responseId, event)
                     }
                 }
-
-
             }
         }
         updateValuesFromBundle(savedInstanceState)

@@ -6,6 +6,7 @@ import com.frankie.app.api.auth.GoogleSignInInput
 import com.frankie.app.business.auth.LoginInteractor
 import com.frankie.app.ui.common.InputUtils
 import com.frankie.app.ui.common.error.ErrorProcessor
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -18,20 +19,20 @@ class LoginViewModel(private val loginInteractor: LoginInteractor, errorProcesso
     val loginState = _loginState.asStateFlow()
 
     fun login(email: String, password: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _loginState.value = LoginState(isLoading = true)
             val trimmedEmail = email.trim()
             val trimmedPsw = password.trim()
             val isPswValid = InputUtils.isValidPassword(trimmedPsw)
             val isEmailValid = InputUtils.isValidEmail(trimmedEmail)
             if (isEmailValid && isPswValid) {
-                loginInteractor.login(trimmedEmail, trimmedPsw).collect { result ->
-                    if (result.isSuccess) {
-                        _loginState.update { LoginState(isLoggedIn = true, isLoading = false) }
-                    } else {
-                        _loginState.update { LoginState(isLoading = false) }
-                        processLoginError(result.exceptionOrNull()!!)
-                    }
+                try {
+                    loginInteractor.login(trimmedEmail, trimmedPsw)
+                    _loginState.update { LoginState(isLoggedIn = true, isLoading = false) }
+                } catch (e: Exception) {
+                    _loginState.update { LoginState(isLoading = false) }
+                    processLoginError(e)
+
                 }
             } else {
                 _loginState.update {
@@ -45,18 +46,15 @@ class LoginViewModel(private val loginInteractor: LoginInteractor, errorProcesso
     }
 
     fun googleSignIn(idToken: String, clientId: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _loginState.value = LoginState(isLoading = true)
-            loginInteractor.googleSignIn(GoogleSignInInput(idToken, clientId))
-                .collect { result ->
-                    if (result.isSuccess) {
-                        _loginState.update { LoginState(isLoggedIn = true, isLoading = false) }
-                    } else {
-                        _loginState.update { LoginState(isLoading = false) }
-                        processLoginError(result.exceptionOrNull()!!)
-                    }
-                }
-
+            try {
+                loginInteractor.googleSignIn(GoogleSignInInput(idToken, clientId))
+                _loginState.update { LoginState(isLoggedIn = true, isLoading = false) }
+            } catch (e: Exception) {
+                _loginState.update { LoginState(isLoading = false) }
+                processLoginError(e)
+            }
         }
     }
 

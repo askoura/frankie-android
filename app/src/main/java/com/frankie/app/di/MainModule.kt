@@ -26,5 +26,5 @@ val mainModule = module {
         )
     }
     single<DownloadManager> { DownloadManagerImpl(get(named("appContext")), get()) }
-    viewModel { MainViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { MainViewModel(get(), get(), get(), get(),  get(), get(), get()) }
 }

@@ -11,7 +11,6 @@ import com.frankie.expressionmanager.usecase.ValidationOutput
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
@@ -37,7 +36,7 @@ class DownloadManagerImpl(
             )
             saveValidationJsonOutput(
                 surveyData.id, design.validationJsonOutput.toString()
-            ).collect()
+            )
             val loadingState = DownloadState.Loading(
                 surveyName = surveyName, totalFilesCount = design.files.size
             )
@@ -104,16 +103,13 @@ class DownloadManagerImpl(
         }.flowOn(Dispatchers.IO)
     }
 
-    private suspend fun saveValidationJsonOutput(
+    private fun saveValidationJsonOutput(
         surveyId: String, validationOutput: String
-    ): Flow<Result<Unit>> {
-        return flow {
-            val file = getValidationJsonFile(appContext, surveyId)
-            file.outputStream().use { outputStream ->
-                outputStream.write(validationOutput.toByteArray())
-            }
-            emit(Result.success(Unit))
-        }.flowOn(Dispatchers.IO)
+    ) {
+        val file = getValidationJsonFile(appContext, surveyId)
+        file.outputStream().use { outputStream ->
+            outputStream.write(validationOutput.toByteArray())
+        }
     }
 
     private suspend fun saveFile(

@@ -10,17 +10,11 @@ import com.frankie.app.db.model.Response.Companion.ACTUAL_FILENAME_KEY
 import com.frankie.app.db.model.Response.Companion.STORED_FILENAME_KEY
 import com.frankie.app.ui.common.FileUtils
 import com.frankie.expressionmanager.model.ResponseEvent
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.single
 
 
 interface UploadSurveyResponsesUseCase {
-    operator fun invoke(): Flow<Result<Unit>>
+    suspend operator fun invoke()
 
 }
 
@@ -31,31 +25,29 @@ class UploadSurveyResponsesUseCaseImpl(
     private val eventBus: EventBus
 ) : UploadSurveyResponsesUseCase {
 
-    override fun invoke() = flow {
-        eventBus.emitEvent(AppEvent.UploadingResponse(true))
-        surveyRepository.getOfflineSurveyList()
-            .single()
-            .getOrThrow()
-            .filter {
-                it.surveyStatus == SurveyStatus.ACTIVE && it.localUnsyncedResponsesCount > 0
-            }.forEach {
-                try {
-                    uploadSurvey(it.id)
-                } catch (e: java.lang.Exception) {
-                    reportError(e)
+    override suspend fun invoke() {
+        try {
+            eventBus.emitEvent(AppEvent.UploadingResponse(true))
+            surveyRepository.getOfflineSurveyList()
+                .filter {
+                    it.surveyStatus == SurveyStatus.ACTIVE && it.localUnsyncedResponsesCount > 0
+                }.forEach {
+                    try {
+                        uploadSurvey(it.id)
+                    } catch (e: Exception) {
+                        reportError(e)
+                    }
                 }
-            }
-        emit(Result.success(Unit))
-    }.catch {
-        eventBus.emitEvent(AppEvent.UploadingResponse(false))
-    }.flowOn(Dispatchers.IO)
+        } catch (e: java.lang.Exception) {
+            eventBus.emitEvent(AppEvent.UploadingResponse(false))
+        }
+    }
 
     private suspend fun uploadSurvey(surveyId: String) {
         eventBus.emitEvent(AppEvent.UploadingSurveyResponse(surveyId))
         val responses = responseRepository.getResponses(surveyId)
-            .single().getOrThrow()
             .filter { !it.isSynced }
-        val surveyDbEntity = surveyRepository.getSurveyDbEntity(surveyId).single().getOrThrow()
+        val surveyDbEntity = surveyRepository.getSurveyDbEntity(surveyId)
             ?: throw Exception("Survey not found")
         val fileQuestions = surveyDbEntity.fileQuestions.map { "${it}.value" }
         responses.forEach { response ->
@@ -92,20 +84,15 @@ class UploadSurveyResponsesUseCaseImpl(
         allFilenames.forEach { filename ->
             val file = FileUtils.getResponseFile(appContext, filename.storedFileName, surveyId)
             if (file.exists()) {
-                val result = surveyRepository.uploadSurveyResponseFile(
-                    surveyId,
-                    filename.originalFileName,
-                    file
-                ).single()
-                if (result.isSuccess) {
-                    // 2. delete file after upload
-                    try {
-                        file.delete()
-                    } catch (e: Exception) {
-                        reportError(e)
-                    }
-                } else {
-                    reportError(result.exceptionOrNull())
+                try {
+                    surveyRepository.uploadSurveyResponseFile(
+                        surveyId,
+                        filename.originalFileName,
+                        file
+                    )
+                    file.delete()
+                } catch (e: Exception) {
+                    reportError(e)
                 }
             } else {
                 reportError(IllegalStateException("File not found: $filename"))
@@ -127,7 +114,7 @@ class UploadSurveyResponsesUseCaseImpl(
             surveyRepository.uploadSurveyResponse(surveyId, response.id, uploadData).single()
         if (result.isSuccess) {
             // 4. mark response as synced
-            responseRepository.markResponseAsSynced(response.id).collect()
+            responseRepository.markResponseAsSynced(response.id)
             surveyRepository.updateSurveyInDB(result.getOrThrow())
             eventBus.emitEvent(AppEvent.UploadedSurveyResponse(surveyId))
         } else {

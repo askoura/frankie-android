@@ -25,14 +25,13 @@ import java.io.File
 
 interface SurveyRepository {
 
-    fun getSurveyDbEntity(surveyId: String): Flow<Result<SurveyDataEntity?>>
+    suspend fun getSurveyDbEntity(surveyId: String): SurveyDataEntity?
     fun getSurveyList(): Flow<Result<List<SurveyData>>>
-    fun getOfflineSurveyList(): Flow<Result<List<SurveyData>>>
+    suspend fun getOfflineSurveyList(): List<SurveyData>
 
-    fun getOfflineSurvey(surveyId: String): Flow<Result<SurveyData>>
+    suspend fun getOfflineSurvey(surveyId: String): SurveyData
     fun getSurveyFile(surveyId: String, resourceId: String): Flow<Result<DataStream>>
-
-    fun uploadSurveyResponseFile(surveyId: String, fileName: String, file: File): Flow<Result<Unit>>
+    suspend fun uploadSurveyResponseFile(surveyId: String, fileName: String, file: File)
 
     fun uploadSurveyResponse(
         surveyId: String,
@@ -60,12 +59,8 @@ class SurveyRepositoryImpl(
     private val sessionManager: SessionManager
 ) : SurveyRepository {
 
-    override fun getSurveyDbEntity(surveyId: String): Flow<Result<SurveyDataEntity?>> = flow {
-        val survey = surveyDao.getSurveyDataById(surveyId)
-        emit(Result.success(survey))
-    }.catch {
-        emit(Result.failure(it))
-    }.flowOn(Dispatchers.IO)
+    override suspend fun getSurveyDbEntity(surveyId: String): SurveyDataEntity? =
+        surveyDao.getSurveyDataById(surveyId)
 
     override fun getSurveyList(): Flow<Result<List<SurveyData>>> {
         return flow {
@@ -114,37 +109,29 @@ class SurveyRepositoryImpl(
         }.flowOn(Dispatchers.IO)
     }
 
-    override fun getOfflineSurveyList(): Flow<Result<List<SurveyData>>> {
-        return flow {
-            val userId = sessionManager.getUserIdOrThrow()
-            surveyDao.getAllSurveyData(sessionManager.getUserIdOrThrow()).let { list ->
-                emit(Result.success(list.map {
-                    it.toSurveyData(
-                        responseDao.countByUserAndSurvey(userId, it.id),
-                        responseDao.countCompleteByUserAndSurvey(userId, it.id),
-                        responseDao.countUnsyncedByUserAndSurvey(userId, it.id)
-                    )
-                }))
+    override suspend fun getOfflineSurveyList(): List<SurveyData> {
+        val userId = sessionManager.getUserIdOrThrow()
+        surveyDao.getAllSurveyData(sessionManager.getUserIdOrThrow()).let { list ->
+            return list.map {
+                it.toSurveyData(
+                    responseDao.countByUserAndSurvey(userId, it.id),
+                    responseDao.countCompleteByUserAndSurvey(userId, it.id),
+                    responseDao.countUnsyncedByUserAndSurvey(userId, it.id)
+                )
             }
-
         }
+
     }
 
-    override fun getOfflineSurvey(surveyId: String): Flow<Result<SurveyData>> {
-        return flow {
-            val userId = sessionManager.getUserIdOrThrow()
-            val survey = surveyDao.getSurveyDataById(surveyId)!!
-            emit(
-                Result.success(
-                    survey.toSurveyData(
-                        responseDao.countByUserAndSurvey(userId, survey.id),
-                        responseDao.countCompleteByUserAndSurvey(userId, survey.id),
-                        responseDao.countUnsyncedByUserAndSurvey(userId, survey.id)
-                    )
-                )
-            )
 
-        }
+    override suspend fun getOfflineSurvey(surveyId: String): SurveyData {
+        val userId = sessionManager.getUserIdOrThrow()
+        val survey = surveyDao.getSurveyDataById(surveyId)!!
+        return survey.toSurveyData(
+            responseDao.countByUserAndSurvey(userId, survey.id),
+            responseDao.countCompleteByUserAndSurvey(userId, survey.id),
+            responseDao.countUnsyncedByUserAndSurvey(userId, survey.id)
+        )
     }
 
     override suspend fun saveSurveyToDB(surveyData: SurveyData, fileQuestions: List<String>) {
@@ -205,18 +192,15 @@ class SurveyRepositoryImpl(
         }.flowOn(Dispatchers.IO)
     }
 
-    override fun uploadSurveyResponseFile(
+    override suspend fun uploadSurveyResponseFile(
         surveyId: String,
         fileName: String,
         file: File
-    ): Flow<Result<Unit>> = flow {
+    ) {
         val multipartBody =
             MultipartBody.Part.createFormData("file", file.name, file.asRequestBody())
         service.uploadSurveyFile(surveyId, fileName, multipartBody)
-        emit(Result.success(Unit))
-    }.catch {
-        emit(Result.failure(it))
-    }.flowOn(Dispatchers.IO)
+    }
 
     override fun uploadSurveyResponse(
         surveyId: String,
