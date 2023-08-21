@@ -19,7 +19,7 @@ interface PermissionDao {
     suspend fun getPermissionsForItem(surveyId: Long): List<PermissionEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPermission(permission: PermissionEntity)
+    suspend fun insert(permission: PermissionEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     @Transaction
@@ -30,11 +30,4 @@ interface PermissionDao {
 
     @Query("DELETE FROM permissions WHERE userId = :userId and surveyId NOT IN (:surveyIdList)")
     suspend fun deletePermissionsForUserNotInList(userId: String, surveyIdList: List<String>)
-
-    @Transaction
-    suspend fun updateUserPermissions(userId: String, surveyIdList: List<String>) {
-        deletePermissionsForUserNotInList(userId, surveyIdList)
-        val permissions = surveyIdList.map { PermissionEntity(userId = userId, surveyId = it) }
-        insertMultiple(permissions)
-    }
 }

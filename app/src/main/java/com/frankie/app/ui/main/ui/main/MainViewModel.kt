@@ -11,9 +11,11 @@ import com.frankie.app.business.survey.SurveyRepository
 import com.frankie.app.storage.DownloadManager
 import com.frankie.app.storage.DownloadState
 import com.frankie.app.ui.common.error.ErrorProcessor
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -21,6 +23,7 @@ import kotlinx.coroutines.launch
 class MainViewModel(
     private val surveyRepository: SurveyRepository,
     private val logoutUseCase: LogoutUseCase,
+    private val googleSignInClient: GoogleSignInClient,
     private val downloadManager: DownloadManager,
     private val backgroundSync: BackgroundSync,
     private val eventBus: EventBus,
@@ -35,20 +38,51 @@ class MainViewModel(
     val downloadState = _downloadState.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            eventBus.events.filter { it is AppEvent.ResponsesUploaded }.collect {
-                fetchSurveyList(false)
+        viewModelScope.launch(Dispatchers.IO) {
+            eventBus.events.collect { event ->
+                when (event) {
+                    is AppEvent.UploadedSurveyResponse -> {
+                        _state.update {
+                            _state.value.copy(
+                                surveyList = _state.value.surveyList.toMutableList().apply {
+                                    val index = indexOfFirst { it.id == event.surveyId }
+                                    val value = surveyRepository.getOfflineSurvey(event.surveyId)
+                                    set(index, value)
+                                })
+                        }
+                    }
+
+                    is AppEvent.UploadingResponse -> {
+                        if (!event.uploading) {
+                            _state.update {
+                                _state.value.copy(
+                                    surveyList = _state.value.surveyList.map {
+                                        it.copy(isSyncing = true)
+                                    })
+                            }
+                        }
+                    }
+
+                    is AppEvent.UploadingSurveyResponse -> {
+                        _state.update {
+                            _state.value.copy(
+                                surveyList = _state.value.surveyList.map {
+                                    it.copy(isSyncing = it.id == event.surveyId)
+                                })
+                        }
+                    }
+                }
             }
         }
     }
 
     fun fetchSurveyList(triggeredByUser: Boolean) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _state.update { _state.value.copy(isLoading = _firstLoad.value || triggeredByUser) }
             _firstLoad.value = false
             merge(
-                surveyRepository.getSurveyList(),
-                surveyRepository.getOfflineSurveyList()
+                flow { surveyRepository.getOfflineSurveyList() },
+                surveyRepository.getSurveyList()
             ).collect { result ->
                 if (result.isSuccess) {
                     _state.update {
@@ -65,7 +99,7 @@ class MainViewModel(
     }
 
     fun syncSurveyForOffline(surveyData: SurveyData) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             downloadManager.downloadSurveyFiles(surveyData).collect { result ->
                 when (result) {
                     is DownloadState.Loading,
@@ -91,13 +125,22 @@ class MainViewModel(
     }
 
     fun uploadSurveyResponses() {
-        viewModelScope.launch {
-            backgroundSync.startSurveySync()
+        viewModelScope.launch(Dispatchers.IO) {
+            val canSync = surveyRepository.getOfflineSurveyList()
+                .any { it.localUnsyncedResponsesCount > 0 }
+            if (canSync) {
+                backgroundSync.startSurveySync()
+            }
         }
     }
 
-    fun logout() {
-        logoutUseCase()
+    fun logout(onLogoutFinished: () -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            logoutUseCase()
+            googleSignInClient.signOut().addOnCompleteListener {
+                onLogoutFinished()
+            }
+        }
     }
 
     data class State(

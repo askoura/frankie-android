@@ -17,6 +17,7 @@ import androidx.core.app.NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import com.frankie.app.R
+import com.frankie.app.business.parcelable
 import com.frankie.app.business.responses.ResponseRepository
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.ui.common.FileUtils
@@ -47,7 +48,7 @@ class AudioRecordingService : Service() {
 
         if (intent.action.equals(START_FOREGROUND_ACTION)) {
             Log.d(TAG, "Received Start Foreground Intent ")
-            val survey = intent.getParcelableExtra<SurveyData>(EXTRA_SURVEY)
+            val survey = intent.parcelable<SurveyData>(EXTRA_SURVEY)
                 ?: throw IllegalArgumentException("Survey is required")
             val responseId = intent.getStringExtra(EXTRA_RESPONSE_ID)
                 ?: throw IllegalArgumentException("responseId is required")
@@ -118,8 +119,8 @@ class AudioRecordingService : Service() {
         val event = ResponseEvent.VoiceRecording(
             uuid.toString(), LocalDateTime.now(ZoneOffset.UTC)
         )
-        CoroutineScope(Dispatchers.Main).launch {
-            responseRepository.addEvent(responseId, event).collect()
+        CoroutineScope(Dispatchers.IO).launch {
+            responseRepository.addEvent(responseId, event)
         }
         @Suppress("DEPRECATION")
         mediaRecorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)

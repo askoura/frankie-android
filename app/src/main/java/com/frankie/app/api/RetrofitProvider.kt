@@ -79,7 +79,7 @@ object RetrofitProvider {
 //    private const val SCHEME = "https://"
         private const val SCHEME = "http://"
 //    private const val BACKEND_HOST = "api.staging-frankiesurveys.com"
-        private const val BACKEND_HOST = "frankie.app"
+        private const val BACKEND_HOST = "10.0.2.2"
 //    private const val BACKEND_PORT = ""
         private const val BACKEND_PORT = "8080"
     private const val BASE_URL = "$SCHEME$BACKEND_HOST:$BACKEND_PORT"

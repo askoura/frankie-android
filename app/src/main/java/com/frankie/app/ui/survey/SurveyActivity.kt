@@ -25,6 +25,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.lifecycle.coroutineScope
 import com.frankie.app.R
+import com.frankie.app.business.parcelable
 import com.frankie.app.business.responses.ResponseRepository
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.databinding.ActivitySurveyBinding
@@ -34,10 +35,11 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import java.time.LocalDateTime
@@ -58,7 +60,7 @@ class SurveyActivity : AppCompatActivity() {
 
 
     val survey: SurveyData
-        get() = intent.getParcelableExtra(EXTRA_SURVEY)
+        get() = intent.parcelable(EXTRA_SURVEY)
             ?: throw IllegalArgumentException("Survey is required")
 
 
@@ -89,22 +91,17 @@ class SurveyActivity : AppCompatActivity() {
                     val event = ResponseEvent.Location(
                         it.longitude, it.latitude, LocalDateTime.now(ZoneOffset.UTC)
                     )
-                    lifecycle.coroutineScope.launch {
-                        responseRepository.addEvent(responseId, event).collect()
+                    lifecycle.coroutineScope.launch(Dispatchers.IO) {
+                        responseRepository.addEvent(responseId, event)
                     }
                 }
-
-
             }
         }
         updateValuesFromBundle(savedInstanceState)
     }
 
-    private fun createLocationRequest() = LocationRequest.create().apply {
-        interval = 10000
-        fastestInterval = 5000
-        priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-    }
+    private fun createLocationRequest() =
+        LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000).build()
 
 
     private fun updateValuesFromBundle(savedInstanceState: Bundle?) {
@@ -384,6 +381,20 @@ class SurveyActivity : AppCompatActivity() {
                 android.R.string.ok
             ) { _, _ ->
                 this@SurveyActivity.finish()
+            }
+
+        }
+        builder.create().show()
+    }
+
+    fun showMaxSizeValidation(actual: Int, max: Int) {
+        val builder = AlertDialog.Builder(this)
+        builder.apply {
+            setTitle(R.string.max_size_exceeded)
+            setMessage(getString(R.string.max_size_exceeded_message, actual, max))
+            setNeutralButton(
+                android.R.string.ok
+            ) { _, _ ->
             }
 
         }

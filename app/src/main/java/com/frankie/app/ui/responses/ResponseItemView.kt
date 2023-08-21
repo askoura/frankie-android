@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.setPadding
 import com.frankie.app.R
+import com.frankie.app.business.fromUtc
 import com.frankie.app.databinding.ItemResponseBinding
 import com.frankie.app.db.model.Response
 import com.frankie.app.ui.common.dpToPx
@@ -39,9 +40,9 @@ class ResponseItemView @JvmOverloads constructor(
         binding.syncedStatus.text =
             context.getString(R.string.response_sync_status, response.isSynced)
         binding.startDate.text =
-            context.getString(R.string.response_start_date, response.startDate.toString())
+            context.getString(R.string.response_start_date, response.startDate.fromUtc().toString())
         binding.submitDate.text =
-            context.getString(R.string.response_submit_date, response.submitDate.toString())
+            context.getString(R.string.response_submit_date, response.submitDate?.fromUtc().toString())
         binding.lang.text = context.getString(R.string.response_lang, response.lang)
         binding.content.text =
             response.values.entries.filter { it.value.toString().isNotBlank() }

@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.frankie.app.R
+import com.frankie.app.business.parcelable
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.databinding.ActivityResponsesBinding
 import com.frankie.app.db.model.Response
@@ -23,7 +24,7 @@ class ResponsesActivity : AppCompatActivity() {
     private lateinit var adapter: ResponseListAdapter
 
     val survey: SurveyData
-        get() = intent.getParcelableExtra(SURVEY)
+        get() = intent.parcelable(SURVEY)
             ?: throw IllegalArgumentException("Survey is required")
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,7 +56,7 @@ class ResponsesActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
                 return true
             }
 

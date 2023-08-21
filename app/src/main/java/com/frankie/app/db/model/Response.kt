@@ -7,7 +7,6 @@ import androidx.room.PrimaryKey
 import com.frankie.app.db.survey.SurveyDataEntity
 import com.frankie.expressionmanager.model.NavigationIndex
 import com.frankie.expressionmanager.model.ResponseEvent
-import com.frankie.expressionmanager.model.SurveyLang
 import java.time.LocalDateTime
 
 @Entity(
@@ -22,30 +21,32 @@ import java.time.LocalDateTime
 )
 
 data class Response(
-        @PrimaryKey
-        val id: String,
+    @PrimaryKey
+    val id: String,
 
-        @ColumnInfo(name = "navigation_index")
-        val navigationIndex: NavigationIndex,
+    @ColumnInfo(name = "navigation_index")
+    val navigationIndex: NavigationIndex,
 
-        @ColumnInfo(name = "is_synced")
-        val isSynced: Boolean,
+    @ColumnInfo(name = "is_synced")
+    val isSynced: Boolean,
 
-        val lang: String,
+    val lang: String,
 
-        @ColumnInfo(index = true)
-        val surveyId: String,
+    @ColumnInfo(index = true)
+    val surveyId: String,
 
-        val startDate: LocalDateTime,
+    val startDate: LocalDateTime,
 
-        val submitDate: LocalDateTime?,
+    val submitDate: LocalDateTime?,
 
-        val userId: String,
+    val userId: String,
 
-        @ColumnInfo(name = "response_values")
-        val values: Map<String, Any>,
+    @ColumnInfo(name = "response_values")
+    val values: Map<String, Any>,
 
-        val events: List<ResponseEvent>
+    val version: Int,
+
+    val events: List<ResponseEvent>
 ) {
     companion object {
         const val STORED_FILENAME_KEY = "stored_filename"

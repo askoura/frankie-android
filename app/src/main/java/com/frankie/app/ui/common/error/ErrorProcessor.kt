@@ -1,6 +1,9 @@
 package com.frankie.app.ui.common.error
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.frankie.app.R
+import com.frankie.app.ui.common.ConnectivityChecker
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -18,7 +21,7 @@ interface ErrorProcessor {
     val errors: SharedFlow<ProcessedError>
 }
 
-class ErrorProcessorImpl : ErrorProcessor {
+class ErrorProcessorImpl(private val connectivityChecker: ConnectivityChecker) : ErrorProcessor {
 
     private val _errors = MutableSharedFlow<ProcessedError>()
     override val errors = _errors.asSharedFlow()
@@ -36,7 +39,11 @@ class ErrorProcessorImpl : ErrorProcessor {
             is InterruptedIOException,
             is NoRouteToHostException,
             is SSLException -> {
-                ProcessedError.NetworkError
+                if (connectivityChecker.networkAvailable) {
+                    ProcessedError.Timeout
+                } else {
+                    ProcessedError.NetworkError
+                }
             }
 
             else -> {
@@ -58,13 +65,9 @@ class ErrorProcessorImpl : ErrorProcessor {
     // TODO proper error handling per code
     private fun processHttpException(throwable: HttpException): ProcessedError {
         return when (throwable.code()) {
-            401 -> {
-                ProcessedError.AuthError
-            }
-
-            else -> {
-                ProcessedError.GeneralError
-            }
+            401 -> ProcessedError.AuthError
+            404 -> ProcessedError.NotFound
+            else -> ProcessedError.GeneralError
         }
     }
 
@@ -72,7 +75,9 @@ class ErrorProcessorImpl : ErrorProcessor {
 
 sealed class ProcessedError(val titleRes: Int, val messageRes: Int) {
     object AuthError : ProcessedError(R.string.error_auth_title, R.string.error_auth_description)
+    object NotFound : ProcessedError(R.string.error_general_title, R.string.not_found_description)
     object GeneralError : ProcessedError(R.string.error_general_title, R.string.error_general_description)
     object NetworkError : ProcessedError(R.string.error_network_title, R.string.error_network_description)
+    object Timeout : ProcessedError(R.string.error_timeout_title, R.string.error_timeout_description)
     object LoginError : ProcessedError(R.string.error_login_title, R.string.error_login_description)
 }

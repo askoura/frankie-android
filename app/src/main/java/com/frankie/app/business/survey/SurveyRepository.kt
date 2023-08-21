@@ -1,11 +1,13 @@
 package com.frankie.app.business.survey
 
 import com.frankie.app.api.survey.PublishInfo
+import com.frankie.app.api.survey.Survey
 import com.frankie.app.api.survey.SurveyDesign
 import com.frankie.app.api.survey.SurveyService
 import com.frankie.app.api.survey.UploadResponseRequestData
 import com.frankie.app.db.ResponseDao
 import com.frankie.app.db.permission.PermissionDao
+import com.frankie.app.db.permission.PermissionEntity
 import com.frankie.app.db.survey.PublishInfoEntity
 import com.frankie.app.db.survey.SurveyDao
 import com.frankie.app.db.survey.SurveyDataEntity
@@ -23,20 +25,23 @@ import java.io.File
 
 interface SurveyRepository {
 
-    fun getSurveyDbEntity(surveyId: String): Flow<Result<SurveyDataEntity?>>
+    suspend fun getSurveyDbEntity(surveyId: String): SurveyDataEntity?
     fun getSurveyList(): Flow<Result<List<SurveyData>>>
-    fun getOfflineSurveyList(): Flow<Result<List<SurveyData>>>
-    fun getSurveyFile(surveyId: String, resourceId: String): Flow<Result<DataStream>>
+    suspend fun getOfflineSurveyList(): List<SurveyData>
 
-    fun uploadSurveyResponseFile(surveyId: String, fileName: String, file: File): Flow<Result<Unit>>
+    suspend fun getOfflineSurvey(surveyId: String): SurveyData
+    fun getSurveyFile(surveyId: String, resourceId: String): Flow<Result<DataStream>>
+    suspend fun uploadSurveyResponseFile(surveyId: String, fileName: String, file: File)
 
     fun uploadSurveyResponse(
         surveyId: String,
         responseId: String,
         uploadResponseRequestData: UploadResponseRequestData
-    ): Flow<Result<Unit>>
+    ): Flow<Result<Survey>>
 
     suspend fun saveSurveyToDB(surveyData: SurveyData, fileQuestions: List<String>)
+    suspend fun updateSurveyToDB(surveyData: SurveyData, fileQuestions: List<String>)
+    suspend fun updateSurveyInDB(survey: Survey)
 
     suspend fun surveyDesign(surveyData: SurveyData): SurveyDesign
 
@@ -54,12 +59,8 @@ class SurveyRepositoryImpl(
     private val sessionManager: SessionManager
 ) : SurveyRepository {
 
-    override fun getSurveyDbEntity(surveyId: String): Flow<Result<SurveyDataEntity?>> = flow {
-        val survey = surveyDao.getSurveyDataById(surveyId)
-        emit(Result.success(survey))
-    }.catch {
-        emit(Result.failure(it))
-    }.flowOn(Dispatchers.IO)
+    override suspend fun getSurveyDbEntity(surveyId: String): SurveyDataEntity? =
+        surveyDao.getSurveyDataById(surveyId)
 
     override fun getSurveyList(): Flow<Result<List<SurveyData>>> {
         return flow {
@@ -74,7 +75,7 @@ class SurveyRepositoryImpl(
                     surveyId = survey.id,
                     userId = sessionManager.getUserIdOrThrow()
                 )
-                val syncedCount = responseDao.countSyncedByUserAndSurvey(
+                val unsyncedCount = responseDao.countUnsyncedByUserAndSurvey(
                     surveyId = survey.id,
                     userId = sessionManager.getUserIdOrThrow()
                 )
@@ -87,7 +88,7 @@ class SurveyRepositoryImpl(
                     newVersionAvailable,
                     count,
                     responseCount,
-                    syncedCount
+                    unsyncedCount
                 )
                 val fileQuestions = jacksonKtMapper.treeToValue(
                     design.validationJsonOutput,
@@ -100,7 +101,7 @@ class SurveyRepositoryImpl(
                 surveyData
             }
 
-            savePermissionsToDB(surveyList)
+            deletePermissionsForUserNotInList(surveyList)
 
             emit(Result.success(surveyList))
         }.catch {
@@ -108,25 +109,53 @@ class SurveyRepositoryImpl(
         }.flowOn(Dispatchers.IO)
     }
 
-    override fun getOfflineSurveyList(): Flow<Result<List<SurveyData>>> {
-        return flow {
-            val userId = sessionManager.getUserIdOrThrow()
-            emit(Result.success(surveyDao.getAllSurveyData(sessionManager.getUserIdOrThrow()).map {
+    override suspend fun getOfflineSurveyList(): List<SurveyData> {
+        val userId = sessionManager.getUserIdOrThrow()
+        surveyDao.getAllSurveyData(sessionManager.getUserIdOrThrow()).let { list ->
+            return list.map {
                 it.toSurveyData(
                     responseDao.countByUserAndSurvey(userId, it.id),
                     responseDao.countCompleteByUserAndSurvey(userId, it.id),
-                    responseDao.countSyncedByUserAndSurvey(userId, it.id)
+                    responseDao.countUnsyncedByUserAndSurvey(userId, it.id)
                 )
-            }))
+            }
         }
+
+    }
+
+
+    override suspend fun getOfflineSurvey(surveyId: String): SurveyData {
+        val userId = sessionManager.getUserIdOrThrow()
+        val survey = surveyDao.getSurveyDataById(surveyId)!!
+        return survey.toSurveyData(
+            responseDao.countByUserAndSurvey(userId, survey.id),
+            responseDao.countCompleteByUserAndSurvey(userId, survey.id),
+            responseDao.countUnsyncedByUserAndSurvey(userId, survey.id)
+        )
     }
 
     override suspend fun saveSurveyToDB(surveyData: SurveyData, fileQuestions: List<String>) {
         surveyDao.insert(surveyData.toSurveyDataEntity(fileQuestions))
+        permissionDao.insert(
+            PermissionEntity(
+                userId = sessionManager.getUserIdOrThrow(),
+                surveyId = surveyData.id
+            )
+        )
     }
 
-    private suspend fun savePermissionsToDB(surveyList: List<SurveyData>) {
-        permissionDao.updateUserPermissions(
+    override suspend fun updateSurveyToDB(surveyData: SurveyData, fileQuestions: List<String>) {
+        surveyDao.update(surveyData.toSurveyDataEntity(fileQuestions))
+    }
+
+    override suspend fun updateSurveyInDB(survey: Survey) {
+        surveyDao.getSurveyDataById(survey.id)?.let { surveyDataEntity ->
+            surveyDao.update(surveyDataEntity.update(survey))
+        } ?: throw IllegalStateException("Survey not found with id: ${survey.id}")
+    }
+
+    private suspend fun deletePermissionsForUserNotInList(surveyList: List<SurveyData>) {
+        permissionDao.deletePermissionsForUserNotInList(
             sessionManager.getUserIdOrThrow(),
             surveyList.map { it.id })
     }
@@ -163,29 +192,57 @@ class SurveyRepositoryImpl(
         }.flowOn(Dispatchers.IO)
     }
 
-    override fun uploadSurveyResponseFile(
+    override suspend fun uploadSurveyResponseFile(
         surveyId: String,
         fileName: String,
         file: File
-    ): Flow<Result<Unit>> = flow {
+    ) {
         val multipartBody =
             MultipartBody.Part.createFormData("file", file.name, file.asRequestBody())
         service.uploadSurveyFile(surveyId, fileName, multipartBody)
-        emit(Result.success(Unit))
-    }.catch {
-        emit(Result.failure(it))
-    }.flowOn(Dispatchers.IO)
+    }
 
     override fun uploadSurveyResponse(
         surveyId: String,
         responseId: String,
         uploadResponseRequestData: UploadResponseRequestData
-    ): Flow<Result<Unit>> = flow {
-        service.uploadSurveyResponse(surveyId, responseId, uploadResponseRequestData)
-        emit(Result.success(Unit))
+    ): Flow<Result<Survey>> = flow {
+
+        emit(
+            Result.success(
+                service.uploadSurveyResponse(
+                    surveyId,
+                    responseId,
+                    uploadResponseRequestData
+                )
+            )
+        )
     }.catch {
         emit(Result.failure(it))
     }.flowOn(Dispatchers.IO)
+}
+
+private fun SurveyDataEntity.update(survey: Survey): SurveyDataEntity {
+    return SurveyDataEntity(
+        id = id,
+        creationDate = survey.creationDate,
+        lastModified = survey.lastModified,
+        endDate = survey.endDate,
+        startDate = survey.startDate,
+        name = survey.name,
+        status = survey.status,
+        usage = survey.usage,
+        quota = survey.surveyQuota,
+        userQuota = survey.userQuota,
+        publishInfoEntity = publishInfoEntity,
+        newVersionAvailable = newVersionAvailable,
+        saveTimings = survey.saveTimings,
+        backgroundAudio = survey.backgroundAudio,
+        recordGps = survey.recordGps,
+        totalResponsesCount = survey.totalResponseCount,
+        syncedResponseCount = survey.syncedResponseCount,
+        fileQuestions = fileQuestions
+    )
 }
 
 private fun SurveyData.toSurveyDataEntity(fileQuestions: List<String> = emptyList()): SurveyDataEntity {

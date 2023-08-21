@@ -39,7 +39,7 @@ class SurveyListItemView @JvmOverloads constructor(
                       && !surveyData.quotaExceeded()
                       && surveyData.surveyStatus == SurveyStatus.ACTIVE
         val isSyncOfflineEnabled = surveyData.newVersionAvailable
-        val isUploadEnabled = surveyData.localCompleteResponsesCount > surveyData.localSyncedResponsesCount
+        val isUploadEnabled = surveyData.localUnsyncedResponsesCount > 0
         val isResponsesEnabled = surveyData.localResponsesCount > 0
         binding.localResponseCount.text = surveyData.localResponsesCount.let { count ->
             context.getString(R.string.local_responses_count, count)

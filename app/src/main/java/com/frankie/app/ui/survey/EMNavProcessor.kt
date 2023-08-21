@@ -171,6 +171,7 @@ class EMNavProcessor constructor(
                     navigationIndex = result.navigationIndex,
                     lang = surveyLang,
                     surveyId = survey.id,
+                    version = survey.publishInfo.version,
                     startDate = LocalDateTime.now(ZoneOffset.UTC),
                     submitDate = null,
                     isSynced = false,

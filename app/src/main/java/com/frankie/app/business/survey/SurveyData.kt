@@ -3,8 +3,6 @@ package com.frankie.app.business.survey
 import android.os.Parcelable
 import com.frankie.app.api.survey.PublishInfo
 import com.frankie.app.api.survey.Survey
-import com.frankie.app.business.fromUtc
-import com.frankie.expressionmanager.model.SurveyLang
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDateTime
 
@@ -24,12 +22,13 @@ data class SurveyData(
     val newVersionAvailable: Boolean,
     val localResponsesCount: Int,
     val localCompleteResponsesCount: Int,
-    val localSyncedResponsesCount: Int,
+    val localUnsyncedResponsesCount: Int,
     val syncedResponseCount: Int,
     val totalResponseCount: Int,
     val saveTimings: Boolean,
     val backgroundAudio: Boolean,
     val recordGps: Boolean,
+    val isSyncing: Boolean = false
 ) : Parcelable {
 
     private val scheduled: Boolean
@@ -46,13 +45,12 @@ data class SurveyData(
             }
         }
 
-    fun quotaExceeded(completeSyncedResponsesCount: Int? = null): Boolean {
+    fun quotaExceeded(newUnsyncedCount: Int? = null): Boolean {
+        val finalUnsyncedCount = newUnsyncedCount ?: localUnsyncedResponsesCount
         val userQuotaExceeded =
-            userQuota > -1 && ((completeSyncedResponsesCount
-                ?: (localCompleteResponsesCount - localSyncedResponsesCount)) + syncedResponseCount >= userQuota)
+            userQuota > -1 && finalUnsyncedCount + syncedResponseCount >= userQuota
         val totalQuotaExceeded =
-            surveyQuota > -1 && ((completeSyncedResponsesCount
-                ?: (localCompleteResponsesCount - localSyncedResponsesCount)) + totalResponseCount >= surveyQuota)
+            surveyQuota > -1 && finalUnsyncedCount + totalResponseCount >= surveyQuota
         return userQuotaExceeded || totalQuotaExceeded
     }
 
@@ -63,14 +61,14 @@ data class SurveyData(
             newVersionAvailable: Boolean,
             responsesCount: Int,
             completeResponsesCount: Int,
-            syncedResponsesCount: Int
+            unsyncedCount: Int
         ): SurveyData {
             return SurveyData(
                 id = survey.id,
-                survey.creationDate.fromUtc(),
-                survey.lastModified.fromUtc(),
-                survey.startDate?.fromUtc(),
-                survey.endDate?.fromUtc(),
+                survey.creationDate,
+                survey.lastModified,
+                survey.startDate,
+                survey.endDate,
                 survey.name,
                 survey.status,
                 survey.usage,
@@ -80,7 +78,7 @@ data class SurveyData(
                 newVersionAvailable,
                 responsesCount,
                 completeResponsesCount,
-                syncedResponsesCount,
+                unsyncedCount,
                 survey.syncedResponseCount,
                 survey.totalResponseCount,
                 survey.saveTimings,
