@@ -58,13 +58,14 @@ object RetrofitProvider {
     }
 
     private fun getRetrofit(httpClient: OkHttpClient) = Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(BuildConfig.SERVER_URL)
             .addConverterFactory(JacksonConverterFactory.create(ObjectMapper().registerModule(JavaTimeModule())))
         .client(httpClient)
         .build()
 
     private fun getHttpClientBuilder(): OkHttpClient.Builder {
         val httpClient = OkHttpClient.Builder()
+        BuildConfig.BUILD_TYPE
         if (BuildConfig.DEBUG) {
             val httpLoggingInterceptor = HttpLoggingInterceptor()
             httpLoggingInterceptor.level =
@@ -75,13 +76,5 @@ object RetrofitProvider {
         httpClient.connectTimeout(10, TimeUnit.SECONDS)
         return httpClient
     }
-
-//    private const val SCHEME = "https://"
-        private const val SCHEME = "http://"
-//    private const val BACKEND_HOST = "api.staging-frankiesurveys.com"
-        private const val BACKEND_HOST = "10.0.2.2"
-//    private const val BACKEND_PORT = ""
-        private const val BACKEND_PORT = "8080"
-    private const val BASE_URL = "$SCHEME$BACKEND_HOST:$BACKEND_PORT"
 
 }

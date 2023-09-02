@@ -2,9 +2,9 @@ package com.frankie.app.di
 
 import android.content.Context
 import androidx.work.WorkManager
+import com.frankie.app.BuildConfig
 import com.frankie.app.EventBus
 import com.frankie.app.EventBusImpl
-import com.frankie.app.R
 import com.frankie.app.business.settings.SharedPrefsManager
 import com.frankie.app.business.settings.SharedPrefsManagerImpl
 import com.frankie.app.business.survey.BackgroundSync
@@ -38,7 +38,7 @@ val androidModule = module {
     single<ConnectivityChecker> { ConnectivityCheckerImpl(get()) }
     single {
         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(androidContext().getString(R.string.auth_client_id))
+            .requestIdToken(BuildConfig.AUTH_CLIENT_ID)
             .requestEmail()
             .build()
     }
