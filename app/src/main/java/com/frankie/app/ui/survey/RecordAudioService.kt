@@ -128,9 +128,12 @@ class AudioRecordingService : Service() {
             MediaRecorder()
         mediaRecorder?.apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
-            setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
+            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
             setOutputFile(file.absolutePath)
-            setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+            setAudioSamplingRate(44100) // You can set the desired audio sampling rate (optional)
+            setAudioChannels(1) // Set the number of audio channels (optional, 1 for mono)
+            setAudioEncodingBitRate(64000) // Set the audio bit rate (optional)
             try {
                 prepare()
             } catch (e: IOException) {

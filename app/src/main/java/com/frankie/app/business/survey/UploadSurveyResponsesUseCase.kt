@@ -70,7 +70,7 @@ class UploadSurveyResponsesUseCaseImpl(
                 .mapIndexed { index, it ->
                     FileUploadInfo(
                         it.fileName,
-                        "voice_recording_${index + 1}.3gp"
+                        "voice_recording_${index + 1}.m4a"
                     )
                 }
         val filenames = response.values.filterKeys(fileQuestions::contains)

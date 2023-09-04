@@ -115,6 +115,8 @@ class FrankieWebView
             override fun onSuccess(apiNavigationOutput: ApiNavigationOutput) {
                 if (navigateRequest.navigationDirection == NavigationDirection.Resume) {
                     surveyActivity?.onResponseIdReceived(apiNavigationOutput.responseId.toString())
+                } else if (apiNavigationOutput.navigationIndex is NavigationIndex.End) {
+                    surveyActivity?.stopRecording()
                 }
                 val string = mapper.writeValueAsString(apiNavigationOutput)
                 loadUrl("javascript:navigateOffline($string)")
