@@ -21,21 +21,37 @@ interface SurveyService {
     suspend fun getSurveyPermissionList(@Path("surveyId") surveyId: String): List<User>
 
     @POST("survey/{surveyId}/offline/design")
-    suspend fun getSurveyDesign(@Path("surveyId") surveyId: String, @Body publishInfo: PublishInfo): SurveyDesign
+    suspend fun getSurveyDesign(
+        @Path("surveyId") surveyId: String,
+        @Body publishInfo: PublishInfo
+    ): SurveyDesign
 
     @Streaming
     @GET("survey/{surveyId}/resource/{resourceId}")
-    suspend fun getSurveyFile(@Path("surveyId") surveyId: String, @Path("resourceId") resourceId: String): ResponseBody
+    suspend fun getSurveyFile(
+        @Path("surveyId") surveyId: String,
+        @Path("resourceId") resourceId: String
+    ): ResponseBody
 
     @Multipart
     @POST("survey/{surveyId}/offline/response/upload/{fileName}")
-    suspend fun uploadSurveyFile(@Path("surveyId") surveyId: String,
-                                 @Path("fileName") fileName: String,
-                                 @Part file: MultipartBody.Part): Response<Unit>
+    suspend fun uploadSurveyFile(
+        @Path("surveyId") surveyId: String,
+        @Path("fileName") fileName: String,
+        @Part file: MultipartBody.Part
+    ): Response<Unit>
+
+    @POST("survey/{surveyId}/offline/response/upload/{fileName}/exists")
+    suspend fun fileExists(
+        @Path("surveyId") surveyId: String,
+        @Path("fileName") fileName: String
+    ): Boolean
 
     @POST("survey/{surveyId}/response/{responseId}/upload")
-    suspend fun uploadSurveyResponse(@Path("surveyId") surveyId: String,
-                                     @Path("responseId") responseId: String,
-                                     @Body uploadResponseRequestData: UploadResponseRequestData): Survey
+    suspend fun uploadSurveyResponse(
+        @Path("surveyId") surveyId: String,
+        @Path("responseId") responseId: String,
+        @Body uploadResponseRequestData: UploadResponseRequestData
+    ): Survey
 
 }

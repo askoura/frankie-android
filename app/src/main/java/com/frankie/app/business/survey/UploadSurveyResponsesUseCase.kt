@@ -70,7 +70,7 @@ class UploadSurveyResponsesUseCaseImpl(
                 .mapIndexed { index, it ->
                     FileUploadInfo(
                         it.fileName,
-                        "voice_recording_$index.3gp"
+                        "voice_recording_${index + 1}.3gp"
                     )
                 }
         val filenames = response.values.filterKeys(fileQuestions::contains)
@@ -81,19 +81,19 @@ class UploadSurveyResponsesUseCaseImpl(
             }
 
         val allFilenames = filenames + voiceRecordingFilenames
-        allFilenames.forEach { filename ->
+        allFilenames.filter {
+            !surveyRepository.fileOnServer(surveyId, it.storedFileName)
+        }.forEach { filename ->
             val file = FileUtils.getResponseFile(appContext, filename.storedFileName, surveyId)
             if (file.exists()) {
-                try {
-                    surveyRepository.uploadSurveyResponseFile(
-                        surveyId,
-                        filename.originalFileName,
-                        file
-                    )
-                    file.delete()
-                } catch (e: Exception) {
-                    reportError(e)
-                }
+                surveyRepository.uploadSurveyResponseFile(
+                    surveyId,
+                    fileName = filename.originalFileName,
+                    storedFileName = filename.storedFileName,
+                    file = file
+                )
+                file.delete()
+
             } else {
                 reportError(IllegalStateException("File not found: $filename"))
             }

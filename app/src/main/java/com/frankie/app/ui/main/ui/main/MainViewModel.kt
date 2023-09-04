@@ -15,6 +15,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
@@ -81,17 +82,15 @@ class MainViewModel(
             _state.update { _state.value.copy(isLoading = _firstLoad.value || triggeredByUser) }
             _firstLoad.value = false
             merge(
-                flow { surveyRepository.getOfflineSurveyList() },
+                flow { emit(surveyRepository.getOfflineSurveyList()) },
                 surveyRepository.getSurveyList()
-            ).collect { result ->
-                if (result.isSuccess) {
-                    _state.update {
-                        _state.value.copy(surveyList = result.getOrThrow())
-                    }
-                } else {
-                    if (triggeredByUser || _firstLoad.value) {
-                        processError(result.exceptionOrNull()!!)
-                    }
+            ).catch {
+                if (triggeredByUser || _firstLoad.value) {
+                    processError(it)
+                }
+            }.collect { list ->
+                _state.update {
+                    _state.value.copy(surveyList = list)
                 }
             }
             _state.update { _state.value.copy(isLoading = false) }

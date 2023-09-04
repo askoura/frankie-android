@@ -219,9 +219,9 @@ class SurveyActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         AudioRecordingService.stop(this)
         stopLocationUpdates()
+        super.onDestroy()
     }
 
 

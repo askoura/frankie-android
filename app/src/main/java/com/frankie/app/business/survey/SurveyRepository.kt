@@ -26,12 +26,22 @@ import java.io.File
 interface SurveyRepository {
 
     suspend fun getSurveyDbEntity(surveyId: String): SurveyDataEntity?
-    fun getSurveyList(): Flow<Result<List<SurveyData>>>
+    fun getSurveyList(): Flow<List<SurveyData>>
     suspend fun getOfflineSurveyList(): List<SurveyData>
 
     suspend fun getOfflineSurvey(surveyId: String): SurveyData
     fun getSurveyFile(surveyId: String, resourceId: String): Flow<Result<DataStream>>
-    suspend fun uploadSurveyResponseFile(surveyId: String, fileName: String, file: File)
+    suspend fun uploadSurveyResponseFile(
+        surveyId: String,
+        fileName: String,
+        storedFileName: String,
+        file: File
+    )
+
+    suspend fun fileOnServer(
+        surveyId: String,
+        fileName: String
+    ): Boolean
 
     fun uploadSurveyResponse(
         surveyId: String,
@@ -62,7 +72,7 @@ class SurveyRepositoryImpl(
     override suspend fun getSurveyDbEntity(surveyId: String): SurveyDataEntity? =
         surveyDao.getSurveyDataById(surveyId)
 
-    override fun getSurveyList(): Flow<Result<List<SurveyData>>> {
+    override fun getSurveyList(): Flow<List<SurveyData>> {
         return flow {
             val surveyList = service.getSurveyList().map { survey ->
                 val design = service.getSurveyDesign(survey.id, PublishInfo())
@@ -103,9 +113,7 @@ class SurveyRepositoryImpl(
 
             deletePermissionsForUserNotInList(surveyList)
 
-            emit(Result.success(surveyList))
-        }.catch {
-            emit(Result.failure(it))
+            emit(surveyList)
         }.flowOn(Dispatchers.IO)
     }
 
@@ -193,13 +201,15 @@ class SurveyRepositoryImpl(
     }
 
     override suspend fun uploadSurveyResponseFile(
-        surveyId: String,
-        fileName: String,
-        file: File
+        surveyId: String, fileName: String, storedFileName: String, file: File
     ) {
         val multipartBody =
-            MultipartBody.Part.createFormData("file", file.name, file.asRequestBody())
-        service.uploadSurveyFile(surveyId, fileName, multipartBody)
+            MultipartBody.Part.createFormData("file", fileName, file.asRequestBody())
+        service.uploadSurveyFile(surveyId, storedFileName, multipartBody)
+    }
+
+    override suspend fun fileOnServer(surveyId: String, fileName: String): Boolean {
+        return service.fileExists(surveyId, fileName)
     }
 
     override fun uploadSurveyResponse(
