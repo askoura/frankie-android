@@ -48,7 +48,12 @@ class MainViewModel(
                                 surveyList = _state.value.surveyList.toMutableList().apply {
                                     val index = indexOfFirst { it.id == event.surveyId }
                                     val value = surveyRepository.getOfflineSurvey(event.surveyId)
-                                    set(index, value)
+                                    set(
+                                        index, value.copy(
+                                            isSyncing = _state.value.surveyList.firstOrNull { it.id == value.id }?.isSyncing
+                                                ?: false
+                                        )
+                                    )
                                 })
                         }
                     }
@@ -90,7 +95,12 @@ class MainViewModel(
                 }
             }.collect { list ->
                 _state.update {
-                    _state.value.copy(surveyList = list)
+                    _state.value.copy(surveyList = list.map { survey ->
+                        survey.copy(
+                            isSyncing = _state.value.surveyList.firstOrNull { it.id == survey.id }?.isSyncing
+                                ?: false
+                        )
+                    })
                 }
             }
             _state.update { _state.value.copy(isLoading = false) }
