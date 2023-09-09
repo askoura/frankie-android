@@ -108,6 +108,7 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
     //noinspection GradleDependency
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
+    implementation 'id.zelory:compressor:3.0.1'
 
 
     //noinspection GradleDependency

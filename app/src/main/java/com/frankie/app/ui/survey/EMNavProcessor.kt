@@ -19,6 +19,9 @@ import com.frankie.expressionmanager.model.*
 import com.frankie.expressionmanager.usecase.*
 import kotlinx.coroutines.*
 import java.io.InputStream
+import java.net.URLConnection
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
@@ -253,6 +256,25 @@ class EMNavProcessor constructor(
             fileSize = responseFile.length()
         )
     }
+    fun uploadFile(
+        key: String,
+        fileName: String,
+        byteArray: ByteArray
+    ): ResponseUploadFile {
+        val uuid = UUID.randomUUID()
+        val responseFile = FileUtils.getResponseFile(
+            context = getActivity(),
+            fileName = uuid.toString(),
+            surveyId = survey.id
+        )
+        responseFile.writeBytes(byteArray)
+        return saveFileResponse(
+            fileName = fileName,
+            uuid = uuid,
+            key = key,
+            fileSize = responseFile.length()
+        )
+    }
 
     fun saveFileResponse(
         fileName: String,
@@ -267,7 +289,8 @@ class EMNavProcessor constructor(
         val responseUploadFile = ResponseUploadFile(
             filename = fileName,
             storedFilename = uuid.toString(),
-            size = fileSize
+            size = fileSize,
+            type = URLConnection.guessContentTypeFromName(fileName)
         )
         val newValues = response.values.toMutableMap().apply {
             put("$key.value", responseUploadFile)
@@ -304,7 +327,8 @@ data class ResponseUploadFile(
     val filename: String,
     @JsonProperty("stored_filename")
     val storedFilename: String,
-    val size: Long
+    val size: Long,
+    val type: String
 )
 
 interface NavigationListener {

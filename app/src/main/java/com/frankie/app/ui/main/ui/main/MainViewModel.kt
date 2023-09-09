@@ -63,7 +63,7 @@ class MainViewModel(
                             _state.update {
                                 _state.value.copy(
                                     surveyList = _state.value.surveyList.map {
-                                        it.copy(isSyncing = true)
+                                        it.copy(isSyncing = false)
                                     })
                             }
                         }

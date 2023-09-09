@@ -38,6 +38,7 @@ class UploadSurveyResponsesUseCaseImpl(
                         reportError(e)
                     }
                 }
+            eventBus.emitEvent(AppEvent.UploadingResponse(false))
         } catch (e: java.lang.Exception) {
             eventBus.emitEvent(AppEvent.UploadingResponse(false))
         }

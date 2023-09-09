@@ -391,11 +391,17 @@ class SurveyActivity : AppCompatActivity() {
         builder.create().show()
     }
 
-    fun showMaxSizeValidation(actual: Int, max: Int) {
+    fun showMaxSizeValidation(actual: Int, max: Int, compression: Boolean = false) {
         val builder = AlertDialog.Builder(this)
         builder.apply {
             setTitle(R.string.max_size_exceeded)
-            setMessage(getString(R.string.max_size_exceeded_message, actual, max))
+            setMessage(
+                getString(
+                    if (compression) R.string.max_size_exceeded_message_compression_note else R.string.max_size_exceeded_message,
+                    actual,
+                    max
+                )
+            )
             setNeutralButton(
                 android.R.string.ok
             ) { _, _ ->

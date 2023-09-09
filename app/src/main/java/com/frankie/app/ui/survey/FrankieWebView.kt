@@ -19,6 +19,10 @@ import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.ui.common.FileUtils
 import com.frankie.expressionmanager.ext.ScriptUtils
 import com.frankie.expressionmanager.model.*
+import id.zelory.compressor.Compressor
+import id.zelory.compressor.constraint.destination
+import id.zelory.compressor.constraint.size
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -175,7 +179,7 @@ class FrankieWebView
 
         @JavascriptInterface
         fun capturePhoto(key: String, maxSizeInKb: Int) {
-            maxSizeKb = maxSizeInKb
+            maxSizeKb = if (maxSizeInKb > 0) maxSizeInKb else null
             operationKey = key
             val uuid = UUID.randomUUID()
             val file = FileUtils.getResponseFile(context, uuid.toString(), survey.id)
@@ -206,7 +210,7 @@ class FrankieWebView
 
         @JavascriptInterface
         fun captureVideo(key: String, maxSizeInKb: Int) {
-            maxSizeKb = maxSizeInKb
+            maxSizeKb = if (maxSizeInKb > 0) maxSizeInKb else null
             operationKey = key
             surveyActivity?.takeVideo()
         }
@@ -325,21 +329,28 @@ class FrankieWebView
         try {
             stream = context.contentResolver.openInputStream(saverUri!!)
             val size = stream!!.readBytes().size.toLong()
-            if (isSizeViolated(size)) {
-                resetFileUploadVariables()
-                return
-            }
+            val shouldCompress = isSizeViolated(size, true)
+            val uuid = UUID.fromString(saverUri.toString().substringAfterLast("/"))
             val result = emNavProcessor.saveFileResponse(
                 fileName = "captured-image.jpg",
-                uuid = UUID.fromString(saverUri.toString().substringAfterLast("/")),
+                uuid = uuid,
                 fileSize = size,
                 key = operationKey!!
             )
+            val finalSize = if (shouldCompress) {
+                compress(
+                    FileUtils.getResponseFile(context, uuid.toString(), survey.id),
+                    maxSizeKb!! * 1000L
+                )
+            } else {
+                result.size
+            }
+            Log.d("blah", "after")
             (context as Activity).runOnUiThread {
                 loadUrl(
                     "javascript:onPhotoCaptured$operationKey(${
                         jacksonKtMapper.writeValueAsString(
-                            result
+                            result.copy(size = finalSize)
                         )
                     })"
                 )
@@ -352,6 +363,16 @@ class FrankieWebView
         resetFileUploadVariables()
     }
 
+    private fun compress(file: File, size: Long): Long {
+        runBlocking {
+            Compressor.compress(context, file) {
+                size(size) // 2 MB
+                destination(file)
+            }
+        }
+        return file.length()
+    }
+
     fun onBarcodeScanned(contents: String) {
         (context as Activity).runOnUiThread {
             loadUrl("javascript:onBarcodeScanned$operationKey(\"$contents\")")
@@ -362,7 +383,8 @@ class FrankieWebView
         var stream: InputStream? = null
         try {
             stream = context.contentResolver.openInputStream(contentUri!!)
-            val size = stream!!.readBytes().size.toLong()
+            val byteArray = stream!!.readBytes()
+            val size = byteArray.size.toLong()
             if (isSizeViolated(size)) {
                 resetFileUploadVariables()
                 return
@@ -370,7 +392,7 @@ class FrankieWebView
             val result = emNavProcessor.uploadFile(
                 key = operationKey!!,
                 fileName = "captured-video.mp4",
-                inputStream = stream
+                byteArray = byteArray
             )
             (context as Activity).runOnUiThread {
                 loadUrl(
@@ -389,13 +411,17 @@ class FrankieWebView
         resetFileUploadVariables()
     }
 
-    private fun isSizeViolated(size: Long): Boolean {
+    private fun isSizeViolated(size: Long, compressionPossible: Boolean = false): Boolean {
         val sizeInKb = size / 1024
         val sizeViolated = maxSizeKb?.let {
             sizeInKb > it
         } ?: false
         if (sizeViolated) {
-            surveyActivity?.showMaxSizeValidation(sizeInKb.toInt(), maxSizeKb!!)
+            surveyActivity?.showMaxSizeValidation(
+                sizeInKb.toInt(),
+                maxSizeKb!!,
+                compressionPossible
+            )
         }
         return sizeViolated
     }
