@@ -46,8 +46,8 @@ class MainViewModel(
                         _state.update {
                             _state.value.copy(
                                 surveyList = _state.value.surveyList.toMutableList().apply {
-                                    val index = indexOfFirst { it.id == event.surveyId }
-                                    val value = surveyRepository.getOfflineSurvey(event.surveyId)
+                                    val index = indexOfFirst { it.id == event.survey.id }
+                                    val value = surveyRepository.getOfflineSurvey(event.survey.id)
                                     set(
                                         index, value.copy(
                                             isSyncing = _state.value.surveyList.firstOrNull { it.id == value.id }?.isSyncing

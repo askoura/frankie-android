@@ -1,5 +1,6 @@
 package com.frankie.app
 
+import com.frankie.app.api.survey.Survey
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -26,5 +27,5 @@ class EventBusImpl : EventBus {
 sealed class AppEvent {
     data class UploadingResponse(val uploading: Boolean) : AppEvent()
     data class UploadingSurveyResponse(val surveyId: String) : AppEvent()
-    data class UploadedSurveyResponse(val surveyId: String) : AppEvent()
+    data class UploadedSurveyResponse(val responseId:String, val survey: Survey) : AppEvent()
 }

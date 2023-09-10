@@ -340,7 +340,7 @@ class FrankieWebView
             val finalSize = if (shouldCompress) {
                 compress(
                     FileUtils.getResponseFile(context, uuid.toString(), survey.id),
-                    maxSizeKb!! * 1000L
+                    maxSizeKb!! * 1024L
                 )
             } else {
                 result.size

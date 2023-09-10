@@ -36,7 +36,7 @@ class ResponsesActivity : AppCompatActivity() {
         adapter = ResponseListAdapter({ response: Response ->
             startActivity(SurveyActivity.createIntent(this, survey, response.id))
         }, { response: Response ->
-            viewModel.deleteResponse(survey, response.id)
+            viewModel.deleteResponse(response.id)
         })
         binding.recycler.adapter = adapter
         binding.recycler.layoutManager = LinearLayoutManager(binding.root.context)

@@ -47,7 +47,7 @@ class UploadSurveyResponsesUseCaseImpl(
     private suspend fun uploadSurvey(surveyId: String) {
         eventBus.emitEvent(AppEvent.UploadingSurveyResponse(surveyId))
         val responses = responseRepository.getResponses(surveyId)
-            .filter { !it.isSynced }
+            .filter { !it.isSynced && it.submitDate != null }
         val surveyDbEntity = surveyRepository.getSurveyDbEntity(surveyId)
             ?: throw Exception("Survey not found")
         val fileQuestions = surveyDbEntity.fileQuestions.map { "${it}.value" }
@@ -117,7 +117,7 @@ class UploadSurveyResponsesUseCaseImpl(
             // 4. mark response as synced
             responseRepository.markResponseAsSynced(response.id)
             surveyRepository.updateSurveyInDB(result.getOrThrow())
-            eventBus.emitEvent(AppEvent.UploadedSurveyResponse(surveyId))
+            eventBus.emitEvent(AppEvent.UploadedSurveyResponse(response.id, result.getOrThrow()))
         } else {
             reportError(result.exceptionOrNull())
         }

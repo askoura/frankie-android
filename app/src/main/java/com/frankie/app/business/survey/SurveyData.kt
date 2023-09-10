@@ -54,6 +54,23 @@ data class SurveyData(
         return userQuotaExceeded || totalQuotaExceeded
     }
 
+    fun updateFromSurvey(survey: Survey) = copy(
+        lastModified = survey.lastModified,
+        startDate = survey.startDate,
+        endDate = survey.endDate,
+        name = survey.name,
+        status = survey.status,
+        usage = survey.usage,
+        surveyQuota = survey.surveyQuota,
+        userQuota = survey.userQuota,
+        syncedResponseCount = survey.syncedResponseCount,
+        totalResponseCount = survey.totalResponseCount,
+        saveTimings = survey.saveTimings,
+        backgroundAudio = survey.backgroundAudio,
+        recordGps = survey.recordGps,
+
+        )
+
     companion object {
         fun fromSurveyAndDesign(
             survey: Survey,
