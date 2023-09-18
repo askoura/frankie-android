@@ -10,7 +10,6 @@ import com.frankie.app.db.model.Response.Companion.ACTUAL_FILENAME_KEY
 import com.frankie.app.db.model.Response.Companion.STORED_FILENAME_KEY
 import com.frankie.app.ui.common.FileUtils
 import com.frankie.expressionmanager.model.ResponseEvent
-import kotlinx.coroutines.flow.single
 
 
 interface UploadSurveyResponsesUseCase {
@@ -112,7 +111,7 @@ class UploadSurveyResponsesUseCaseImpl(
             navigationIndex = response.navigationIndex
         )
         val result =
-            surveyRepository.uploadSurveyResponse(surveyId, response.id, uploadData).single()
+            surveyRepository.uploadSurveyResponse(surveyId, response.id, uploadData)
         if (result.isSuccess) {
             // 4. mark response as synced
             responseRepository.markResponseAsSynced(response.id)

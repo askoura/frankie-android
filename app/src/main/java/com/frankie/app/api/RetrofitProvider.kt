@@ -5,7 +5,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.frankie.app.BuildConfig
 import com.frankie.app.business.auth.RefreshTokenUseCase
 import com.frankie.app.business.survey.SessionManager
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -41,7 +40,7 @@ object RetrofitProvider {
             val activeToken = sessionManager.getActiveToken() ?: return@addInterceptor response
 
             val newTokenResult = runBlocking {
-                refreshTokenUseCase(refreshToken, activeToken).first()
+                refreshTokenUseCase(refreshToken, activeToken)
             }
             if (newTokenResult.isSuccess) {
                 val newRequest = original.newBuilder()

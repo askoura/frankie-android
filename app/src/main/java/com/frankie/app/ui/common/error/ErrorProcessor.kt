@@ -1,7 +1,5 @@
 package com.frankie.app.ui.common.error
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import com.frankie.app.R
 import com.frankie.app.ui.common.ConnectivityChecker
 import kotlinx.coroutines.flow.MutableSharedFlow

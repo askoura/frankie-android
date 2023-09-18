@@ -259,6 +259,7 @@ class FrankieWebView
     init {
         addJavascriptInterface(androidJavascriptInterface, JAVASCRIPT_INTERFACE_NAME)
         settings.javaScriptEnabled = true
+        settings.blockNetworkLoads = true
         if (BuildConfig.DEBUG) {
             setWebContentsDebuggingEnabled(true)
         }

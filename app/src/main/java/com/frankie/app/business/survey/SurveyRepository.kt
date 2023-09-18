@@ -43,11 +43,11 @@ interface SurveyRepository {
         fileName: String
     ): Boolean
 
-    fun uploadSurveyResponse(
+    suspend fun uploadSurveyResponse(
         surveyId: String,
         responseId: String,
         uploadResponseRequestData: UploadResponseRequestData
-    ): Flow<Result<Survey>>
+    ): Result<Survey>
 
     suspend fun saveSurveyToDB(surveyData: SurveyData, fileQuestions: List<String>)
     suspend fun updateSurveyToDB(surveyData: SurveyData, fileQuestions: List<String>)
@@ -212,13 +212,12 @@ class SurveyRepositoryImpl(
         return service.fileExists(surveyId, fileName)
     }
 
-    override fun uploadSurveyResponse(
+    override suspend fun uploadSurveyResponse(
         surveyId: String,
         responseId: String,
         uploadResponseRequestData: UploadResponseRequestData
-    ): Flow<Result<Survey>> = flow {
-
-        emit(
+    ): Result<Survey> {
+        return try {
             Result.success(
                 service.uploadSurveyResponse(
                     surveyId,
@@ -226,56 +225,56 @@ class SurveyRepositoryImpl(
                     uploadResponseRequestData
                 )
             )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    private fun SurveyDataEntity.update(survey: Survey): SurveyDataEntity {
+        return SurveyDataEntity(
+            id = id,
+            creationDate = survey.creationDate,
+            lastModified = survey.lastModified,
+            endDate = survey.endDate,
+            startDate = survey.startDate,
+            name = survey.name,
+            status = survey.status,
+            usage = survey.usage,
+            quota = survey.surveyQuota,
+            userQuota = survey.userQuota,
+            publishInfoEntity = publishInfoEntity,
+            newVersionAvailable = newVersionAvailable,
+            saveTimings = survey.saveTimings,
+            backgroundAudio = survey.backgroundAudio,
+            recordGps = survey.recordGps,
+            totalResponsesCount = survey.totalResponseCount,
+            syncedResponseCount = survey.syncedResponseCount,
+            fileQuestions = fileQuestions
         )
-    }.catch {
-        emit(Result.failure(it))
-    }.flowOn(Dispatchers.IO)
-}
+    }
 
-private fun SurveyDataEntity.update(survey: Survey): SurveyDataEntity {
-    return SurveyDataEntity(
-        id = id,
-        creationDate = survey.creationDate,
-        lastModified = survey.lastModified,
-        endDate = survey.endDate,
-        startDate = survey.startDate,
-        name = survey.name,
-        status = survey.status,
-        usage = survey.usage,
-        quota = survey.surveyQuota,
-        userQuota = survey.userQuota,
-        publishInfoEntity = publishInfoEntity,
-        newVersionAvailable = newVersionAvailable,
-        saveTimings = survey.saveTimings,
-        backgroundAudio = survey.backgroundAudio,
-        recordGps = survey.recordGps,
-        totalResponsesCount = survey.totalResponseCount,
-        syncedResponseCount = survey.syncedResponseCount,
-        fileQuestions = fileQuestions
-    )
-}
-
-private fun SurveyData.toSurveyDataEntity(fileQuestions: List<String> = emptyList()): SurveyDataEntity {
-    return SurveyDataEntity(
-        id = this.id,
-        creationDate = this.creationDate,
-        lastModified = this.lastModified,
-        endDate = this.endDate,
-        startDate = this.startDate,
-        name = this.name,
-        status = this.status,
-        usage = this.usage,
-        quota = this.surveyQuota,
-        userQuota = this.userQuota,
-        publishInfoEntity = this.publishInfo.toPublishInfoEntity(),
-        newVersionAvailable = this.newVersionAvailable,
-        saveTimings = this.saveTimings,
-        backgroundAudio = this.backgroundAudio,
-        recordGps = this.recordGps,
-        totalResponsesCount = this.totalResponseCount,
-        syncedResponseCount = this.syncedResponseCount,
-        fileQuestions = fileQuestions
-    )
+    private fun SurveyData.toSurveyDataEntity(fileQuestions: List<String> = emptyList()): SurveyDataEntity {
+        return SurveyDataEntity(
+            id = this.id,
+            creationDate = this.creationDate,
+            lastModified = this.lastModified,
+            endDate = this.endDate,
+            startDate = this.startDate,
+            name = this.name,
+            status = this.status,
+            usage = this.usage,
+            quota = this.surveyQuota,
+            userQuota = this.userQuota,
+            publishInfoEntity = this.publishInfo.toPublishInfoEntity(),
+            newVersionAvailable = this.newVersionAvailable,
+            saveTimings = this.saveTimings,
+            backgroundAudio = this.backgroundAudio,
+            recordGps = this.recordGps,
+            totalResponsesCount = this.totalResponseCount,
+            syncedResponseCount = this.syncedResponseCount,
+            fileQuestions = fileQuestions
+        )
+    }
 }
 
 

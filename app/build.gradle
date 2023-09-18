@@ -43,6 +43,12 @@ android {
             debuggable true
             crunchPngs false
         }
+        debugRealDevice {
+            initWith buildTypes.debug
+            buildConfigField "String", "SERVER_URL", "\"http://localhost:8080\""
+            // remember to run command `adb reverse tcp:8080 tcp:8080` to access server on localhost
+            // through actual device
+        }
 
         staging {
             initWith buildTypes.debug
