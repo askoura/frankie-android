@@ -16,6 +16,7 @@ import javax.net.ssl.SSLException
 interface ErrorProcessor {
     suspend fun processError(throwable: Throwable)
     suspend fun processLoginError(throwable: Throwable)
+    suspend fun roleNotSupported()
     val errors: SharedFlow<ProcessedError>
 }
 
@@ -60,6 +61,10 @@ class ErrorProcessorImpl(private val connectivityChecker: ConnectivityChecker) :
         }
     }
 
+    override suspend fun roleNotSupported() {
+        _errors.emit(ProcessedError.NoOfflineRole)
+    }
+
     // TODO proper error handling per code
     private fun processHttpException(throwable: HttpException): ProcessedError {
         return when (throwable.code()) {
@@ -78,4 +83,5 @@ sealed class ProcessedError(val titleRes: Int, val messageRes: Int) {
     object NetworkError : ProcessedError(R.string.error_network_title, R.string.error_network_description)
     object Timeout : ProcessedError(R.string.error_timeout_title, R.string.error_timeout_description)
     object LoginError : ProcessedError(R.string.error_login_title, R.string.error_login_description)
+    object NoOfflineRole : ProcessedError(R.string.error_role_not_supported_title, R.string.error_role_not_supported_description)
 }

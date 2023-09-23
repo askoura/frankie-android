@@ -61,6 +61,4 @@ data class PublishInfoEntity(
     val version: Int = 0,
     val subVersion: Int = 0,
     val timeLastModified: String = PublishInfo.LAST_MODIFIED_INITIAL,
-) {
-    constructor() : this(0, 0, PublishInfo.LAST_MODIFIED_INITIAL)
-}
+)

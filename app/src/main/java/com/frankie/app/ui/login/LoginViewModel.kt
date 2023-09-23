@@ -27,8 +27,20 @@ class LoginViewModel(private val loginInteractor: LoginInteractor, errorProcesso
             val isEmailValid = InputUtils.isValidEmail(trimmedEmail)
             if (isEmailValid && isPswValid) {
                 try {
-                    loginInteractor.login(trimmedEmail, trimmedPsw)
-                    _loginState.update { LoginState(isLoggedIn = true, isLoading = false) }
+                    val response = loginInteractor.login(trimmedEmail, trimmedPsw)
+                    if (response.roles.any { role ->
+                            listOf(
+                                Roles.SUPER_ADMIN,
+                                Roles.SURVEY_ADMIN,
+                                Roles.SURVEYOR
+                            ).map { it.name.lowercase() }.contains(role)
+                        }
+                    ) {
+                        _loginState.update { LoginState(isLoggedIn = true, isLoading = false) }
+                    } else {
+                        roleNotSupported()
+                        _loginState.update { LoginState(isLoading = false) }
+                    }
                 } catch (e: Exception) {
                     _loginState.update { LoginState(isLoading = false) }
                     processLoginError(e)
@@ -61,7 +73,13 @@ class LoginViewModel(private val loginInteractor: LoginInteractor, errorProcesso
     data class LoginState(
         val isLoading: Boolean = false,
         val isLoggedIn: Boolean = false,
+        val roleNotSupported: Boolean = false,
         val pswValidationError: Boolean = false,
         val emailValidationError: Boolean = false
     )
+}
+
+@Suppress("unused")
+enum class Roles {
+    SUPER_ADMIN, SURVEY_ADMIN, SURVEYOR, ANALYST;
 }
