@@ -19,6 +19,8 @@
     <string name="error_recording_permission_missing_desc">Access Location and Record Audio permissions must be granted to proceed. Please go to settings to grant app both permissions</string>
     <string name="error_login_title">Sign in failed!</string>
     <string name="error_login_description">Please enter valid credentials</string>
+    <string name="error_signup_not_allowed_title">Sign in failed!</string>
+    <string name="error_signup_not_allowed_description">You have to have an existing account to log in through google… go create an account</string>
     <string name="error_role_not_supported_title">Sign in failed!</string>
     <string name="error_role_not_supported_description">You must be a surveyor, Survey Admin or Super Admin to be able to log in to this app</string>
     <string name="validation_email_error">Please enter valid email</string>

@@ -72,7 +72,9 @@ object RetrofitProvider {
             httpClient.networkInterceptors().add(httpLoggingInterceptor)
         }
         httpClient.callTimeout(0, TimeUnit.SECONDS)
-        httpClient.connectTimeout(10, TimeUnit.SECONDS)
+        httpClient.readTimeout(0, TimeUnit.SECONDS)
+        httpClient.writeTimeout(0, TimeUnit.SECONDS)
+        httpClient.connectTimeout(0, TimeUnit.SECONDS)
         return httpClient
     }
 

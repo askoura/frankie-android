@@ -61,7 +61,7 @@ class LoginViewModel(private val loginInteractor: LoginInteractor, errorProcesso
         viewModelScope.launch(Dispatchers.IO) {
             _loginState.value = LoginState(isLoading = true)
             try {
-                loginInteractor.googleSignIn(GoogleSignInInput(idToken, clientId))
+                val response = loginInteractor.googleSignIn(GoogleSignInInput(idToken, clientId))
                 _loginState.update { LoginState(isLoggedIn = true, isLoading = false) }
             } catch (e: Exception) {
                 _loginState.update { LoginState(isLoading = false) }
