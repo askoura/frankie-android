@@ -3,6 +3,8 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'kotlin-parcelize'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
@@ -18,14 +20,14 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    signingConfigs {
-        debug {
-            storeFile file('../keystore/debug.keystore')
-            storePassword = 'KSr3#V^^heD7g1mIO!m9'
-            keyAlias 'debug'
-            keyPassword = 'Ow0%I!TUwDONAejpS^XF'
-        }
-    }
+//    signingConfigs {
+//        debug {
+//            storeFile file('../keystore/debug.keystore')
+//            storePassword = 'KSr3#V^^heD7g1mIO!m9'
+//            keyAlias 'debug'
+//            keyPassword = 'Ow0%I!TUwDONAejpS^XF'
+//        }
+//    }
 
     buildTypes {
         release {
@@ -85,6 +87,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment-ktx:2.7.1'
     implementation 'androidx.navigation:navigation-ui-ktx:2.7.1'
     implementation "androidx.work:work-runtime-ktx:2.8.1"
+    implementation("androidx.core:core-splashscreen:1.0.0")
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -124,6 +127,9 @@ dependencies {
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
 
-
+    // firebase
+    implementation platform('com.google.firebase:firebase-bom:32.2.3')
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation("com.google.firebase:firebase-crashlytics-ktx")
 
 }

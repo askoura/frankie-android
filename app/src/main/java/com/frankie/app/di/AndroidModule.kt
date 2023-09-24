@@ -5,6 +5,8 @@ import androidx.work.WorkManager
 import com.frankie.app.BuildConfig
 import com.frankie.app.EventBus
 import com.frankie.app.EventBusImpl
+import com.frankie.app.business.settings.ConsentSettings
+import com.frankie.app.business.settings.ConsentSettingsImpl
 import com.frankie.app.business.settings.SharedPrefsManager
 import com.frankie.app.business.settings.SharedPrefsManagerImpl
 import com.frankie.app.business.survey.BackgroundSync
@@ -29,6 +31,7 @@ val androidModule = module {
     single<EventBus> { EventBusImpl() }
     single<SharedPrefsManager> { SharedPrefsManagerImpl(get()) }
     single<SessionManager> { SessionManagerImpl(get()) }
+    single<ConsentSettings> { ConsentSettingsImpl(get(named("appContext")), get()) }
     single { FrankieDb.getDatabase(get(named("appContext"))) }
     single { get<FrankieDb>().surveyDataDao() }
     single { get<FrankieDb>().permissionDao() }
