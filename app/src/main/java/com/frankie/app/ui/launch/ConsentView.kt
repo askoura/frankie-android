@@ -1,8 +1,6 @@
 package com.frankie.app.ui.launch
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,22 +11,14 @@ import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.frankie.app.R
 import com.frankie.app.databinding.DialogConsentBinding
-import com.frankie.app.ui.common.color
 import com.frankie.app.ui.common.gone
 import com.frankie.app.ui.common.visible
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 
 
-@SuppressLint("ViewConstructor")
-class ConsentView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
-) : ConstraintLayout(context, attrs, defStyleAttr) {
+class ConsentView(context: Context) : ConstraintLayout(context) {
 
-    private val binding =
-        DialogConsentBinding.inflate(LayoutInflater.from(context), this, true).apply {
-            root.gone()
-        }
+    private val binding = DialogConsentBinding.inflate(LayoutInflater.from(context), this)
 
     private val sheetBehavior: BottomSheetBehavior<View>
     private val switchList: List<SwitchCompat> =
@@ -38,6 +28,7 @@ class ConsentView @JvmOverloads constructor(
 
     init {
         layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+        setBackgroundResource(R.color.black_10_percent)
         sheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
         sheetBehavior.isHideable = true
         sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
@@ -97,25 +88,24 @@ class ConsentView @JvmOverloads constructor(
         binding.switchGoogleAnalytics.isChecked = isFirebaseAnalyticsApproved
 
         binding.root.visible()
-        setBackgroundColor(context.color(R.color.black))
 
         animateShow()
     }
 
     private fun animateShow() {
         val bottomUpAnim: Animation = AnimationUtils.loadAnimation(context, R.anim.show_from_bottom)
-        binding.rootView.visible()
-        binding.rootView.startAnimation(bottomUpAnim)
+        visible()
+        startAnimation(bottomUpAnim)
     }
 
     private fun animateHide(consentSettingsListener: ConsentSettingsListener) {
         val bottomUpAnim: Animation = AnimationUtils.loadAnimation(context, R.anim.hide_to_bottom)
-        binding.rootView.startAnimation(bottomUpAnim)
+        startAnimation(bottomUpAnim)
         bottomUpAnim.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationRepeat(animation: Animation?) {}
 
             override fun onAnimationEnd(animation: Animation?) {
-                binding.rootView.gone()
+                gone()
                 if (shouldApproveAll(sheetBehavior.state)) {
                     consentSettingsListener.setConsent(
                         firebaseAnalytics = true,

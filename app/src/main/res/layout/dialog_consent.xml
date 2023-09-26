@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/root_view"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/transparent"
-    android:orientation="vertical">
+    tools:layout_width="match_parent"
+    tools:layout_height="match_parent"
+    tools:background="@color/black_10_percent"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <ImageView
+        android:src="@drawable/ic_launcher_foreground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="0dp"
@@ -25,6 +29,7 @@
             android:layout_gravity="bottom"
             android:background="@color/white"
             android:orientation="vertical"
+            android:elevation="8dp"
             android:padding="16dp">
 
             <TextView
@@ -127,7 +132,7 @@
                     <View
                         android:id="@+id/separator_google_analytics"
                         android:layout_height="1dp"
-                        android:background="@color/black"
+                        android:background="@color/gray"
                         android:layout_width="match_parent"
                         android:layout_marginTop="16dp" />
 
@@ -175,4 +180,4 @@
             android:text="@string/consent_approve"
             android:textColor="@color/white" />
     </FrameLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+</merge>
