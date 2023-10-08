@@ -20,14 +20,14 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-//    signingConfigs {
-//        debug {
-//            storeFile file('../keystore/debug.keystore')
-//            storePassword = 'KSr3#V^^heD7g1mIO!m9'
-//            keyAlias 'debug'
-//            keyPassword = 'Ow0%I!TUwDONAejpS^XF'
-//        }
-//    }
+    signingConfigs {
+        debug {
+            storeFile file('../keystore/debug.keystore')
+            storePassword = 'KSr3#V^^heD7g1mIO!m9'
+            keyAlias 'debug'
+            keyPassword = 'Ow0%I!TUwDONAejpS^XF'
+        }
+    }
 
     buildTypes {
         release {
