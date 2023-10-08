@@ -5,8 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.frankie.app.R
@@ -81,7 +79,7 @@ class ConsentView(context: Context) : ConstraintLayout(context) {
         consentSettingsListener: ConsentSettingsListener
     ) {
         binding.buttonConfirmChoices.setOnClickListener {
-            animateHide(consentSettingsListener)
+            confirmChoices(consentSettingsListener)
         }
         binding.textIntro.setText(R.string.consent_intro)
         binding.switchCrashlytics.isChecked = isCrashlyticsApproved
@@ -89,38 +87,22 @@ class ConsentView(context: Context) : ConstraintLayout(context) {
 
         binding.root.visible()
 
-        animateShow()
-    }
-
-    private fun animateShow() {
-        val bottomUpAnim: Animation = AnimationUtils.loadAnimation(context, R.anim.show_from_bottom)
         visible()
-        startAnimation(bottomUpAnim)
     }
 
-    private fun animateHide(consentSettingsListener: ConsentSettingsListener) {
-        val bottomUpAnim: Animation = AnimationUtils.loadAnimation(context, R.anim.hide_to_bottom)
-        startAnimation(bottomUpAnim)
-        bottomUpAnim.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationRepeat(animation: Animation?) {}
-
-            override fun onAnimationEnd(animation: Animation?) {
-                gone()
-                if (shouldApproveAll(sheetBehavior.state)) {
-                    consentSettingsListener.setConsent(
-                        firebaseAnalytics = true,
-                        crashlytics = true
-                    )
-                } else {
-                    consentSettingsListener.setConsent(
-                        binding.switchGoogleAnalytics.isChecked,
-                        binding.switchCrashlytics.isChecked
-                    )
-                }
-            }
-
-            override fun onAnimationStart(animation: Animation?) {}
-        })
+    private fun confirmChoices(consentSettingsListener: ConsentSettingsListener) {
+        gone()
+        if (shouldApproveAll(sheetBehavior.state)) {
+            consentSettingsListener.setConsent(
+                firebaseAnalytics = true,
+                crashlytics = true
+            )
+        } else {
+            consentSettingsListener.setConsent(
+                binding.switchGoogleAnalytics.isChecked,
+                binding.switchCrashlytics.isChecked
+            )
+        }
     }
 
     private fun onSwitchesChanged() {
