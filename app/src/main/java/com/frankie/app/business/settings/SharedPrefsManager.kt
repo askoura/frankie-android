@@ -8,6 +8,8 @@ interface SharedPrefsManager {
     var activeToken: String?
     var refreshToken: String?
     var userId: String?
+    fun saveBoolean(key: String, value: Boolean)
+    fun getBoolean(key: String, defaultValue: Boolean = false): Boolean
     fun clear()
 }
 
@@ -43,10 +45,19 @@ class SharedPrefsManagerImpl(context: Context) : SharedPrefsManager {
         return preferences.getString(key, defaultValue)
     }
 
+    override fun saveBoolean(key: String, value: Boolean) {
+        editor.putBoolean(key, value)
+        editor.apply()
+    }
+
+    override fun getBoolean(key: String, defaultValue: Boolean): Boolean {
+        return preferences.getBoolean(key, defaultValue)
+    }
+
     companion object {
-        const val PREFS_NAME = "frankie_prefs"
-        const val KEY_ACTIVE_TOKEN = "active_token"
-        const val KEY_REFRESH_TOKEN = "refresh_token"
-        const val KEY_USER_ID = "user_id"
+        private const val PREFS_NAME = "frankie_prefs"
+        private const val KEY_ACTIVE_TOKEN = "active_token"
+        private const val KEY_REFRESH_TOKEN = "refresh_token"
+        private const val KEY_USER_ID = "user_id"
     }
 }

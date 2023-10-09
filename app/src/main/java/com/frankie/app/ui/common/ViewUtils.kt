@@ -38,6 +38,14 @@ fun ImageButton.setEnabledTint(context: Context, isEnabled: Boolean) {
     }
 }
 
-fun View.visibleOrGone(visible:Boolean){
-    visibility = if(visible) VISIBLE else GONE
+fun View.visibleOrGone(visible: Boolean) {
+    visibility = if (visible) VISIBLE else GONE
+}
+
+fun View.gone() {
+    visibility = GONE
+}
+
+fun View.visible() {
+    visibility = VISIBLE
 }
