@@ -14,6 +14,7 @@ import com.frankie.app.db.survey.SurveyDataEntity
 import com.frankie.expressionmanager.model.DataType
 import com.frankie.expressionmanager.model.jacksonKtMapper
 import com.frankie.expressionmanager.usecase.ValidationOutput
+import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -21,7 +22,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
-import java.io.File
 
 interface SurveyRepository {
 
@@ -74,8 +74,14 @@ class SurveyRepositoryImpl(
 
     override fun getSurveyList(): Flow<List<SurveyData>> {
         return flow {
-            val surveyList = service.getSurveyList().map { survey ->
-                val design = service.getSurveyDesign(survey.id, PublishInfo())
+            val list =
+                if (sessionManager.isGuest()) service.getGuestSurveyList() else service.getSurveyList()
+            val surveyList = list.map { survey ->
+                val design = if (sessionManager.isGuest()) service.getGuestSurveyDesign(
+                    survey.id,
+                    PublishInfo()
+                )
+                else service.getSurveyDesign(survey.id, PublishInfo())
                 val savedSurvey = surveyDao.getSurveyDataById(survey.id)
                 val count = responseDao.countByUserAndSurvey(
                     surveyId = survey.id,
@@ -169,7 +175,11 @@ class SurveyRepositoryImpl(
     }
 
     override suspend fun surveyDesign(surveyData: SurveyData): SurveyDesign {
-        return service.getSurveyDesign(surveyData.id, surveyData.publishInfo)
+        return if (sessionManager.isGuest()) service.getGuestSurveyDesign(
+            surveyData.id, surveyData
+                .publishInfo
+        )
+        else service.getSurveyDesign(surveyData.id, surveyData.publishInfo)
     }
 
     override fun getSurveyFile(

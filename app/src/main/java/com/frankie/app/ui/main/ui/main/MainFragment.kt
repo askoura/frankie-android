@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.frankie.app.R
 import com.frankie.app.business.ByteSize
 import com.frankie.app.business.formatBytes
+import com.frankie.app.business.survey.SessionManager
 import com.frankie.app.databinding.FragmentMainBinding
 import com.frankie.app.storage.DownloadState
 import com.frankie.app.ui.common.error.ErrorDisplayManager
@@ -30,6 +31,7 @@ import org.koin.core.parameter.parametersOf
 
 class MainFragment : Fragment() {
 
+    private val sessionManager: SessionManager by inject()
     private val viewModel: MainViewModel by lazy { getViewModel() }
     private val errorDisplayManager: ErrorDisplayManager by inject { parametersOf(requireActivity()) }
     private lateinit var binding: FragmentMainBinding
@@ -47,6 +49,11 @@ class MainFragment : Fragment() {
         val menuHost: MenuHost = requireActivity()
 
         menuHost.addMenuProvider(object : MenuProvider {
+            override fun onPrepareMenu(menu: Menu) {
+                super.onPrepareMenu(menu)
+                menu.findItem(R.id.logout).isVisible = !sessionManager.isGuest()
+            }
+
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 // Add menu items here
                 menuInflater.inflate(R.menu.main, menu)

@@ -63,4 +63,5 @@
     <string name="consent_firebase_details">In order to monitor and continuously improve the use and usability of the app, we use the tool Google Analytics for Firebase from Google Inc., Mountainview, California, USA.\nThe collected data help us to better understand the use and thus the app improve in the right places. All IP addresses are only saved in anonymized form. Therefore, the data obtained cannot be used to personally identify users.
 FirebaseAnalytics uses an advertising ID. You can restrict this use in the device settings of your mobile device: Settings&gt; Google&gt; Ads&gt; Reset Advertising ID.</string>
     <string name="consent_firebase_title">Firebase</string>
+    <string name="login_as_guest">Try app as guest</string>
 </resources>

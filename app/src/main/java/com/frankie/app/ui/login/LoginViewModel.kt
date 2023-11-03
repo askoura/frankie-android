@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.frankie.app.api.auth.GoogleSignInInput
 import com.frankie.app.business.auth.LoginInteractor
+import com.frankie.app.business.survey.SessionManager
 import com.frankie.app.ui.common.InputUtils
 import com.frankie.app.ui.common.error.ErrorProcessor
 import kotlinx.coroutines.Dispatchers
@@ -12,7 +13,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class LoginViewModel(private val loginInteractor: LoginInteractor, errorProcessor: ErrorProcessor) :
+class LoginViewModel(
+    private val loginInteractor: LoginInteractor,
+    private val sessionManager: SessionManager,
+    errorProcessor: ErrorProcessor
+) :
     ViewModel(), ErrorProcessor by errorProcessor {
 
     private val _loginState = MutableStateFlow(LoginState())
@@ -56,6 +61,11 @@ class LoginViewModel(private val loginInteractor: LoginInteractor, errorProcesso
                 processLoginError(e)
             }
         }
+    }
+
+    fun tryAsGuest() {
+        sessionManager.saveUserAsGuest()
+        _loginState.update { LoginState(isLoggedIn = true, isLoading = false) }
     }
 
     data class LoginState(
