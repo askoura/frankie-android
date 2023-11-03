@@ -1,32 +1,23 @@
 {
-  "_VisibilityOff-13c6a359.js": {
-    "file": "assets/VisibilityOff-13c6a359.js",
+  "_VisibilityOff-443b400e.js": {
+    "file": "assets/VisibilityOff-443b400e.js",
     "imports": [
       "index.html"
     ]
   },
-  "_index-56898da5.js": {
-    "css": [
-      "assets/index-9cbd1de5.css"
-    ],
-    "file": "assets/index-56898da5.js",
-    "imports": [
-      "index.html"
-    ]
-  },
-  "_index.esm-44f6c566.js": {
-    "file": "assets/index.esm-44f6c566.js",
+  "_index.esm-f1edf67b.js": {
+    "file": "assets/index.esm-f1edf67b.js",
     "imports": [
       "index.html"
     ]
   },
   "index.css": {
-    "file": "assets/index-9cbd1de5.css",
+    "file": "assets/index-eddb9b53.css",
     "src": "index.css"
   },
   "index.html": {
     "css": [
-      "assets/index-36c29f30.css"
+      "assets/index-eddb9b53.css"
     ],
     "dynamicImports": [
       "src/pages/Page404/index.jsx",
@@ -41,7 +32,7 @@
       "src/pages/manage/Profile/index.jsx",
       "src/pages/manage/CreateSurvey/index.jsx"
     ],
-    "file": "assets/index-4b7b2bb0.js",
+    "file": "assets/index-4408a88f.js",
     "isEntry": true,
     "src": "index.html"
   },
@@ -53,7 +44,7 @@
     "css": [
       "assets/index-baf20498.css"
     ],
-    "file": "assets/index-5dcc02ba.js",
+    "file": "assets/index-5dfdee04.js",
     "imports": [
       "index.html"
     ],
@@ -68,7 +59,7 @@
     "css": [
       "assets/index-429f3045.css"
     ],
-    "file": "assets/index-24bfd391.js",
+    "file": "assets/index-52f86ff4.js",
     "imports": [
       "index.html"
     ],
@@ -83,10 +74,9 @@
     "css": [
       "assets/index-ac50e4e9.css"
     ],
-    "file": "assets/index-1dd96c35.js",
+    "file": "assets/index-c80a9e54.js",
     "imports": [
-      "index.html",
-      "_index-56898da5.js"
+      "index.html"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/manage/ConfirmSignup/index.jsx"
@@ -99,7 +89,7 @@
     "css": [
       "assets/index-97981d38.css"
     ],
-    "file": "assets/index-6e4f852d.js",
+    "file": "assets/index-8e75a887.js",
     "imports": [
       "index.html"
     ],
@@ -114,7 +104,7 @@
     "css": [
       "assets/index-6933bab9.css"
     ],
-    "file": "assets/index-1b853303.js",
+    "file": "assets/index-ce25b6ed.js",
     "imports": [
       "index.html"
     ],
@@ -129,10 +119,9 @@
     "css": [
       "assets/index-a1a6d03e.css"
     ],
-    "file": "assets/index-3763dc85.js",
+    "file": "assets/index-d6d18ca3.js",
     "imports": [
-      "index.html",
-      "_index-56898da5.js"
+      "index.html"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/manage/ForgotPassword/index.jsx"
@@ -145,12 +134,11 @@
     "css": [
       "assets/index-a01e6bd9.css"
     ],
-    "file": "assets/index-91f08a9b.js",
+    "file": "assets/index-218b467a.js",
     "imports": [
       "index.html",
-      "_index-56898da5.js",
-      "_index.esm-44f6c566.js",
-      "_VisibilityOff-13c6a359.js"
+      "_index.esm-f1edf67b.js",
+      "_VisibilityOff-443b400e.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/manage/Login/index.jsx"
@@ -163,7 +151,7 @@
     "css": [
       "assets/index-5036f481.css"
     ],
-    "file": "assets/index-96ae6d68.js",
+    "file": "assets/index-35c08ebe.js",
     "imports": [
       "index.html"
     ],
@@ -178,10 +166,10 @@
     "css": [
       "assets/index-ab9d92a0.css"
     ],
-    "file": "assets/index-163a1560.js",
+    "file": "assets/index-44b5dbcf.js",
     "imports": [
       "index.html",
-      "_VisibilityOff-13c6a359.js"
+      "_VisibilityOff-443b400e.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/manage/Profile/index.jsx"
@@ -194,11 +182,10 @@
     "css": [
       "assets/index-9097f465.css"
     ],
-    "file": "assets/index-50893693.js",
+    "file": "assets/index-a7fc54d8.js",
     "imports": [
       "index.html",
-      "_index-56898da5.js",
-      "_VisibilityOff-13c6a359.js"
+      "_VisibilityOff-443b400e.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/manage/ResetPassword/index.jsx"
@@ -211,12 +198,11 @@
     "css": [
       "assets/index-69d98b86.css"
     ],
-    "file": "assets/index-6499f3d0.js",
+    "file": "assets/index-ac337b8e.js",
     "imports": [
       "index.html",
-      "_index-56898da5.js",
-      "_index.esm-44f6c566.js",
-      "_VisibilityOff-13c6a359.js"
+      "_index.esm-f1edf67b.js",
+      "_VisibilityOff-443b400e.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/manage/Signup/index.jsx"
