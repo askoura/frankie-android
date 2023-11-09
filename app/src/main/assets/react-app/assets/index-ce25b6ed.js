@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:app/src/main/assets/react-app/assets/index-ce25b6ed.js
 import { n as createSvgIcon, j as jsxRuntimeExports, a as useNavigate, u as useTranslation, C as Card, B as Box, h as Button, p as routes, S as Stack, T as Typography, q as TokenService, R as ROLES, L as Link, t as dayMonthUeatFormat, v as serverDateTimeToLocalDateTime, r as reactExports, i as useDispatch, U as UserService, w as SurveyService, x as CircularProgress, l as onError } from "./index-4408a88f.js";
+========
+import { l as createSvgIcon, j as jsxRuntimeExports, a as useNavigate, u as useTranslation, C as Card, B as Box, h as Button, m as routes, S as Stack, T as Typography, n as TokenService, R as ROLES, L as Link, o as dayMonthUeatFormat, s as serverDateTimeToLocalDateTime, r as reactExports, U as UserService, q as SurveyService, H as Header, t as ProcessedError, v as CircularProgress, p as processError, P as PROCESSED_ERRORS } from "./index-64b69271.js";
+>>>>>>>> main-side:app/src/main/assets/react-app/assets/index-36addd1e.js
 const Add = createSvgIcon(/* @__PURE__ */ jsxRuntimeExports.jsx("path", {
   d: "M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
 }), "Add");
@@ -226,4 +230,8 @@ function Dashboard() {
 export {
   Dashboard as default
 };
+<<<<<<<< HEAD:app/src/main/assets/react-app/assets/index-ce25b6ed.js
 //# sourceMappingURL=index-ce25b6ed.js.map
+========
+//# sourceMappingURL=index-36addd1e.js.map
+>>>>>>>> main-side:app/src/main/assets/react-app/assets/index-36addd1e.js

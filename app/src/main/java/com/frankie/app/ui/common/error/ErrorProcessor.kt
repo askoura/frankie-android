@@ -16,6 +16,7 @@ import javax.net.ssl.SSLException
 interface ErrorProcessor {
     suspend fun processError(throwable: Throwable)
     suspend fun processLoginError(throwable: Throwable)
+    suspend fun roleNotSupported()
     val errors: SharedFlow<ProcessedError>
 }
 
@@ -31,6 +32,7 @@ class ErrorProcessorImpl(private val connectivityChecker: ConnectivityChecker) :
             is HttpException -> {
                 processHttpException(throwable)
             }
+
             is UnknownHostException,
             is SocketTimeoutException,
             is ConnectException,
@@ -54,10 +56,19 @@ class ErrorProcessorImpl(private val connectivityChecker: ConnectivityChecker) :
     override suspend fun processLoginError(throwable: Throwable) {
         return if (throwable is HttpException && throwable.code() in listOf(401, 404)) {
             throwable.printStackTrace()
-            _errors.emit(ProcessedError.LoginError)
+            val errorResponse = throwable.response()?.errorBody()?.string()
+            if (!errorResponse.isNullOrEmpty() && errorResponse.contains("SignupNotAllowed")) {
+                _errors.emit(ProcessedError.GoogleSignUpNotAllowed)
+            } else {
+                _errors.emit(ProcessedError.LoginError)
+            }
         } else {
             processError(throwable)
         }
+    }
+
+    override suspend fun roleNotSupported() {
+        _errors.emit(ProcessedError.NoOfflineRole)
     }
 
     // TODO proper error handling per code
@@ -74,8 +85,23 @@ class ErrorProcessorImpl(private val connectivityChecker: ConnectivityChecker) :
 sealed class ProcessedError(val titleRes: Int, val messageRes: Int) {
     object AuthError : ProcessedError(R.string.error_auth_title, R.string.error_auth_description)
     object NotFound : ProcessedError(R.string.error_general_title, R.string.not_found_description)
-    object GeneralError : ProcessedError(R.string.error_general_title, R.string.error_general_description)
-    object NetworkError : ProcessedError(R.string.error_network_title, R.string.error_network_description)
-    object Timeout : ProcessedError(R.string.error_timeout_title, R.string.error_timeout_description)
+    object GeneralError :
+        ProcessedError(R.string.error_general_title, R.string.error_general_description)
+
+    object NetworkError :
+        ProcessedError(R.string.error_network_title, R.string.error_network_description)
+
+    object Timeout :
+        ProcessedError(R.string.error_timeout_title, R.string.error_timeout_description)
+
     object LoginError : ProcessedError(R.string.error_login_title, R.string.error_login_description)
+    object GoogleSignUpNotAllowed : ProcessedError(
+        R.string.error_signup_not_allowed_title,
+        R.string.error_signup_not_allowed_description
+    )
+
+    object NoOfflineRole : ProcessedError(
+        R.string.error_role_not_supported_title,
+        R.string.error_role_not_supported_description
+    )
 }

@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:app/src/main/assets/react-app/assets/index-35c08ebe.js
 import { n as createSvgIcon, j as jsxRuntimeExports, u as useTranslation, a as useNavigate, r as reactExports, i as useDispatch, E as TableContainer, G as Paper, H as Table, J as TableHead, K as TableRow, M as TableCell, N as TableBody, f as IconButton, O as Delete, h as Button, Q as UserDelete, s as setLoading, U as UserService, B as Box } from "./index-4408a88f.js";
+========
+import { l as createSvgIcon, j as jsxRuntimeExports, u as useTranslation, a as useNavigate, r as reactExports, D as LoadingIndicator, t as ProcessedError, E as TableContainer, G as Paper, J as Table, K as TableHead, M as TableRow, N as TableCell, O as TableBody, f as IconButton, Q as Delete, h as Button, V as UserDelete, U as UserService, p as processError, P as PROCESSED_ERRORS, B as Box, H as Header } from "./index-64b69271.js";
+>>>>>>>> main-side:app/src/main/assets/react-app/assets/index-ac638360.js
 const Edit = createSvgIcon(/* @__PURE__ */ jsxRuntimeExports.jsx("path", {
   d: "M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
 }), "Edit");
@@ -122,4 +126,8 @@ function ManageUsers() {
 export {
   ManageUsers as default
 };
+<<<<<<<< HEAD:app/src/main/assets/react-app/assets/index-35c08ebe.js
 //# sourceMappingURL=index-35c08ebe.js.map
+========
+//# sourceMappingURL=index-ac638360.js.map
+>>>>>>>> main-side:app/src/main/assets/react-app/assets/index-ac638360.js

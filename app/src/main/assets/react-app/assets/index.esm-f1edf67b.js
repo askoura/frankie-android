@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:app/src/main/assets/react-app/assets/index.esm-f1edf67b.js
 import { r as reactExports, D as React } from "./index-4408a88f.js";
+========
+import { r as reactExports, y as React } from "./index-64b69271.js";
+>>>>>>>> main-side:app/src/main/assets/react-app/assets/index.esm-920bfdb6.js
 function useLoadGsiScript(options = {}) {
   const { nonce, onScriptLoadSuccess, onScriptLoadError } = options;
   const [scriptLoadedSuccessfully, setScriptLoadedSuccessfully] = reactExports.useState(false);
@@ -121,4 +125,8 @@ export {
   GoogleOAuthProvider as G,
   GoogleLogin as a
 };
+<<<<<<<< HEAD:app/src/main/assets/react-app/assets/index.esm-f1edf67b.js
 //# sourceMappingURL=index.esm-f1edf67b.js.map
+========
+//# sourceMappingURL=index.esm-920bfdb6.js.map
+>>>>>>>> main-side:app/src/main/assets/react-app/assets/index.esm-920bfdb6.js

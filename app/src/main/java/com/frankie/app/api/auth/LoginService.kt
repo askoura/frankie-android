@@ -10,7 +10,7 @@ interface LoginService {
     suspend fun login(
         @Body loginRequest: LoginInput
     ): Response<LoginResponse>
-    @POST("user/google_sign_in")
+    @POST("user/google_login")
     suspend fun googleSignIn(
         @Body googleSignInInput: GoogleSignInInput
     ): Response<LoginResponse>
