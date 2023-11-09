@@ -17,5 +17,5 @@ val loginModule = module {
     single<LoginRepository> { LoginRepositoryImpl(get(), get()) }
     single<LoginInteractor> { LoginInteractorImpl(get()) }
     single<LogoutUseCase> { LogoutUseCaseImpl(get(), get()) }
-    viewModel { LoginViewModel(get(), get()) }
+    viewModel { LoginViewModel(get(), get(), get()) }
 }

@@ -16,12 +16,16 @@ interface SurveyService {
 
     @GET("survey/offline")
     suspend fun getSurveyList(): List<Survey>
-
-    @GET("survey/{surveyId}/permission/all")
-    suspend fun getSurveyPermissionList(@Path("surveyId") surveyId: String): List<User>
+    @GET("/guest/survey/offline")
+    suspend fun getGuestSurveyList(): List<Survey>
 
     @POST("survey/{surveyId}/offline/design")
     suspend fun getSurveyDesign(
+        @Path("surveyId") surveyId: String,
+        @Body publishInfo: PublishInfo
+    ): SurveyDesign
+    @POST("/guest/survey/{surveyId}/offline/design")
+    suspend fun getGuestSurveyDesign(
         @Path("surveyId") surveyId: String,
         @Body publishInfo: PublishInfo
     ): SurveyDesign

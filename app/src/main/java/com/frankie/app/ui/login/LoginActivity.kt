@@ -40,6 +40,9 @@ class LoginActivity : AppCompatActivity() {
         binding.googleSignInButton.setOnClickListener {
             signIn()
         }
+        binding.tryGuestButton.setOnClickListener {
+            viewModel.tryAsGuest()
+        }
 
         binding.btnLogin.setLifecycle(lifecycle)
         binding.btnLogin.setOnClickListener {

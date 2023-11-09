@@ -8,6 +8,9 @@ interface SessionManager {
     fun getRefreshToken(): String?
     fun getUserIdOrThrow(): String
     fun saveSession(loginResponse: LoginResponse)
+    fun saveUserAsGuest()
+
+    fun isGuest(): Boolean = getUserIdOrThrow() == SessionManagerImpl.GUEST_USER_ID
 }
 
 class SessionManagerImpl(private val sharedPrefsManager: SharedPrefsManager) : SessionManager {
@@ -22,6 +25,15 @@ class SessionManagerImpl(private val sharedPrefsManager: SharedPrefsManager) : S
         sharedPrefsManager.userId = loginResponse.id
         sharedPrefsManager.activeToken = loginResponse.activeToken
         sharedPrefsManager.refreshToken = loginResponse.refreshToken
+    }
+
+    override fun saveUserAsGuest() {
+        sharedPrefsManager.userId = GUEST_USER_ID
+    }
+
+    companion object {
+        // some random uuid
+        const val GUEST_USER_ID = "6885978a-7a85-11ee-b962-0242ac120002"
     }
 
 }
