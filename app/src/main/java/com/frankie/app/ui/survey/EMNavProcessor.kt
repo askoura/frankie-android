@@ -27,7 +27,7 @@ import java.time.ZoneOffset
 import java.util.*
 
 @SuppressLint("SetJavaScriptEnabled")
-class EMNavProcessor constructor(
+class EMNavProcessor(
     activityContext: Context,
     val survey: SurveyData
 ) {
@@ -179,7 +179,7 @@ class EMNavProcessor constructor(
                     submitDate = null,
                     isSynced = false,
                     userId = userId,
-                    values = mapOf(),
+                    values = result.toSave,
                     events = if (survey.saveTimings) listOf(result.event) else emptyList()
                 )
             )
