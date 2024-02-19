@@ -1,0 +1,23 @@
+._imageGrid_gkz8d_1 {
+  margin-top: 16px;
+}
+
+._imageContainer_gkz8d_5 {
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+._rankContainer_gkz8d_11 {
+  display: table;
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid transparent;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+._rankValue_gkz8d_19 {
+  color: white;
+  display: table-cell;
+  vertical-align: middle;
+}

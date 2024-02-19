@@ -1,0 +1,90 @@
+._content_118tw_1 {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  background: #ffffff;
+  text-align: center;
+  padding: 3.75rem;
+}
+
+@media (max-width: 768px) {
+  ._content_118tw_1 {
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  ._content_118tw_1 {
+    padding: 1rem;
+  }
+}
+._errorText_118tw_21 {
+  color: #eb5757 !important;
+}
+
+._links_118tw_25 {
+  margin-top: 25px;
+  padding: 0px 20px;
+}
+
+._loginButton_118tw_30 {
+  background-color: #04bdf3 !important;
+  color: #fff !important;
+  border-radius: 13px !important;
+  padding: 12px !important;
+  text-transform: none !important;
+  font-weight: 700 !important;
+  font-size: 1.25rem !important;
+}
+._content_ud0i4_1 {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  background: #ffffff;
+  text-align: center;
+  padding: 3.75rem;
+}
+
+@media (max-width: 768px) {
+  ._content_ud0i4_1 {
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  ._content_ud0i4_1 {
+    padding: 1rem;
+  }
+}
+
+._formGroup_ud0i4_22 {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+._errorText_ud0i4_28 {
+  color: #eb5757 !important;
+}
+
+._successText_ud0i4_32 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  color: #27ae60;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+._signUpButton_ud0i4_44 {
+  background-color: #04bdf3 !important;
+  color: #fff !important;
+  border-radius: 13px !important;
+  padding: 12px !important;
+  text-transform: none !important;
+  font-weight: 700 !important;
+  font-size: 1.25rem !important;
+}

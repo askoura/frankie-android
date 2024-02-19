@@ -1,0 +1,15 @@
+._mainContainer_18m15_1 {
+  margin: auto;
+  padding-top: 16px;
+  max-width: 800px;
+  min-width: 300px;
+  height: calc(100vh - 80px);
+  overflow: auto;
+}
+
+._loadingWrapper_18m15_10 {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  padding-top: 100px;
+}

@@ -1,0 +1,17 @@
+._mainContainer_196br_1 {
+  margin: auto;
+  max-width: 800px;
+  min-width: 300px;
+  height: calc(100vh - 80px);
+  overflow: auto;
+}
+
+._content_196br_9 {
+  margin-top: 30px;
+}
+._addUser_6nyqh_1 {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  align-items: center;
+}

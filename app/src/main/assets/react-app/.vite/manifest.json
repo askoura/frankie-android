@@ -1,0 +1,1615 @@
+{
+  "_Checkbox-HSUkhdvK.js": {
+    "file": "assets/Checkbox-HSUkhdvK.js",
+    "imports": [
+      "index.html",
+      "_SwitchBase-naWSSwc-.js"
+    ]
+  },
+  "_Checkbox-legacy-8hCFdihe.js": {
+    "file": "assets/Checkbox-legacy-8hCFdihe.js",
+    "imports": [
+      "index-legacy.html",
+      "_SwitchBase-legacy-VpMr3A_z.js"
+    ]
+  },
+  "_DatePicker-AVKIEE0b.js": {
+    "file": "assets/DatePicker-AVKIEE0b.js",
+    "imports": [
+      "index.html",
+      "_Grid-q5yBxj4Y.js"
+    ]
+  },
+  "_DatePicker-legacy-9Ey9K3I7.js": {
+    "file": "assets/DatePicker-legacy-9Ey9K3I7.js",
+    "imports": [
+      "index-legacy.html",
+      "_Grid-legacy-ZQipiKyz.js"
+    ]
+  },
+  "_DateTimePicker-legacy-wQD1lg2H.js": {
+    "file": "assets/DateTimePicker-legacy-wQD1lg2H.js",
+    "imports": [
+      "index-legacy.html",
+      "_DatePicker-legacy-9Ey9K3I7.js"
+    ]
+  },
+  "_DateTimePicker-yJMNf3Kv.js": {
+    "file": "assets/DateTimePicker-yJMNf3Kv.js",
+    "imports": [
+      "index.html",
+      "_DatePicker-AVKIEE0b.js"
+    ]
+  },
+  "_Delete-L8nilwQO.js": {
+    "file": "assets/Delete-L8nilwQO.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_Delete-legacy-YNJSp6if.js": {
+    "file": "assets/Delete-legacy-YNJSp6if.js",
+    "imports": [
+      "index-legacy.html"
+    ]
+  },
+  "_ErrorOutlineOutlined-c8Q1J9r2.js": {
+    "file": "assets/ErrorOutlineOutlined-c8Q1J9r2.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_ErrorOutlineOutlined-legacy-c8N5-R3U.js": {
+    "file": "assets/ErrorOutlineOutlined-legacy-c8N5-R3U.js",
+    "imports": [
+      "index-legacy.html"
+    ]
+  },
+  "_ExpandMore-ekVSEAg2.js": {
+    "file": "assets/ExpandMore-ekVSEAg2.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_ExpandMore-legacy-OJtHsg1A.js": {
+    "file": "assets/ExpandMore-legacy-OJtHsg1A.js",
+    "imports": [
+      "index-legacy.html"
+    ]
+  },
+  "_FormControlLabel-B-3jdeza.js": {
+    "file": "assets/FormControlLabel-B-3jdeza.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_FormControlLabel-legacy-0Ne4M7i6.js": {
+    "file": "assets/FormControlLabel-legacy-0Ne4M7i6.js",
+    "imports": [
+      "index-legacy.html"
+    ]
+  },
+  "_FormGroup-A52SYRjs.js": {
+    "file": "assets/FormGroup-A52SYRjs.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_FormGroup-legacy-aaf9eppM.js": {
+    "file": "assets/FormGroup-legacy-aaf9eppM.js",
+    "imports": [
+      "index-legacy.html"
+    ]
+  },
+  "_Grid-legacy-ZQipiKyz.js": {
+    "file": "assets/Grid-legacy-ZQipiKyz.js",
+    "imports": [
+      "index-legacy.html"
+    ]
+  },
+  "_Grid-q5yBxj4Y.js": {
+    "file": "assets/Grid-q5yBxj4Y.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_Link-9ysrr75u.js": {
+    "file": "assets/Link-9ysrr75u.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_Link-legacy-XikCqkk_.js": {
+    "file": "assets/Link-legacy-XikCqkk_.js",
+    "imports": [
+      "index-legacy.html"
+    ]
+  },
+  "_LockOpen-legacy-0yg11qwQ.js": {
+    "file": "assets/LockOpen-legacy-0yg11qwQ.js",
+    "imports": [
+      "index-legacy.html"
+    ]
+  },
+  "_LockOpen-vv5QwsHD.js": {
+    "file": "assets/LockOpen-vv5QwsHD.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_LoginInput-G0ViwFtG.js": {
+    "file": "assets/LoginInput-G0ViwFtG.js",
+    "imports": [
+      "index.html",
+      "_TextField-lJ98NZsg.js",
+      "_DatePicker-AVKIEE0b.js"
+    ]
+  },
+  "_LoginInput-legacy-SHyBw1f-.js": {
+    "file": "assets/LoginInput-legacy-SHyBw1f-.js",
+    "imports": [
+      "index-legacy.html",
+      "_TextField-legacy-vL2OdS5Q.js",
+      "_DatePicker-legacy-9Ey9K3I7.js"
+    ]
+  },
+  "_Radio-legacy-vNTITdYm.js": {
+    "file": "assets/Radio-legacy-vNTITdYm.js",
+    "imports": [
+      "index-legacy.html",
+      "_SwitchBase-legacy-VpMr3A_z.js",
+      "_RadioGroupContext-legacy-1wuSM4bn.js"
+    ]
+  },
+  "_Radio-tPvf6SXM.js": {
+    "file": "assets/Radio-tPvf6SXM.js",
+    "imports": [
+      "index.html",
+      "_SwitchBase-naWSSwc-.js",
+      "_RadioGroupContext-FoUH8Stq.js"
+    ]
+  },
+  "_RadioGroup-GWUTYQXl.js": {
+    "file": "assets/RadioGroup-GWUTYQXl.js",
+    "imports": [
+      "index.html",
+      "_RadioGroupContext-FoUH8Stq.js",
+      "_FormGroup-A52SYRjs.js"
+    ]
+  },
+  "_RadioGroup-legacy-q7mgYtEx.js": {
+    "file": "assets/RadioGroup-legacy-q7mgYtEx.js",
+    "imports": [
+      "index-legacy.html",
+      "_RadioGroupContext-legacy-1wuSM4bn.js",
+      "_FormGroup-legacy-aaf9eppM.js"
+    ]
+  },
+  "_RadioGroupContext-FoUH8Stq.js": {
+    "file": "assets/RadioGroupContext-FoUH8Stq.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_RadioGroupContext-legacy-1wuSM4bn.js": {
+    "file": "assets/RadioGroupContext-legacy-1wuSM4bn.js",
+    "imports": [
+      "index-legacy.html"
+    ]
+  },
+  "_SCQArrayDesign.module-!~{00Z}~.js": {
+    "file": "assets/SCQArrayDesign-XieESCty.css",
+    "src": "_SCQArrayDesign.module-!~{00Z}~.js"
+  },
+  "_SCQArrayDesign.module-01m2Bg02.js": {
+    "css": [
+      "assets/SCQArrayDesign-XieESCty.css"
+    ],
+    "file": "assets/SCQArrayDesign.module-01m2Bg02.js"
+  },
+  "_SCQArrayDesign.module-legacy-24WqvMVt.js": {
+    "file": "assets/SCQArrayDesign.module-legacy-24WqvMVt.js"
+  },
+  "_Switch-HSw-OeVt.js": {
+    "file": "assets/Switch-HSw-OeVt.js",
+    "imports": [
+      "index.html",
+      "_SwitchBase-naWSSwc-.js"
+    ]
+  },
+  "_Switch-legacy-v-eJDCHU.js": {
+    "file": "assets/Switch-legacy-v-eJDCHU.js",
+    "imports": [
+      "index-legacy.html",
+      "_SwitchBase-legacy-VpMr3A_z.js"
+    ]
+  },
+  "_SwitchBase-legacy-VpMr3A_z.js": {
+    "file": "assets/SwitchBase-legacy-VpMr3A_z.js",
+    "imports": [
+      "index-legacy.html"
+    ]
+  },
+  "_SwitchBase-naWSSwc-.js": {
+    "file": "assets/SwitchBase-naWSSwc-.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_TableHead-OntCKomL.js": {
+    "file": "assets/TableHead-OntCKomL.js",
+    "imports": [
+      "index.html",
+      "_TableRow-esdE-LAL.js"
+    ]
+  },
+  "_TableHead-legacy-fccLWbma.js": {
+    "file": "assets/TableHead-legacy-fccLWbma.js",
+    "imports": [
+      "index-legacy.html",
+      "_TableRow-legacy-QjxmKuUL.js"
+    ]
+  },
+  "_TableRow-esdE-LAL.js": {
+    "file": "assets/TableRow-esdE-LAL.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_TableRow-legacy-QjxmKuUL.js": {
+    "file": "assets/TableRow-legacy-QjxmKuUL.js",
+    "imports": [
+      "index-legacy.html"
+    ]
+  },
+  "_TextField-lJ98NZsg.js": {
+    "file": "assets/TextField-lJ98NZsg.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_TextField-legacy-vL2OdS5Q.js": {
+    "file": "assets/TextField-legacy-vL2OdS5Q.js",
+    "imports": [
+      "index-legacy.html"
+    ]
+  },
+  "_UserService-armPMgIn.js": {
+    "file": "assets/UserService-armPMgIn.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_UserService-legacy-idayBd14.js": {
+    "file": "assets/UserService-legacy-idayBd14.js",
+    "imports": [
+      "index-legacy.html"
+    ]
+  },
+  "_Web-!~{002}~.js": {
+    "file": "assets/Web-WwEtpKi8.css",
+    "src": "_Web-!~{002}~.js"
+  },
+  "_Web-KOHZ4PI_.js": {
+    "css": [
+      "assets/Web-WwEtpKi8.css"
+    ],
+    "dynamicImports": [
+      "src/pages/manage/ResponsesSurvey/index.jsx",
+      "src/pages/manage/EditSurvey/index.jsx",
+      "src/pages/DesignSurvey/index.jsx",
+      "src/pages/manage/ResponseEvent/index.jsx",
+      "src/pages/PreviewSurvey/index.jsx",
+      "src/pages/Page404/index.jsx",
+      "src/pages/manage/ConfirmSignup/index.jsx",
+      "src/pages/manage/ForgotPassword/index.jsx",
+      "src/pages/manage/ResetPassword/index.jsx",
+      "src/pages/manage/Dashboard/index.jsx",
+      "src/pages/manage/Login/index.jsx",
+      "src/pages/manage/ManageUsers/index.jsx",
+      "src/pages/manage/AddEditUser/index.jsx",
+      "src/pages/manage/Profile/index.jsx",
+      "src/pages/manage/CreateSurvey/index.jsx",
+      "index.html"
+    ],
+    "file": "assets/Web-KOHZ4PI_.js",
+    "imports": [
+      "index.html",
+      "_DatePicker-AVKIEE0b.js",
+      "_TextField-lJ98NZsg.js",
+      "_FormControlLabel-B-3jdeza.js",
+      "_Checkbox-HSUkhdvK.js"
+    ],
+    "isDynamicEntry": true
+  },
+  "_Web-legacy-LDhM2X1u.js": {
+    "dynamicImports": [
+      "src/pages/manage/ResponsesSurvey/index-legacy.jsx",
+      "src/pages/manage/EditSurvey/index-legacy.jsx",
+      "src/pages/DesignSurvey/index-legacy.jsx",
+      "src/pages/manage/ResponseEvent/index-legacy.jsx",
+      "src/pages/PreviewSurvey/index-legacy.jsx",
+      "src/pages/Page404/index-legacy.jsx",
+      "src/pages/manage/ConfirmSignup/index-legacy.jsx",
+      "src/pages/manage/ForgotPassword/index-legacy.jsx",
+      "src/pages/manage/ResetPassword/index-legacy.jsx",
+      "src/pages/manage/Dashboard/index-legacy.jsx",
+      "src/pages/manage/Login/index-legacy.jsx",
+      "src/pages/manage/ManageUsers/index-legacy.jsx",
+      "src/pages/manage/AddEditUser/index-legacy.jsx",
+      "src/pages/manage/Profile/index-legacy.jsx",
+      "src/pages/manage/CreateSurvey/index-legacy.jsx",
+      "index-legacy.html"
+    ],
+    "file": "assets/Web-legacy-LDhM2X1u.js",
+    "imports": [
+      "index-legacy.html",
+      "_DatePicker-legacy-9Ey9K3I7.js",
+      "_TextField-legacy-vL2OdS5Q.js",
+      "_FormControlLabel-legacy-0Ne4M7i6.js",
+      "_Checkbox-legacy-8hCFdihe.js"
+    ],
+    "isDynamicEntry": true
+  },
+  "_index-!~{00O}~.js": {
+    "file": "assets/index-djBrhMUb.css",
+    "src": "_index-!~{00O}~.js"
+  },
+  "_index-!~{011}~.js": {
+    "file": "assets/index-vjgObjs8.css",
+    "src": "_index-!~{011}~.js"
+  },
+  "_index-8ARaTUZZ.js": {
+    "css": [
+      "assets/index-djBrhMUb.css"
+    ],
+    "file": "assets/index-8ARaTUZZ.js",
+    "imports": [
+      "index.html",
+      "_ErrorOutlineOutlined-c8Q1J9r2.js"
+    ]
+  },
+  "_index-DteEsK-S.js": {
+    "file": "assets/index-DteEsK-S.js",
+    "imports": [
+      "index.html",
+      "_index-nxaqe5zT.js"
+    ]
+  },
+  "_index-l1Dse2n9.js": {
+    "css": [
+      "assets/index-vjgObjs8.css"
+    ],
+    "file": "assets/index-l1Dse2n9.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_index-legacy--XG2187u.js": {
+    "file": "assets/index-legacy--XG2187u.js",
+    "imports": [
+      "index-legacy.html",
+      "_ErrorOutlineOutlined-legacy-c8N5-R3U.js"
+    ]
+  },
+  "_index-legacy-6OqQYde5.js": {
+    "file": "assets/index-legacy-6OqQYde5.js",
+    "imports": [
+      "index-legacy.html",
+      "_index-legacy-qlp3hc0T.js"
+    ]
+  },
+  "_index-legacy-D22paHDg.js": {
+    "file": "assets/index-legacy-D22paHDg.js",
+    "imports": [
+      "index-legacy.html"
+    ]
+  },
+  "_index-legacy-qlp3hc0T.js": {
+    "file": "assets/index-legacy-qlp3hc0T.js",
+    "imports": [
+      "index-legacy.html"
+    ]
+  },
+  "_index-nxaqe5zT.js": {
+    "file": "assets/index-nxaqe5zT.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_useDrop-legacy-lI5_t_vT.js": {
+    "file": "assets/useDrop-legacy-lI5_t_vT.js",
+    "imports": [
+      "index-legacy.html"
+    ]
+  },
+  "_useDrop-ll_87b05.js": {
+    "file": "assets/useDrop-ll_87b05.js",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "index-legacy.html": {
+    "dynamicImports": [
+      "_Web-legacy-LDhM2X1u.js",
+      "src/components/Questions/DateTime/DateTimeQuestion-legacy.jsx",
+      "src/components/Questions/Scq/Scq-legacy.jsx",
+      "src/components/Questions/SCQArray/SCQArray-legacy.jsx",
+      "src/components/Questions/Signature/Signature-legacy.jsx",
+      "src/components/Questions/PhotoCapture/PhotoCapture-legacy.jsx",
+      "src/components/Questions/VideoCapture/VideoCapture-legacy.jsx",
+      "src/components/Questions/Mcq/Mcq-legacy.jsx",
+      "src/components/Questions/Number/NumberQuestion-legacy.jsx",
+      "src/components/Questions/Text/TextQuestion-legacy.jsx",
+      "src/components/Questions/VideoDisplay/VideoDisplay-legacy.jsx",
+      "src/components/Questions/ImageDisplay/ImageDisplay-legacy.jsx",
+      "src/components/Questions/ImageRanking/ImageRanking-legacy.jsx",
+      "src/components/Questions/Paragraph/ParagraphQuestion-legacy.jsx",
+      "src/components/Questions/Barcode/Barcode-legacy.jsx",
+      "src/components/Questions/Email/EmailQuestion-legacy.jsx",
+      "src/components/Questions/ImageScq/ImageScq-legacy.jsx",
+      "src/components/Questions/ImageMcq/ImageMcq-legacy.jsx",
+      "src/components/Questions/Ranking/Ranking-legacy.jsx",
+      "src/components/Questions/NPS/NPS-legacy.jsx",
+      "src/components/run/Validation/index-legacy.jsx",
+      "src/components/Questions/FileUpload/FileUpload-legacy.jsx",
+      "src/components/Questions/IconScq/IconScq-legacy.jsx",
+      "src/components/Questions/IconMcq/IconMcq-legacy.jsx",
+      "src/components/Questions/SCQArray/SCQIconArray-legacy.jsx"
+    ],
+    "file": "assets/index-legacy-T3s18jo3.js",
+    "isDynamicEntry": true,
+    "isEntry": true,
+    "src": "index-legacy.html"
+  },
+  "index.html": {
+    "css": [
+      "assets/index-GHl8PYHn.css"
+    ],
+    "dynamicImports": [
+      "_Web-KOHZ4PI_.js",
+      "src/components/Questions/DateTime/DateTimeQuestion.jsx",
+      "src/components/Questions/Scq/Scq.jsx",
+      "src/components/Questions/SCQArray/SCQArray.jsx",
+      "src/components/Questions/Signature/Signature.jsx",
+      "src/components/Questions/PhotoCapture/PhotoCapture.jsx",
+      "src/components/Questions/VideoCapture/VideoCapture.jsx",
+      "src/components/Questions/Mcq/Mcq.jsx",
+      "src/components/Questions/Number/NumberQuestion.jsx",
+      "src/components/Questions/Text/TextQuestion.jsx",
+      "src/components/Questions/VideoDisplay/VideoDisplay.jsx",
+      "src/components/Questions/ImageDisplay/ImageDisplay.jsx",
+      "src/components/Questions/ImageRanking/ImageRanking.jsx",
+      "src/components/Questions/Paragraph/ParagraphQuestion.jsx",
+      "src/components/Questions/Barcode/Barcode.jsx",
+      "src/components/Questions/Email/EmailQuestion.jsx",
+      "src/components/Questions/ImageScq/ImageScq.jsx",
+      "src/components/Questions/ImageMcq/ImageMcq.jsx",
+      "src/components/Questions/Ranking/Ranking.jsx",
+      "src/components/Questions/NPS/NPS.jsx",
+      "src/components/run/Validation/index.jsx",
+      "src/components/Questions/FileUpload/FileUpload.jsx",
+      "src/components/Questions/IconScq/IconScq.jsx",
+      "src/components/Questions/IconMcq/IconMcq.jsx",
+      "src/components/Questions/SCQArray/SCQIconArray.jsx"
+    ],
+    "file": "assets/index-RBnW6nvi.js",
+    "isDynamicEntry": true,
+    "isEntry": true,
+    "src": "index.html"
+  },
+  "src/components/Questions/Barcode/Barcode-legacy.jsx": {
+    "file": "assets/Barcode-legacy-4CSht8Lh.js",
+    "imports": [
+      "index-legacy.html",
+      "_TextField-legacy-vL2OdS5Q.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/Barcode/Barcode-legacy.jsx"
+  },
+  "src/components/Questions/Barcode/Barcode.jsx": {
+    "css": [
+      "assets/PhotoCapture-uWZnxkt7.css"
+    ],
+    "file": "assets/Barcode-QGyVZOQF.js",
+    "imports": [
+      "index.html",
+      "_TextField-lJ98NZsg.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/Barcode/Barcode.jsx"
+  },
+  "src/components/Questions/DateTime/DateTimeQuestion-legacy.jsx": {
+    "file": "assets/DateTimeQuestion-legacy-WoL7OIFA.js",
+    "imports": [
+      "index-legacy.html",
+      "_DatePicker-legacy-9Ey9K3I7.js",
+      "_DateTimePicker-legacy-wQD1lg2H.js",
+      "_TextField-legacy-vL2OdS5Q.js",
+      "_Grid-legacy-ZQipiKyz.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/DateTime/DateTimeQuestion-legacy.jsx"
+  },
+  "src/components/Questions/DateTime/DateTimeQuestion.jsx": {
+    "css": [
+      "assets/DateTimeQuestion-L80j2LLS.css"
+    ],
+    "file": "assets/DateTimeQuestion-ajPi96qA.js",
+    "imports": [
+      "index.html",
+      "_DatePicker-AVKIEE0b.js",
+      "_DateTimePicker-yJMNf3Kv.js",
+      "_TextField-lJ98NZsg.js",
+      "_Grid-q5yBxj4Y.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/DateTime/DateTimeQuestion.jsx"
+  },
+  "src/components/Questions/Email/EmailQuestion-legacy.jsx": {
+    "file": "assets/EmailQuestion-legacy-syXZOTsG.js",
+    "imports": [
+      "index-legacy.html",
+      "_TextField-legacy-vL2OdS5Q.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/Email/EmailQuestion-legacy.jsx"
+  },
+  "src/components/Questions/Email/EmailQuestion.jsx": {
+    "css": [
+      "assets/EmailQuestion-ez1_4EOm.css"
+    ],
+    "file": "assets/EmailQuestion-nu_UfNCF.js",
+    "imports": [
+      "index.html",
+      "_TextField-lJ98NZsg.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/Email/EmailQuestion.jsx"
+  },
+  "src/components/Questions/FileUpload/FileUpload-legacy.jsx": {
+    "file": "assets/FileUpload-legacy-x51pcD1t.js",
+    "imports": [
+      "index-legacy.html",
+      "_index-legacy--XG2187u.js",
+      "_Link-legacy-XikCqkk_.js",
+      "_ErrorOutlineOutlined-legacy-c8N5-R3U.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/FileUpload/FileUpload-legacy.jsx"
+  },
+  "src/components/Questions/FileUpload/FileUpload.jsx": {
+    "file": "assets/FileUpload-upYri9ue.js",
+    "imports": [
+      "index.html",
+      "_index-8ARaTUZZ.js",
+      "_Link-9ysrr75u.js",
+      "_ErrorOutlineOutlined-c8Q1J9r2.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/FileUpload/FileUpload.jsx"
+  },
+  "src/components/Questions/IconMcq/IconMcq-legacy.jsx": {
+    "file": "assets/IconMcq-legacy-rjleFpNz.js",
+    "imports": [
+      "index-legacy.html",
+      "_Grid-legacy-ZQipiKyz.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/IconMcq/IconMcq-legacy.jsx"
+  },
+  "src/components/Questions/IconMcq/IconMcq.jsx": {
+    "css": [
+      "assets/IconScq-Sgf-jAcs.css"
+    ],
+    "file": "assets/IconMcq-8divSe4N.js",
+    "imports": [
+      "index.html",
+      "_Grid-q5yBxj4Y.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/IconMcq/IconMcq.jsx"
+  },
+  "src/components/Questions/IconScq/IconScq-legacy.jsx": {
+    "file": "assets/IconScq-legacy-GpX1ZLXq.js",
+    "imports": [
+      "index-legacy.html",
+      "_Grid-legacy-ZQipiKyz.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/IconScq/IconScq-legacy.jsx"
+  },
+  "src/components/Questions/IconScq/IconScq.jsx": {
+    "css": [
+      "assets/IconScq-Sgf-jAcs.css"
+    ],
+    "file": "assets/IconScq-WyPg_3zr.js",
+    "imports": [
+      "index.html",
+      "_Grid-q5yBxj4Y.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/IconScq/IconScq.jsx"
+  },
+  "src/components/Questions/ImageDisplay/ImageDisplay-legacy.jsx": {
+    "file": "assets/ImageDisplay-legacy-BE23Hjtv.js",
+    "imports": [
+      "index-legacy.html"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/ImageDisplay/ImageDisplay-legacy.jsx"
+  },
+  "src/components/Questions/ImageDisplay/ImageDisplay.jsx": {
+    "file": "assets/ImageDisplay-ODSdc42j.js",
+    "imports": [
+      "index.html"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/ImageDisplay/ImageDisplay.jsx"
+  },
+  "src/components/Questions/ImageMcq/ImageMcq-legacy.jsx": {
+    "file": "assets/ImageMcq-legacy-GwxirxTe.js",
+    "imports": [
+      "index-legacy.html",
+      "_Grid-legacy-ZQipiKyz.js",
+      "_Checkbox-legacy-8hCFdihe.js",
+      "_SwitchBase-legacy-VpMr3A_z.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/ImageMcq/ImageMcq-legacy.jsx"
+  },
+  "src/components/Questions/ImageMcq/ImageMcq.jsx": {
+    "css": [
+      "assets/ImageMcq-TenXz34n.css"
+    ],
+    "file": "assets/ImageMcq-m3dWbxZd.js",
+    "imports": [
+      "index.html",
+      "_Grid-q5yBxj4Y.js",
+      "_Checkbox-HSUkhdvK.js",
+      "_SwitchBase-naWSSwc-.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/ImageMcq/ImageMcq.jsx"
+  },
+  "src/components/Questions/ImageRanking/ImageRanking-legacy.jsx": {
+    "file": "assets/ImageRanking-legacy-9j9o2pZX.js",
+    "imports": [
+      "index-legacy.html",
+      "_Grid-legacy-ZQipiKyz.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/ImageRanking/ImageRanking-legacy.jsx"
+  },
+  "src/components/Questions/ImageRanking/ImageRanking.jsx": {
+    "css": [
+      "assets/ImageRanking-4xYzf_i9.css"
+    ],
+    "file": "assets/ImageRanking-Qot7yZ7o.js",
+    "imports": [
+      "index.html",
+      "_Grid-q5yBxj4Y.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/ImageRanking/ImageRanking.jsx"
+  },
+  "src/components/Questions/ImageScq/ImageScq-legacy.jsx": {
+    "file": "assets/ImageScq-legacy-NJH3ZFWC.js",
+    "imports": [
+      "index-legacy.html",
+      "_Grid-legacy-ZQipiKyz.js",
+      "_Radio-legacy-vNTITdYm.js",
+      "_SwitchBase-legacy-VpMr3A_z.js",
+      "_RadioGroupContext-legacy-1wuSM4bn.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/ImageScq/ImageScq-legacy.jsx"
+  },
+  "src/components/Questions/ImageScq/ImageScq.jsx": {
+    "css": [
+      "assets/ImageScq-YKqXyLi0.css"
+    ],
+    "file": "assets/ImageScq-WHWOTxdv.js",
+    "imports": [
+      "index.html",
+      "_Grid-q5yBxj4Y.js",
+      "_Radio-tPvf6SXM.js",
+      "_SwitchBase-naWSSwc-.js",
+      "_RadioGroupContext-FoUH8Stq.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/ImageScq/ImageScq.jsx"
+  },
+  "src/components/Questions/Mcq/Mcq-legacy.jsx": {
+    "file": "assets/Mcq-legacy-RMHvi4l2.js",
+    "imports": [
+      "index-legacy.html",
+      "src/components/run/Validation/index-legacy.jsx",
+      "_FormControlLabel-legacy-0Ne4M7i6.js",
+      "_Checkbox-legacy-8hCFdihe.js",
+      "_RadioGroup-legacy-q7mgYtEx.js",
+      "_TextField-legacy-vL2OdS5Q.js",
+      "_index-legacy--XG2187u.js",
+      "_ErrorOutlineOutlined-legacy-c8N5-R3U.js",
+      "_SwitchBase-legacy-VpMr3A_z.js",
+      "_RadioGroupContext-legacy-1wuSM4bn.js",
+      "_FormGroup-legacy-aaf9eppM.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/Mcq/Mcq-legacy.jsx"
+  },
+  "src/components/Questions/Mcq/Mcq.jsx": {
+    "file": "assets/Mcq-QKL6Mmno.js",
+    "imports": [
+      "index.html",
+      "src/components/run/Validation/index.jsx",
+      "_FormControlLabel-B-3jdeza.js",
+      "_Checkbox-HSUkhdvK.js",
+      "_RadioGroup-GWUTYQXl.js",
+      "_TextField-lJ98NZsg.js",
+      "_index-8ARaTUZZ.js",
+      "_ErrorOutlineOutlined-c8Q1J9r2.js",
+      "_SwitchBase-naWSSwc-.js",
+      "_RadioGroupContext-FoUH8Stq.js",
+      "_FormGroup-A52SYRjs.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/Mcq/Mcq.jsx"
+  },
+  "src/components/Questions/NPS/NPS-legacy.jsx": {
+    "file": "assets/NPS-legacy-xEuOAdfK.js",
+    "imports": [
+      "index-legacy.html"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/NPS/NPS-legacy.jsx"
+  },
+  "src/components/Questions/NPS/NPS.jsx": {
+    "css": [
+      "assets/NPS-O9Aig2hB.css"
+    ],
+    "file": "assets/NPS-92cnl-iz.js",
+    "imports": [
+      "index.html"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/NPS/NPS.jsx"
+  },
+  "src/components/Questions/Number/NumberQuestion-legacy.jsx": {
+    "file": "assets/NumberQuestion-legacy-cYrZKTds.js",
+    "imports": [
+      "index-legacy.html",
+      "_TextField-legacy-vL2OdS5Q.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/Number/NumberQuestion-legacy.jsx"
+  },
+  "src/components/Questions/Number/NumberQuestion.jsx": {
+    "css": [
+      "assets/NumberQuestion-6lQLOkYS.css"
+    ],
+    "file": "assets/NumberQuestion-_z3Z_Fn1.js",
+    "imports": [
+      "index.html",
+      "_TextField-lJ98NZsg.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/Number/NumberQuestion.jsx"
+  },
+  "src/components/Questions/Paragraph/ParagraphQuestion-legacy.jsx": {
+    "file": "assets/ParagraphQuestion-legacy-xdfKiICJ.js",
+    "imports": [
+      "index-legacy.html"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/Paragraph/ParagraphQuestion-legacy.jsx"
+  },
+  "src/components/Questions/Paragraph/ParagraphQuestion.jsx": {
+    "css": [
+      "assets/ParagraphQuestion-GnW4EwkX.css"
+    ],
+    "file": "assets/ParagraphQuestion-KAjPu5lB.js",
+    "imports": [
+      "index.html"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/Paragraph/ParagraphQuestion.jsx"
+  },
+  "src/components/Questions/PhotoCapture/PhotoCapture-legacy.jsx": {
+    "file": "assets/PhotoCapture-legacy-eSozzzFu.js",
+    "imports": [
+      "index-legacy.html"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/PhotoCapture/PhotoCapture-legacy.jsx"
+  },
+  "src/components/Questions/PhotoCapture/PhotoCapture.jsx": {
+    "css": [
+      "assets/PhotoCapture-uWZnxkt7.css"
+    ],
+    "file": "assets/PhotoCapture-QEhLcIMV.js",
+    "imports": [
+      "index.html"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/PhotoCapture/PhotoCapture.jsx"
+  },
+  "src/components/Questions/Ranking/Ranking-legacy.jsx": {
+    "file": "assets/Ranking-legacy-6gJEJcMr.js",
+    "imports": [
+      "index-legacy.html",
+      "_useDrop-legacy-lI5_t_vT.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/Ranking/Ranking-legacy.jsx"
+  },
+  "src/components/Questions/Ranking/Ranking.jsx": {
+    "css": [
+      "assets/Ranking-ePaIjcGd.css"
+    ],
+    "file": "assets/Ranking-7IhKqY56.js",
+    "imports": [
+      "index.html",
+      "_useDrop-ll_87b05.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/Ranking/Ranking.jsx"
+  },
+  "src/components/Questions/SCQArray/SCQArray-legacy.jsx": {
+    "file": "assets/SCQArray-legacy-HQxKobze.js",
+    "imports": [
+      "index-legacy.html",
+      "src/components/run/Validation/index-legacy.jsx",
+      "_TableRow-legacy-QjxmKuUL.js",
+      "_TableHead-legacy-fccLWbma.js",
+      "_Radio-legacy-vNTITdYm.js",
+      "_index-legacy--XG2187u.js",
+      "_ErrorOutlineOutlined-legacy-c8N5-R3U.js",
+      "_SwitchBase-legacy-VpMr3A_z.js",
+      "_RadioGroupContext-legacy-1wuSM4bn.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/SCQArray/SCQArray-legacy.jsx"
+  },
+  "src/components/Questions/SCQArray/SCQArray.jsx": {
+    "file": "assets/SCQArray-jeuguxNS.js",
+    "imports": [
+      "index.html",
+      "src/components/run/Validation/index.jsx",
+      "_TableRow-esdE-LAL.js",
+      "_TableHead-OntCKomL.js",
+      "_Radio-tPvf6SXM.js",
+      "_index-8ARaTUZZ.js",
+      "_ErrorOutlineOutlined-c8Q1J9r2.js",
+      "_SwitchBase-naWSSwc-.js",
+      "_RadioGroupContext-FoUH8Stq.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/SCQArray/SCQArray.jsx"
+  },
+  "src/components/Questions/SCQArray/SCQIconArray-legacy.jsx": {
+    "file": "assets/SCQIconArray-legacy-PCa10eEg.js",
+    "imports": [
+      "index-legacy.html",
+      "src/components/run/Validation/index-legacy.jsx",
+      "_SCQArrayDesign.module-legacy-24WqvMVt.js",
+      "_TableRow-legacy-QjxmKuUL.js",
+      "_index-legacy--XG2187u.js",
+      "_ErrorOutlineOutlined-legacy-c8N5-R3U.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/SCQArray/SCQIconArray-legacy.jsx"
+  },
+  "src/components/Questions/SCQArray/SCQIconArray.jsx": {
+    "file": "assets/SCQIconArray-zd-_EQqN.js",
+    "imports": [
+      "index.html",
+      "src/components/run/Validation/index.jsx",
+      "_SCQArrayDesign.module-01m2Bg02.js",
+      "_TableRow-esdE-LAL.js",
+      "_index-8ARaTUZZ.js",
+      "_ErrorOutlineOutlined-c8Q1J9r2.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/SCQArray/SCQIconArray.jsx"
+  },
+  "src/components/Questions/Scq/Scq-legacy.jsx": {
+    "file": "assets/Scq-legacy-dJS_xN1A.js",
+    "imports": [
+      "index-legacy.html",
+      "src/components/run/Validation/index-legacy.jsx",
+      "_RadioGroup-legacy-q7mgYtEx.js",
+      "_FormControlLabel-legacy-0Ne4M7i6.js",
+      "_Radio-legacy-vNTITdYm.js",
+      "_TextField-legacy-vL2OdS5Q.js",
+      "_index-legacy--XG2187u.js",
+      "_ErrorOutlineOutlined-legacy-c8N5-R3U.js",
+      "_RadioGroupContext-legacy-1wuSM4bn.js",
+      "_FormGroup-legacy-aaf9eppM.js",
+      "_SwitchBase-legacy-VpMr3A_z.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/Scq/Scq-legacy.jsx"
+  },
+  "src/components/Questions/Scq/Scq.jsx": {
+    "file": "assets/Scq-jg5AdHwM.js",
+    "imports": [
+      "index.html",
+      "src/components/run/Validation/index.jsx",
+      "_RadioGroup-GWUTYQXl.js",
+      "_FormControlLabel-B-3jdeza.js",
+      "_Radio-tPvf6SXM.js",
+      "_TextField-lJ98NZsg.js",
+      "_index-8ARaTUZZ.js",
+      "_ErrorOutlineOutlined-c8Q1J9r2.js",
+      "_RadioGroupContext-FoUH8Stq.js",
+      "_FormGroup-A52SYRjs.js",
+      "_SwitchBase-naWSSwc-.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/Scq/Scq.jsx"
+  },
+  "src/components/Questions/Signature/Signature-legacy.jsx": {
+    "file": "assets/Signature-legacy-rXOPMzWk.js",
+    "imports": [
+      "index-legacy.html",
+      "_index-legacy-qlp3hc0T.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/Signature/Signature-legacy.jsx"
+  },
+  "src/components/Questions/Signature/Signature.jsx": {
+    "css": [
+      "assets/Signature-IFVCyzOv.css"
+    ],
+    "file": "assets/Signature-Prk4-VKW.js",
+    "imports": [
+      "index.html",
+      "_index-nxaqe5zT.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/Signature/Signature.jsx"
+  },
+  "src/components/Questions/Text/TextQuestion-legacy.jsx": {
+    "file": "assets/TextQuestion-legacy-OFaH7D89.js",
+    "imports": [
+      "index-legacy.html",
+      "_TextField-legacy-vL2OdS5Q.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/Text/TextQuestion-legacy.jsx"
+  },
+  "src/components/Questions/Text/TextQuestion.jsx": {
+    "css": [
+      "assets/TextQuestion-xl5bfnYD.css"
+    ],
+    "file": "assets/TextQuestion-wlMIYBgG.js",
+    "imports": [
+      "index.html",
+      "_TextField-lJ98NZsg.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/Text/TextQuestion.jsx"
+  },
+  "src/components/Questions/VideoCapture/VideoCapture-legacy.jsx": {
+    "file": "assets/VideoCapture-legacy-k9hXJrZd.js",
+    "imports": [
+      "index-legacy.html",
+      "_index-legacy-6OqQYde5.js",
+      "_index-legacy-qlp3hc0T.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/VideoCapture/VideoCapture-legacy.jsx"
+  },
+  "src/components/Questions/VideoCapture/VideoCapture.jsx": {
+    "css": [
+      "assets/PhotoCapture-uWZnxkt7.css"
+    ],
+    "file": "assets/VideoCapture-f2pe5iN8.js",
+    "imports": [
+      "index.html",
+      "_index-DteEsK-S.js",
+      "_index-nxaqe5zT.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/VideoCapture/VideoCapture.jsx"
+  },
+  "src/components/Questions/VideoDisplay/VideoDisplay-legacy.jsx": {
+    "file": "assets/VideoDisplay-legacy-GkOxFRQq.js",
+    "imports": [
+      "index-legacy.html",
+      "_index-legacy-6OqQYde5.js",
+      "_index-legacy-qlp3hc0T.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/VideoDisplay/VideoDisplay-legacy.jsx"
+  },
+  "src/components/Questions/VideoDisplay/VideoDisplay.jsx": {
+    "file": "assets/VideoDisplay-ZOSIVktg.js",
+    "imports": [
+      "index.html",
+      "_index-DteEsK-S.js",
+      "_index-nxaqe5zT.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/Questions/VideoDisplay/VideoDisplay.jsx"
+  },
+  "src/components/run/Validation/index-legacy.jsx": {
+    "file": "assets/index-legacy-JNavHwgI.js",
+    "imports": [
+      "index-legacy.html",
+      "_index-legacy--XG2187u.js",
+      "_ErrorOutlineOutlined-legacy-c8N5-R3U.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/run/Validation/index-legacy.jsx"
+  },
+  "src/components/run/Validation/index.jsx": {
+    "file": "assets/index-LD7W28vy.js",
+    "imports": [
+      "index.html",
+      "_index-8ARaTUZZ.js",
+      "_ErrorOutlineOutlined-c8Q1J9r2.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/components/run/Validation/index.jsx"
+  },
+  "src/pages/DesignSurvey/index-legacy.jsx": {
+    "file": "assets/index-legacy-c0J9P0Pp.js",
+    "imports": [
+      "index-legacy.html",
+      "_Web-legacy-LDhM2X1u.js",
+      "_DatePicker-legacy-9Ey9K3I7.js",
+      "_TextField-legacy-vL2OdS5Q.js",
+      "_SCQArrayDesign.module-legacy-24WqvMVt.js",
+      "_TableRow-legacy-QjxmKuUL.js",
+      "_TableHead-legacy-fccLWbma.js",
+      "_Radio-legacy-vNTITdYm.js",
+      "_useDrop-legacy-lI5_t_vT.js",
+      "_index-legacy-6OqQYde5.js",
+      "_Grid-legacy-ZQipiKyz.js",
+      "_ExpandMore-legacy-OJtHsg1A.js",
+      "_Switch-legacy-v-eJDCHU.js",
+      "_FormControlLabel-legacy-0Ne4M7i6.js",
+      "_Checkbox-legacy-8hCFdihe.js",
+      "_index-legacy-qlp3hc0T.js",
+      "_DateTimePicker-legacy-wQD1lg2H.js",
+      "_Delete-legacy-YNJSp6if.js",
+      "_ErrorOutlineOutlined-legacy-c8N5-R3U.js",
+      "_SwitchBase-legacy-VpMr3A_z.js",
+      "_RadioGroupContext-legacy-1wuSM4bn.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/DesignSurvey/index-legacy.jsx"
+  },
+  "src/pages/DesignSurvey/index.jsx": {
+    "css": [
+      "assets/index-9SH8pjyC.css"
+    ],
+    "file": "assets/index-je9OwtBW.js",
+    "imports": [
+      "index.html",
+      "_Web-KOHZ4PI_.js",
+      "_DatePicker-AVKIEE0b.js",
+      "_TextField-lJ98NZsg.js",
+      "_SCQArrayDesign.module-01m2Bg02.js",
+      "_TableRow-esdE-LAL.js",
+      "_TableHead-OntCKomL.js",
+      "_Radio-tPvf6SXM.js",
+      "_useDrop-ll_87b05.js",
+      "_index-DteEsK-S.js",
+      "_Grid-q5yBxj4Y.js",
+      "_ExpandMore-ekVSEAg2.js",
+      "_Switch-HSw-OeVt.js",
+      "_FormControlLabel-B-3jdeza.js",
+      "_Checkbox-HSUkhdvK.js",
+      "_index-nxaqe5zT.js",
+      "_DateTimePicker-yJMNf3Kv.js",
+      "_Delete-L8nilwQO.js",
+      "_ErrorOutlineOutlined-c8Q1J9r2.js",
+      "_SwitchBase-naWSSwc-.js",
+      "_RadioGroupContext-FoUH8Stq.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/DesignSurvey/index.jsx"
+  },
+  "src/pages/Page404/index-legacy.jsx": {
+    "file": "assets/index-legacy-ovBVoF0b.js",
+    "imports": [
+      "index-legacy.html"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/Page404/index-legacy.jsx"
+  },
+  "src/pages/Page404/index.jsx": {
+    "css": [
+      "assets/index-SQhNpQ0n.css"
+    ],
+    "file": "assets/index-9vfmWr38.js",
+    "imports": [
+      "index.html"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/Page404/index.jsx"
+  },
+  "src/pages/PreviewSurvey/index-legacy.jsx": {
+    "file": "assets/index-legacy-UFP4vvH4.js",
+    "imports": [
+      "index-legacy.html"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/PreviewSurvey/index-legacy.jsx"
+  },
+  "src/pages/PreviewSurvey/index.jsx": {
+    "css": [
+      "assets/index-V2rYHao1.css"
+    ],
+    "file": "assets/index-5A3Z6KBE.js",
+    "imports": [
+      "index.html"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/PreviewSurvey/index.jsx"
+  },
+  "src/pages/manage/AddEditUser/index-legacy.jsx": {
+    "file": "assets/index-legacy-EQG13pIm.js",
+    "imports": [
+      "index-legacy.html",
+      "_UserService-legacy-idayBd14.js",
+      "_Web-legacy-LDhM2X1u.js",
+      "_FormGroup-legacy-aaf9eppM.js",
+      "_TextField-legacy-vL2OdS5Q.js",
+      "_FormControlLabel-legacy-0Ne4M7i6.js",
+      "_Checkbox-legacy-8hCFdihe.js",
+      "_DatePicker-legacy-9Ey9K3I7.js",
+      "_Grid-legacy-ZQipiKyz.js",
+      "_SwitchBase-legacy-VpMr3A_z.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/AddEditUser/index-legacy.jsx"
+  },
+  "src/pages/manage/AddEditUser/index.jsx": {
+    "css": [
+      "assets/index-OhxKhWMW.css"
+    ],
+    "file": "assets/index-SPZeHmaE.js",
+    "imports": [
+      "index.html",
+      "_UserService-armPMgIn.js",
+      "_Web-KOHZ4PI_.js",
+      "_FormGroup-A52SYRjs.js",
+      "_TextField-lJ98NZsg.js",
+      "_FormControlLabel-B-3jdeza.js",
+      "_Checkbox-HSUkhdvK.js",
+      "_DatePicker-AVKIEE0b.js",
+      "_Grid-q5yBxj4Y.js",
+      "_SwitchBase-naWSSwc-.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/AddEditUser/index.jsx"
+  },
+  "src/pages/manage/ConfirmSignup/index-legacy.jsx": {
+    "file": "assets/index-legacy-N72ZFWyl.js",
+    "imports": [
+      "index-legacy.html",
+      "_Web-legacy-LDhM2X1u.js",
+      "_DatePicker-legacy-9Ey9K3I7.js",
+      "_Grid-legacy-ZQipiKyz.js",
+      "_TextField-legacy-vL2OdS5Q.js",
+      "_FormControlLabel-legacy-0Ne4M7i6.js",
+      "_Checkbox-legacy-8hCFdihe.js",
+      "_SwitchBase-legacy-VpMr3A_z.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/ConfirmSignup/index-legacy.jsx"
+  },
+  "src/pages/manage/ConfirmSignup/index.jsx": {
+    "css": [
+      "assets/index-QuCZ0ypF.css"
+    ],
+    "file": "assets/index-pWNc0u2X.js",
+    "imports": [
+      "index.html",
+      "_Web-KOHZ4PI_.js",
+      "_DatePicker-AVKIEE0b.js",
+      "_Grid-q5yBxj4Y.js",
+      "_TextField-lJ98NZsg.js",
+      "_FormControlLabel-B-3jdeza.js",
+      "_Checkbox-HSUkhdvK.js",
+      "_SwitchBase-naWSSwc-.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/ConfirmSignup/index.jsx"
+  },
+  "src/pages/manage/CreateSurvey/index-legacy.jsx": {
+    "file": "assets/index-legacy-lHW6xx8M.js",
+    "imports": [
+      "index-legacy.html",
+      "_Web-legacy-LDhM2X1u.js",
+      "_FormGroup-legacy-aaf9eppM.js",
+      "_TextField-legacy-vL2OdS5Q.js",
+      "_FormControlLabel-legacy-0Ne4M7i6.js",
+      "_DatePicker-legacy-9Ey9K3I7.js",
+      "_Grid-legacy-ZQipiKyz.js",
+      "_Checkbox-legacy-8hCFdihe.js",
+      "_SwitchBase-legacy-VpMr3A_z.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/CreateSurvey/index-legacy.jsx"
+  },
+  "src/pages/manage/CreateSurvey/index.jsx": {
+    "css": [
+      "assets/index-ulAxI3b4.css"
+    ],
+    "file": "assets/index-V8KW_yr5.js",
+    "imports": [
+      "index.html",
+      "_Web-KOHZ4PI_.js",
+      "_FormGroup-A52SYRjs.js",
+      "_TextField-lJ98NZsg.js",
+      "_FormControlLabel-B-3jdeza.js",
+      "_DatePicker-AVKIEE0b.js",
+      "_Grid-q5yBxj4Y.js",
+      "_Checkbox-HSUkhdvK.js",
+      "_SwitchBase-naWSSwc-.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/CreateSurvey/index.jsx"
+  },
+  "src/pages/manage/Dashboard/index-legacy.jsx": {
+    "file": "assets/index-legacy-rCsukwH7.js",
+    "imports": [
+      "index-legacy.html",
+      "_UserService-legacy-idayBd14.js",
+      "_Web-legacy-LDhM2X1u.js",
+      "_FormControlLabel-legacy-0Ne4M7i6.js",
+      "_DatePicker-legacy-9Ey9K3I7.js",
+      "_Grid-legacy-ZQipiKyz.js",
+      "_TextField-legacy-vL2OdS5Q.js",
+      "_Checkbox-legacy-8hCFdihe.js",
+      "_SwitchBase-legacy-VpMr3A_z.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/Dashboard/index-legacy.jsx"
+  },
+  "src/pages/manage/Dashboard/index.jsx": {
+    "css": [
+      "assets/index-MfT-U4B8.css"
+    ],
+    "file": "assets/index-XBlUbiBf.js",
+    "imports": [
+      "index.html",
+      "_UserService-armPMgIn.js",
+      "_Web-KOHZ4PI_.js",
+      "_FormControlLabel-B-3jdeza.js",
+      "_DatePicker-AVKIEE0b.js",
+      "_Grid-q5yBxj4Y.js",
+      "_TextField-lJ98NZsg.js",
+      "_Checkbox-HSUkhdvK.js",
+      "_SwitchBase-naWSSwc-.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/Dashboard/index.jsx"
+  },
+  "src/pages/manage/EditSurvey/index-legacy.jsx": {
+    "file": "assets/index-legacy-_hhO3ahP.js",
+    "imports": [
+      "index-legacy.html",
+      "_ExpandMore-legacy-OJtHsg1A.js",
+      "_Web-legacy-LDhM2X1u.js",
+      "_Switch-legacy-v-eJDCHU.js",
+      "_index-legacy-D22paHDg.js",
+      "_UserService-legacy-idayBd14.js",
+      "_TableRow-legacy-QjxmKuUL.js",
+      "_TableHead-legacy-fccLWbma.js",
+      "_TextField-legacy-vL2OdS5Q.js",
+      "_FormControlLabel-legacy-0Ne4M7i6.js",
+      "_DatePicker-legacy-9Ey9K3I7.js",
+      "_Grid-legacy-ZQipiKyz.js",
+      "_Checkbox-legacy-8hCFdihe.js",
+      "_SwitchBase-legacy-VpMr3A_z.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/EditSurvey/index-legacy.jsx"
+  },
+  "src/pages/manage/EditSurvey/index.jsx": {
+    "css": [
+      "assets/index-AFo9VDws.css"
+    ],
+    "file": "assets/index-kLxQCiAJ.js",
+    "imports": [
+      "index.html",
+      "_ExpandMore-ekVSEAg2.js",
+      "_Web-KOHZ4PI_.js",
+      "_Switch-HSw-OeVt.js",
+      "_index-l1Dse2n9.js",
+      "_UserService-armPMgIn.js",
+      "_TableRow-esdE-LAL.js",
+      "_TableHead-OntCKomL.js",
+      "_TextField-lJ98NZsg.js",
+      "_FormControlLabel-B-3jdeza.js",
+      "_DatePicker-AVKIEE0b.js",
+      "_Grid-q5yBxj4Y.js",
+      "_Checkbox-HSUkhdvK.js",
+      "_SwitchBase-naWSSwc-.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/EditSurvey/index.jsx"
+  },
+  "src/pages/manage/ForgotPassword/index-legacy.jsx": {
+    "file": "assets/index-legacy-YSqPA7dG.js",
+    "imports": [
+      "index-legacy.html",
+      "_Web-legacy-LDhM2X1u.js",
+      "_LoginInput-legacy-SHyBw1f-.js",
+      "_FormGroup-legacy-aaf9eppM.js",
+      "_TextField-legacy-vL2OdS5Q.js",
+      "_DatePicker-legacy-9Ey9K3I7.js",
+      "_Grid-legacy-ZQipiKyz.js",
+      "_FormControlLabel-legacy-0Ne4M7i6.js",
+      "_Checkbox-legacy-8hCFdihe.js",
+      "_SwitchBase-legacy-VpMr3A_z.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/ForgotPassword/index-legacy.jsx"
+  },
+  "src/pages/manage/ForgotPassword/index.jsx": {
+    "css": [
+      "assets/index-KxXYN4GO.css"
+    ],
+    "file": "assets/index-x_tI_FmS.js",
+    "imports": [
+      "index.html",
+      "_Web-KOHZ4PI_.js",
+      "_LoginInput-G0ViwFtG.js",
+      "_FormGroup-A52SYRjs.js",
+      "_TextField-lJ98NZsg.js",
+      "_DatePicker-AVKIEE0b.js",
+      "_Grid-q5yBxj4Y.js",
+      "_FormControlLabel-B-3jdeza.js",
+      "_Checkbox-HSUkhdvK.js",
+      "_SwitchBase-naWSSwc-.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/ForgotPassword/index.jsx"
+  },
+  "src/pages/manage/Login/index-legacy.jsx": {
+    "file": "assets/index-legacy-KUOgzt_x.js",
+    "imports": [
+      "index-legacy.html",
+      "_Web-legacy-LDhM2X1u.js",
+      "_LoginInput-legacy-SHyBw1f-.js",
+      "_FormGroup-legacy-aaf9eppM.js",
+      "_TextField-legacy-vL2OdS5Q.js",
+      "_LockOpen-legacy-0yg11qwQ.js",
+      "_DatePicker-legacy-9Ey9K3I7.js",
+      "_FormControlLabel-legacy-0Ne4M7i6.js",
+      "_Link-legacy-XikCqkk_.js",
+      "_Checkbox-legacy-8hCFdihe.js",
+      "_SwitchBase-legacy-VpMr3A_z.js",
+      "_Grid-legacy-ZQipiKyz.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/Login/index-legacy.jsx"
+  },
+  "src/pages/manage/Login/index.jsx": {
+    "css": [
+      "assets/index-Pe8tjntX.css"
+    ],
+    "file": "assets/index-1SjB6EW-.js",
+    "imports": [
+      "index.html",
+      "_Web-KOHZ4PI_.js",
+      "_LoginInput-G0ViwFtG.js",
+      "_FormGroup-A52SYRjs.js",
+      "_TextField-lJ98NZsg.js",
+      "_LockOpen-vv5QwsHD.js",
+      "_DatePicker-AVKIEE0b.js",
+      "_FormControlLabel-B-3jdeza.js",
+      "_Link-9ysrr75u.js",
+      "_Checkbox-HSUkhdvK.js",
+      "_SwitchBase-naWSSwc-.js",
+      "_Grid-q5yBxj4Y.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/Login/index.jsx"
+  },
+  "src/pages/manage/ManageUsers/index-legacy.jsx": {
+    "file": "assets/index-legacy-u0S3Cv1J.js",
+    "imports": [
+      "index-legacy.html",
+      "_UserService-legacy-idayBd14.js",
+      "_index-legacy-D22paHDg.js",
+      "_TableRow-legacy-QjxmKuUL.js",
+      "_TableHead-legacy-fccLWbma.js",
+      "_Web-legacy-LDhM2X1u.js",
+      "_DatePicker-legacy-9Ey9K3I7.js",
+      "_Grid-legacy-ZQipiKyz.js",
+      "_TextField-legacy-vL2OdS5Q.js",
+      "_FormControlLabel-legacy-0Ne4M7i6.js",
+      "_Checkbox-legacy-8hCFdihe.js",
+      "_SwitchBase-legacy-VpMr3A_z.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/ManageUsers/index-legacy.jsx"
+  },
+  "src/pages/manage/ManageUsers/index.jsx": {
+    "css": [
+      "assets/index-I0gYrnx6.css"
+    ],
+    "file": "assets/index-74J_X1nf.js",
+    "imports": [
+      "index.html",
+      "_UserService-armPMgIn.js",
+      "_index-l1Dse2n9.js",
+      "_TableRow-esdE-LAL.js",
+      "_TableHead-OntCKomL.js",
+      "_Web-KOHZ4PI_.js",
+      "_DatePicker-AVKIEE0b.js",
+      "_Grid-q5yBxj4Y.js",
+      "_TextField-lJ98NZsg.js",
+      "_FormControlLabel-B-3jdeza.js",
+      "_Checkbox-HSUkhdvK.js",
+      "_SwitchBase-naWSSwc-.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/ManageUsers/index.jsx"
+  },
+  "src/pages/manage/Profile/index-legacy.jsx": {
+    "file": "assets/index-legacy-T3IUmE8M.js",
+    "imports": [
+      "index-legacy.html",
+      "_UserService-legacy-idayBd14.js",
+      "_Web-legacy-LDhM2X1u.js",
+      "_FormControlLabel-legacy-0Ne4M7i6.js",
+      "_FormGroup-legacy-aaf9eppM.js",
+      "_TextField-legacy-vL2OdS5Q.js",
+      "_DatePicker-legacy-9Ey9K3I7.js",
+      "_LockOpen-legacy-0yg11qwQ.js",
+      "_Checkbox-legacy-8hCFdihe.js",
+      "_SwitchBase-legacy-VpMr3A_z.js",
+      "_Grid-legacy-ZQipiKyz.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/Profile/index-legacy.jsx"
+  },
+  "src/pages/manage/Profile/index.jsx": {
+    "css": [
+      "assets/index-YpQs6TzW.css"
+    ],
+    "file": "assets/index-r9HYgAs3.js",
+    "imports": [
+      "index.html",
+      "_UserService-armPMgIn.js",
+      "_Web-KOHZ4PI_.js",
+      "_FormControlLabel-B-3jdeza.js",
+      "_FormGroup-A52SYRjs.js",
+      "_TextField-lJ98NZsg.js",
+      "_DatePicker-AVKIEE0b.js",
+      "_LockOpen-vv5QwsHD.js",
+      "_Checkbox-HSUkhdvK.js",
+      "_SwitchBase-naWSSwc-.js",
+      "_Grid-q5yBxj4Y.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/Profile/index.jsx"
+  },
+  "src/pages/manage/ResetPassword/index-legacy.jsx": {
+    "file": "assets/index-legacy-fPWsFtGr.js",
+    "imports": [
+      "index-legacy.html",
+      "_Web-legacy-LDhM2X1u.js",
+      "_FormGroup-legacy-aaf9eppM.js",
+      "_DatePicker-legacy-9Ey9K3I7.js",
+      "_TextField-legacy-vL2OdS5Q.js",
+      "_FormControlLabel-legacy-0Ne4M7i6.js",
+      "_Checkbox-legacy-8hCFdihe.js",
+      "_SwitchBase-legacy-VpMr3A_z.js",
+      "_Grid-legacy-ZQipiKyz.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/ResetPassword/index-legacy.jsx"
+  },
+  "src/pages/manage/ResetPassword/index.jsx": {
+    "css": [
+      "assets/index-ke1SKkTq.css"
+    ],
+    "file": "assets/index-yC4p37tE.js",
+    "imports": [
+      "index.html",
+      "_Web-KOHZ4PI_.js",
+      "_FormGroup-A52SYRjs.js",
+      "_DatePicker-AVKIEE0b.js",
+      "_TextField-lJ98NZsg.js",
+      "_FormControlLabel-B-3jdeza.js",
+      "_Checkbox-HSUkhdvK.js",
+      "_SwitchBase-naWSSwc-.js",
+      "_Grid-q5yBxj4Y.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/ResetPassword/index.jsx"
+  },
+  "src/pages/manage/ResponseEvent/index-legacy.jsx": {
+    "file": "assets/index-legacy-B8zgDPpJ.js",
+    "imports": [
+      "index-legacy.html",
+      "_Web-legacy-LDhM2X1u.js",
+      "_TableRow-legacy-QjxmKuUL.js",
+      "_TableHead-legacy-fccLWbma.js",
+      "_DatePicker-legacy-9Ey9K3I7.js",
+      "_Grid-legacy-ZQipiKyz.js",
+      "_TextField-legacy-vL2OdS5Q.js",
+      "_FormControlLabel-legacy-0Ne4M7i6.js",
+      "_Checkbox-legacy-8hCFdihe.js",
+      "_SwitchBase-legacy-VpMr3A_z.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/ResponseEvent/index-legacy.jsx"
+  },
+  "src/pages/manage/ResponseEvent/index.jsx": {
+    "css": [
+      "assets/index-JUUkJata.css"
+    ],
+    "file": "assets/index-BgQQBp8H.js",
+    "imports": [
+      "index.html",
+      "_Web-KOHZ4PI_.js",
+      "_TableRow-esdE-LAL.js",
+      "_TableHead-OntCKomL.js",
+      "_DatePicker-AVKIEE0b.js",
+      "_Grid-q5yBxj4Y.js",
+      "_TextField-lJ98NZsg.js",
+      "_FormControlLabel-B-3jdeza.js",
+      "_Checkbox-HSUkhdvK.js",
+      "_SwitchBase-naWSSwc-.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/ResponseEvent/index.jsx"
+  },
+  "src/pages/manage/ResponsesSurvey/index-legacy.jsx": {
+    "file": "assets/index-legacy-rMa1XnUn.js",
+    "imports": [
+      "index-legacy.html",
+      "_Delete-legacy-YNJSp6if.js",
+      "_Web-legacy-LDhM2X1u.js",
+      "_FormControlLabel-legacy-0Ne4M7i6.js",
+      "_Switch-legacy-v-eJDCHU.js",
+      "_TableRow-legacy-QjxmKuUL.js",
+      "_TableHead-legacy-fccLWbma.js",
+      "_DatePicker-legacy-9Ey9K3I7.js",
+      "_TextField-legacy-vL2OdS5Q.js",
+      "_Checkbox-legacy-8hCFdihe.js",
+      "_SwitchBase-legacy-VpMr3A_z.js",
+      "_Grid-legacy-ZQipiKyz.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/ResponsesSurvey/index-legacy.jsx"
+  },
+  "src/pages/manage/ResponsesSurvey/index.jsx": {
+    "css": [
+      "assets/index-PxgwU3cb.css"
+    ],
+    "file": "assets/index-8R4nn72Q.js",
+    "imports": [
+      "index.html",
+      "_Delete-L8nilwQO.js",
+      "_Web-KOHZ4PI_.js",
+      "_FormControlLabel-B-3jdeza.js",
+      "_Switch-HSw-OeVt.js",
+      "_TableRow-esdE-LAL.js",
+      "_TableHead-OntCKomL.js",
+      "_DatePicker-AVKIEE0b.js",
+      "_TextField-lJ98NZsg.js",
+      "_Checkbox-HSUkhdvK.js",
+      "_SwitchBase-naWSSwc-.js",
+      "_Grid-q5yBxj4Y.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/pages/manage/ResponsesSurvey/index.jsx"
+  },
+  "vite/legacy-polyfills-legacy": {
+    "file": "assets/polyfills-legacy-oqbWJuUE.js",
+    "isEntry": true,
+    "src": "vite/legacy-polyfills-legacy"
+  }
+}

@@ -1,0 +1,19 @@
+._mainContainer_mg9ea_1 {
+  margin: auto;
+  max-width: 800px;
+  min-width: 300px;
+  height: calc(100vh - 80px);
+  overflow: auto;
+}
+
+._createUserCard_mg9ea_9 {
+  padding: 25px;
+}
+
+._formGroup_mg9ea_13 {
+  max-width: 400px;
+}
+
+._errorText_mg9ea_17 {
+  color: #eb5757 !important;
+}

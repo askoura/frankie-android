@@ -1,210 +1,25 @@
 {
-  "_VisibilityOff-768a62af.js": {
-    "file": "assets/VisibilityOff-768a62af.js",
-    "imports": [
-      "index.html"
-    ]
-  },
-  "_index.esm-039b8c57.js": {
-    "file": "assets/index.esm-039b8c57.js",
-    "imports": [
-      "index.html"
-    ]
-  },
-  "index.css": {
-    "file": "assets/index-68424b91.css",
-    "src": "index.css"
-  },
-  "index.html": {
-    "css": [
-      "assets/index-68424b91.css"
-    ],
-    "dynamicImports": [
-      "src/pages/Page404/index.jsx",
-      "src/pages/manage/Signup/index.jsx",
-      "src/pages/manage/ConfirmSignup/index.jsx",
-      "src/pages/manage/ForgotPassword/index.jsx",
-      "src/pages/manage/ResetPassword/index.jsx",
-      "src/pages/manage/Dashboard/index.jsx",
-      "src/pages/manage/Login/index.jsx",
-      "src/pages/manage/ManageUsers/index.jsx",
-      "src/pages/manage/AddEditUser/index.jsx",
-      "src/pages/manage/Profile/index.jsx",
-      "src/pages/manage/CreateSurvey/index.jsx"
-    ],
-    "file": "assets/index-a69683b4.js",
-    "isEntry": true,
-    "src": "index.html"
-  },
-  "src/pages/Page404/index.css": {
-    "file": "assets/index-baf20498.css",
-    "src": "src/pages/Page404/index.css"
-  },
-  "src/pages/Page404/index.jsx": {
-    "css": [
-      "assets/index-baf20498.css"
-    ],
-    "file": "assets/index-e27bc111.js",
-    "imports": [
-      "index.html"
-    ],
-    "isDynamicEntry": true,
-    "src": "src/pages/Page404/index.jsx"
-  },
-  "src/pages/manage/AddEditUser/index.css": {
-    "file": "assets/index-429f3045.css",
-    "src": "src/pages/manage/AddEditUser/index.css"
-  },
-  "src/pages/manage/AddEditUser/index.jsx": {
-    "css": [
-      "assets/index-429f3045.css"
-    ],
-    "file": "assets/index-df5a7387.js",
-    "imports": [
-      "index.html"
-    ],
-    "isDynamicEntry": true,
-    "src": "src/pages/manage/AddEditUser/index.jsx"
-  },
-  "src/pages/manage/ConfirmSignup/index.css": {
-    "file": "assets/index-ac50e4e9.css",
-    "src": "src/pages/manage/ConfirmSignup/index.css"
-  },
-  "src/pages/manage/ConfirmSignup/index.jsx": {
-    "css": [
-      "assets/index-ac50e4e9.css"
-    ],
-    "file": "assets/index-ecadc32b.js",
-    "imports": [
-      "index.html"
-    ],
-    "isDynamicEntry": true,
-    "src": "src/pages/manage/ConfirmSignup/index.jsx"
-  },
-  "src/pages/manage/CreateSurvey/index.css": {
-    "file": "assets/index-97981d38.css",
-    "src": "src/pages/manage/CreateSurvey/index.css"
-  },
-  "src/pages/manage/CreateSurvey/index.jsx": {
-    "css": [
-      "assets/index-97981d38.css"
-    ],
-    "file": "assets/index-1a4e4bef.js",
-    "imports": [
-      "index.html"
-    ],
-    "isDynamicEntry": true,
-    "src": "src/pages/manage/CreateSurvey/index.jsx"
-  },
-  "src/pages/manage/Dashboard/index.css": {
-    "file": "assets/index-6933bab9.css",
-    "src": "src/pages/manage/Dashboard/index.css"
-  },
-  "src/pages/manage/Dashboard/index.jsx": {
-    "css": [
-      "assets/index-6933bab9.css"
-    ],
-    "file": "assets/index-6cb8682f.js",
-    "imports": [
-      "index.html"
-    ],
-    "isDynamicEntry": true,
-    "src": "src/pages/manage/Dashboard/index.jsx"
-  },
-  "src/pages/manage/ForgotPassword/index.css": {
-    "file": "assets/index-a1a6d03e.css",
-    "src": "src/pages/manage/ForgotPassword/index.css"
-  },
-  "src/pages/manage/ForgotPassword/index.jsx": {
-    "css": [
-      "assets/index-a1a6d03e.css"
-    ],
-    "file": "assets/index-1f5c2bdf.js",
-    "imports": [
-      "index.html"
-    ],
-    "isDynamicEntry": true,
-    "src": "src/pages/manage/ForgotPassword/index.jsx"
-  },
-  "src/pages/manage/Login/index.css": {
-    "file": "assets/index-a01e6bd9.css",
-    "src": "src/pages/manage/Login/index.css"
-  },
-  "src/pages/manage/Login/index.jsx": {
-    "css": [
-      "assets/index-a01e6bd9.css"
-    ],
-    "file": "assets/index-819b6d6d.js",
-    "imports": [
-      "index.html",
-      "_index.esm-039b8c57.js",
-      "_VisibilityOff-768a62af.js"
-    ],
-    "isDynamicEntry": true,
-    "src": "src/pages/manage/Login/index.jsx"
-  },
-  "src/pages/manage/ManageUsers/index.css": {
-    "file": "assets/index-5036f481.css",
-    "src": "src/pages/manage/ManageUsers/index.css"
-  },
-  "src/pages/manage/ManageUsers/index.jsx": {
-    "css": [
-      "assets/index-5036f481.css"
-    ],
-    "file": "assets/index-2b65574f.js",
-    "imports": [
-      "index.html"
-    ],
-    "isDynamicEntry": true,
-    "src": "src/pages/manage/ManageUsers/index.jsx"
-  },
-  "src/pages/manage/Profile/index.css": {
-    "file": "assets/index-ab9d92a0.css",
-    "src": "src/pages/manage/Profile/index.css"
-  },
-  "src/pages/manage/Profile/index.jsx": {
-    "css": [
-      "assets/index-ab9d92a0.css"
-    ],
-    "file": "assets/index-342db25c.js",
-    "imports": [
-      "index.html",
-      "_VisibilityOff-768a62af.js"
-    ],
-    "isDynamicEntry": true,
-    "src": "src/pages/manage/Profile/index.jsx"
-  },
-  "src/pages/manage/ResetPassword/index.css": {
-    "file": "assets/index-9097f465.css",
-    "src": "src/pages/manage/ResetPassword/index.css"
-  },
-  "src/pages/manage/ResetPassword/index.jsx": {
-    "css": [
-      "assets/index-9097f465.css"
-    ],
-    "file": "assets/index-a17bfd4b.js",
-    "imports": [
-      "index.html",
-      "_VisibilityOff-768a62af.js"
-    ],
-    "isDynamicEntry": true,
-    "src": "src/pages/manage/ResetPassword/index.jsx"
-  },
-  "src/pages/manage/Signup/index.css": {
-    "file": "assets/index-69d98b86.css",
-    "src": "src/pages/manage/Signup/index.css"
-  },
-  "src/pages/manage/Signup/index.jsx": {
-    "css": [
-      "assets/index-69d98b86.css"
-    ],
-    "file": "assets/index-554990ad.js",
-    "imports": [
-      "index.html",
-      "_index.esm-039b8c57.js",
-      "_VisibilityOff-768a62af.js"
-    ],
-    "isDynamicEntry": true,
-    "src": "src/pages/manage/Signup/index.jsx"
-  }
+  "short_name": "React App",
+  "name": "Create React App Sample",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
 }
