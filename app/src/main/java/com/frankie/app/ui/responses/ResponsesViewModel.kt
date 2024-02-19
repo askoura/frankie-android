@@ -7,6 +7,7 @@ import com.frankie.app.EventBus
 import com.frankie.app.business.responses.ResponseRepository
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.db.model.Response
+import com.frankie.app.ui.survey.EMNavProcessor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,6 +22,7 @@ class ResponsesViewModel(
     private val _responses = MutableStateFlow<List<ResponseItem>>(emptyList())
     private lateinit var surveyData: SurveyData
     val responses = _responses.asStateFlow()
+    lateinit var emNavProcessor: EMNavProcessor
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -41,10 +43,13 @@ class ResponsesViewModel(
     private fun refresh() {
         viewModelScope.launch(Dispatchers.IO) {
             responsesRepository.getResponses(surveyData.id).let { newList ->
+                val maskedValues = emNavProcessor.maskedValues(newList)
                 val count = newList.count { it.submitDate != null && !it.isSynced }
                 val quotaExceeded = surveyData.quotaExceeded(count)
                 _responses.update {
-                    newList.map { ResponseItem(it, editEnabled = !quotaExceeded) }
+                    maskedValues.map { response->
+                        ResponseItem(response, editEnabled = !quotaExceeded)
+                    }
                 }
             }
         }
@@ -66,4 +71,3 @@ class ResponsesViewModel(
 }
 
 data class ResponseItem(val responses: Response, val editEnabled: Boolean)
-

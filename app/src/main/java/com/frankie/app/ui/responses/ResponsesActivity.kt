@@ -13,6 +13,7 @@ import com.frankie.app.business.parcelable
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.databinding.ActivityResponsesBinding
 import com.frankie.app.db.model.Response
+import com.frankie.app.ui.survey.EMNavProcessor
 import com.frankie.app.ui.survey.SurveyActivity
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.getViewModel
@@ -31,6 +32,7 @@ class ResponsesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityResponsesBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        viewModel.emNavProcessor = EMNavProcessor(this, survey)
 
 
         adapter = ResponseListAdapter({ response: Response ->

@@ -15,16 +15,17 @@ import com.frankie.app.db.model.Response
 import com.frankie.app.db.model.Response.Companion.STORED_FILENAME_KEY
 import com.frankie.app.ui.common.FileUtils
 import com.frankie.expressionmanager.ext.ScriptUtils
+import com.frankie.expressionmanager.ext.labels
 import com.frankie.expressionmanager.model.*
 import com.frankie.expressionmanager.usecase.*
-import kotlinx.coroutines.*
 import java.io.InputStream
 import java.net.URLConnection
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.*
 
 @SuppressLint("SetJavaScriptEnabled")
 class EMNavProcessor(
@@ -118,6 +119,76 @@ class EMNavProcessor(
         ) { navListener.onError(it) }
     }
 
+    suspend fun maskedValues(
+        values: List<Response>,
+    ): List<Response> {
+        val validationJsonOutput = FileUtils.getValidationJson(getActivity(), survey.id)!!
+        val schema = validationJsonOutput.schema.filter { it.columnName == ColumnName.VALUE }.map {
+            it.componentCode
+        }
+        val labels = validationJsonOutput.survey.labels("",validationJsonOutput.survey.defaultLang())
+        return values.map { response ->
+            val newValues = mutableMapOf<String,String>()
+            val oldValues = response.values
+            val maskedValues = maskedValuesUseCase(
+                response.values,
+                validationJsonOutput
+            )
+            schema.forEach { column->
+                val key = "$column.value"
+                oldValues[key]?.let { value->
+                    val newKey = labels[column]?.stripHTMLTags() ?: column
+                    val newValue = maskedValues[Dependency(column,ReservedCode.MaskedValue)]?.toString() ?:
+                    value
+                        .toString()
+                    newValues[newKey] = newValue
+                }
+            }
+
+           response.copy(values = newValues)
+        }
+    }
+
+    private fun String.stripHTMLTags(): String {
+        return replace(Regex("<.*?>"), "")
+    }
+
+    private suspend fun maskedValuesUseCase(
+        values: Map<String, Any>,
+        validationJsonOutput: ValidationJsonOutput,
+    ): Map<Dependency, Any> {
+
+        return suspendCoroutine { continuation ->
+
+            val navigationUseCaseWrapperImpl = MaskedValuesUseCase(
+                object : ScriptEngine {
+                    override fun executeScript(method: String, script: String): String {
+                        throw IllegalStateException("Should not resort to Script engine")
+                    }
+                },
+                validationJsonOutput = validationJsonOutput,
+                useCaseInput = NavigationUseCaseInput(
+                    values
+                ),
+            )
+            val script = navigationUseCaseWrapperImpl.getNavigationScript()
+            try {
+                (webView.context as Activity).runOnUiThread {
+                    webView.evaluateJavascript("JSON.parse(navigate($script))") { value ->
+                        value?.let {
+                            continuation.resume(
+                                navigationUseCaseWrapperImpl.processNavigationResult(value)
+                            )
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+
     private fun navigationUseCase(
         navigationUseCaseInput: NavigationUseCaseInput,
         onSuccess: (NavigationJsonOutput, SurveyLang, List<SurveyLang>) -> Unit,
@@ -136,7 +207,7 @@ class EMNavProcessor(
         val navigationUseCaseWrapperImpl = NavigationUseCaseWrapperImpl(
             object : ScriptEngine {
                 override fun executeScript(method: String, script: String): String {
-                    throw java.lang.IllegalStateException("Should not resort to Script engine")
+                    throw IllegalStateException("Should not resort to Script engine")
                 }
             },
             validationJsonOutput = validationJsonOutput,
@@ -256,6 +327,7 @@ class EMNavProcessor(
             fileSize = responseFile.length()
         )
     }
+
     fun uploadFile(
         key: String,
         fileName: String,
@@ -342,7 +414,7 @@ fun NavigationJsonOutput.with(
     additionalLang: List<SurveyLang>,
     saveTimings: Boolean
 )
-          : ApiNavigationOutput {
+    : ApiNavigationOutput {
     return ApiNavigationOutput(
         survey,
         state,
@@ -362,4 +434,10 @@ data class ApiNavigationOutput(
     val lang: SurveyLang,
     val additionalLang: List<SurveyLang>?,
     val saveTimings: Boolean
+)
+
+
+data class ResponseMaskedValues(
+    val responseId: String,
+    val values: Map<Dependency, Any>
 )

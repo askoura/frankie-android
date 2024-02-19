@@ -13,6 +13,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.coroutineScope
 import com.frankie.app.R
+import com.frankie.app.ui.common.WebViewUtils
 import com.frankie.app.ui.login.LoginActivity
 import com.frankie.app.ui.main.MainActivity
 import kotlinx.coroutines.launch
@@ -38,10 +39,10 @@ class LaunchActivity : FragmentActivity() {
             }
         }
         super.onCreate(savedInstanceState)
-//        if (!WebViewUtils.chromeSupported(this)) {
-//            notifyUnsupportedChromeAndQuit()
-//            return
-//        }
+        if (!WebViewUtils.chromeSupported(this)) {
+            notifyUnsupportedChromeAndQuit()
+            return
+        }
         if (shouldShowConsent) {
             consentView = ConsentView(this)
             setContentView(consentView)
