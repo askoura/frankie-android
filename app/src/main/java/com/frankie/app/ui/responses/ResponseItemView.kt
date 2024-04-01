@@ -45,7 +45,7 @@ class ResponseItemView @JvmOverloads constructor(
             context.getString(R.string.response_submit_date, response.submitDate?.fromUtc().toString())
         binding.lang.text = context.getString(R.string.response_lang, response.lang)
         binding.content.text =
-            response.values.entries.filter { it.value.toString().isNotBlank() }
+            response.values.entries
                 .joinToString(separator = "\n",
                     transform = { "${it.key.replace(".value", "")}: ${it.value}" }
                 )
