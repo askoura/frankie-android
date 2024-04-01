@@ -1,0 +1,1 @@
+import{j as s}from"./index-_S4YwDqB.js";import{Q as o}from"./Android-C-a1KXUo.js";function c(e){var r,t;const i=(r=e.component.resources)!=null&&r.imageUrl?o(e.component.resources.imageUrl):"";return((t=e.component.resources)==null?void 0:t.imageUrl)&&s.jsx("div",{style:{textAlign:"center"},children:s.jsx("img",{style:{width:"100%",maxWidth:"100%"},src:i})})}export{c as default};
