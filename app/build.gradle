@@ -34,7 +34,7 @@ android {
         release {
             debuggable false
             minifyEnabled false
-            buildConfigField "String", "SERVER_URL", "\"https:/api.staging-frankiesurveys.com\""
+            buildConfigField "String", "SERVER_URL", "\"https://api.staging-frankiesurveys.com\""
             buildConfigField "String", "AUTH_CLIENT_ID", "\"464768435207-e2rkf9h0fjbcnhh2egkj3e9bkvub2p4o.apps.googleusercontent.com\""
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -55,7 +55,7 @@ android {
         staging {
             initWith buildTypes.debug
             buildConfigField "String", "AUTH_CLIENT_ID", "\"464768435207-e2rkf9h0fjbcnhh2egkj3e9bkvub2p4o.apps.googleusercontent.com\""
-            buildConfigField "String", "SERVER_URL", "\"https:/api.staging-frankiesurveys.com\""
+            buildConfigField "String", "SERVER_URL", "\"https://api.staging-frankiesurveys.com\""
             applicationIdSuffix ".debug"
             debuggable true
         }
@@ -83,7 +83,8 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
     def room_version = "2.5.0"
 
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation project(':expressionmanager')
+    implementation project(':scriptengine')
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'com.google.android.gms:play-services-auth:21.0.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'

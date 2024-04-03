@@ -6,6 +6,10 @@ pluginManagement {
     }
 }
 dependencyResolutionManagement {
+    include ':expressionmanager'
+    project(':expressionmanager').projectDir = new File(rootDir, 'frankie-lib/expressionmanager/')
+    include ':scriptengine'
+    project(':scriptengine').projectDir = new File(rootDir, 'frankie-lib/scriptengine/')
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
