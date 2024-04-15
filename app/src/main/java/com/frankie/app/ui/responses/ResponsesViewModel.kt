@@ -18,11 +18,13 @@ class ResponsesViewModel(
     private val responsesRepository: ResponseRepository,
     private val eventBus: EventBus,
 ) : ViewModel() {
-
-    private val _responses = MutableStateFlow<List<ResponseItem>>(emptyList())
     private lateinit var surveyData: SurveyData
+    private val _responses = MutableStateFlow<List<ResponseItem>>(emptyList())
     val responses = _responses.asStateFlow()
+    private var isLoading = false
+    private var lastPageReached = false
     lateinit var emNavProcessor: EMNavProcessor
+    private var currentPage: Int = 0
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -35,23 +37,45 @@ class ResponsesViewModel(
         }
     }
 
+    fun shouldLoadNextPage() = !isLoading && !lastPageReached
+
     fun fetchResponses(surveyData: SurveyData) {
         this.surveyData = surveyData
         refresh()
     }
 
-    private fun refresh() {
+    fun refresh() {
+        viewModelScope.launch {
+            currentPage = 0
+            lastPageReached = false
+            _responses.update { emptyList() }
+            loadNext()
+        }
+    }
+
+    fun loadNext() {
+        if (!shouldLoadNextPage()) {
+            return
+        }
         viewModelScope.launch(Dispatchers.IO) {
-            responsesRepository.getResponses(surveyData.id).let { newList ->
-                val maskedValues = emNavProcessor.maskedValues(newList)
-                val count = newList.count { it.submitDate != null && !it.isSynced }
-                val quotaExceeded = surveyData.quotaExceeded(count)
-                _responses.update {
-                    maskedValues.map { response->
-                        ResponseItem(response, editEnabled = !quotaExceeded)
+            isLoading = true
+            responsesRepository.getResponses(surveyData.id, currentPage++, PER_PAGE)
+                .let { newList ->
+                    if (newList.size < PER_PAGE) {
+                        lastPageReached = true
+                    }
+                    val maskedValues = emNavProcessor.maskedValues(newList)
+                    val count = newList.count { it.submitDate != null && !it.isSynced }
+                    val quotaExceeded = surveyData.quotaExceeded(count)
+                    _responses.update {
+                        it.toMutableList().apply {
+                            addAll(maskedValues.map { response ->
+                                ResponseItem(response, editEnabled = !quotaExceeded)
+                            })
+                        }
                     }
                 }
-            }
+            isLoading = false
         }
     }
 
@@ -67,6 +91,10 @@ class ResponsesViewModel(
                 }
             }
         }
+    }
+
+    companion object {
+        private const val PER_PAGE = 10
     }
 }
 
