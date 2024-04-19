@@ -21,7 +21,8 @@ class ResponsesViewModel(
     private lateinit var surveyData: SurveyData
     private val _responses = MutableStateFlow<List<ResponseItem>>(emptyList())
     val responses = _responses.asStateFlow()
-    private var isLoading = false
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
     private var lastPageReached = false
     lateinit var emNavProcessor: EMNavProcessor
     private var currentPage: Int = 0
@@ -37,7 +38,7 @@ class ResponsesViewModel(
         }
     }
 
-    fun shouldLoadNextPage() = !isLoading && !lastPageReached
+    fun shouldLoadNextPage() = !_isLoading.value && !lastPageReached
 
     fun fetchResponses(surveyData: SurveyData) {
         this.surveyData = surveyData
@@ -58,7 +59,7 @@ class ResponsesViewModel(
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
-            isLoading = true
+            _isLoading.update { true }
             responsesRepository.getResponses(surveyData.id, currentPage++, PER_PAGE)
                 .let { newList ->
                     if (newList.size < PER_PAGE) {
@@ -75,7 +76,7 @@ class ResponsesViewModel(
                         }
                     }
                 }
-            isLoading = false
+            _isLoading.update { false }
         }
     }
 

@@ -55,6 +55,11 @@ class ResponsesActivity : AppCompatActivity() {
                 adapter.submitList(state)
             }
         }
+        lifecycleScope.launch {
+            viewModel.isLoading.collect { isVisible ->
+                binding.swipe.isRefreshing = isVisible
+            }
+        }
 
         title = getString(R.string.title_activity_responses)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
