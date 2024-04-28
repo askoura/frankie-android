@@ -9,7 +9,7 @@
 # -------------------- RETROFIT ---------------------------------
 # Retrofit does reflection on generic parameters. InnerClasses is required to use Signature and
 # EnclosingMethod is required to use InnerClasses.
--keepattributes Signature, InnerClasses, EnclosingMethod
+-keepattributes Signature, InnerClasses, EnclosingMethod, *Annotation*
 
 # Retrofit does reflection on method and parameter annotations.
 -keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
@@ -78,5 +78,13 @@
 # ------------------ KEEP API classes ----------
 -keep class com.frankie.app.api.** { *; }
 
-# -------------------KEEP expression manager
--keep class com.frankie.expressionmanager.** { *; }
+# -------------------EXPRESSION MANAGER
+-keep class com.frankie.expressionmanager.model.** { *; }
+
+
+-keep class com.frankie.app.db.** { *; }
+-keep class com.frankie.expressionmanager.usecase.ValidationOutput { *; }
+-keep class com.frankie.expressionmanager.usecase.ValidationJsonOutput { *; }
+-keep class com.frankie.expressionmanager.context.build.NotSkippedInstructionManifesto { *; }
+-keep class com.frankie.expressionmanager.context.build.SkipCodeOutput { *; }
+-keep class com.frankie.expressionmanager.model.** {*;}
