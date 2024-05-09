@@ -23,6 +23,10 @@ interface SurveyDao {
     @Query("SELECT survey_data_table.* FROM survey_data_table join permissions on permissions.surveyId = survey_data_table.id AND permissions.userId = :userId")
     suspend fun getAllSurveyData(userId:String): List<SurveyDataEntity>
 
+    @Query("SELECT survey_data_table.* FROM survey_data_table join permissions on permissions" +
+        ".surveyId = survey_data_table.id AND permissions.userId = :userId AND guest = 0")
+    suspend fun getAllSurveyDataExcludeGuest(userId:String): List<SurveyDataEntity>
+
 
     @Query("UPDATE survey_data_table SET fileQuestions = :filesQuestions WHERE id == :id")
     suspend fun setFileQuestions(id: String, filesQuestions: List<String>)

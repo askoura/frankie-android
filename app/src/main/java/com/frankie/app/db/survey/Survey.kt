@@ -11,6 +11,7 @@ import java.time.LocalDateTime
 @Entity(tableName = "survey_data_table")
 data class SurveyDataEntity(
     @PrimaryKey val id: String = "",
+    val guest: Boolean = false,
     val creationDate: LocalDateTime,
     val lastModified: LocalDateTime,
     val startDate: LocalDateTime?,

@@ -135,7 +135,7 @@ class MainViewModel(
 
     fun uploadSurveyResponses() {
         viewModelScope.launch(Dispatchers.IO) {
-            val canSync = surveyRepository.getOfflineSurveyList()
+            val canSync = surveyRepository.getOfflineSurveyList(includeGuest = false)
                 .any { it.localUnsyncedResponsesCount > 0 }
             if (canSync) {
                 backgroundSync.startSurveySync()

@@ -27,9 +27,10 @@ class UploadSurveyResponsesUseCaseImpl(
     override suspend fun invoke() {
         try {
             eventBus.emitEvent(AppEvent.UploadingResponse(true))
-            surveyRepository.getOfflineSurveyList()
+            surveyRepository.getOfflineSurveyList(includeGuest = false)
                 .filter {
-                    it.surveyStatus == SurveyStatus.ACTIVE && it.localUnsyncedResponsesCount > 0
+                    it.surveyStatus == SurveyStatus.ACTIVE &&
+                        it.localUnsyncedResponsesCount > 0
                 }.forEach {
                     try {
                         uploadSurvey(it.id)

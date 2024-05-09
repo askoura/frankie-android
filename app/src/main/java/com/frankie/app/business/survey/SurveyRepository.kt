@@ -27,7 +27,7 @@ interface SurveyRepository {
 
     suspend fun getSurveyDbEntity(surveyId: String): SurveyDataEntity?
     fun getSurveyList(): Flow<List<SurveyData>>
-    suspend fun getOfflineSurveyList(): List<SurveyData>
+    suspend fun getOfflineSurveyList(includeGuest: Boolean = true): List<SurveyData>
 
     suspend fun getOfflineSurvey(surveyId: String): SurveyData
     fun getSurveyFile(surveyId: String, resourceId: String): Flow<Result<DataStream>>
@@ -123,9 +123,13 @@ class SurveyRepositoryImpl(
         }.flowOn(Dispatchers.IO)
     }
 
-    override suspend fun getOfflineSurveyList(): List<SurveyData> {
+    override suspend fun getOfflineSurveyList(includeGuest: Boolean): List<SurveyData> {
         val userId = sessionManager.getUserIdOrThrow()
-        surveyDao.getAllSurveyData(sessionManager.getUserIdOrThrow()).let { list ->
+        if (includeGuest) {
+            surveyDao.getAllSurveyData(sessionManager.getUserIdOrThrow())
+        } else {
+            surveyDao.getAllSurveyDataExcludeGuest(sessionManager.getUserIdOrThrow())
+        }.let { list ->
             return list.map {
                 it.toSurveyData(
                     responseDao.countByUserAndSurvey(userId, it.id),
