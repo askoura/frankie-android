@@ -1,0 +1,14 @@
+._wrapper_1hpga_1 {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-top: 10px;
+  margin-bottom: 0;
+  line-height: 16px;
+  letter-spacing: 0.3px;
+}
+
+._icon_1hpga_11 {
+  margin-right: 12px;
+  transform: rotate(180deg);
+}
