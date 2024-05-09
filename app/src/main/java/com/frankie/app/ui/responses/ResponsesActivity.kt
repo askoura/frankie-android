@@ -8,6 +8,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.frankie.app.R
 import com.frankie.app.business.parcelable
 import com.frankie.app.business.survey.SurveyData
@@ -34,25 +35,35 @@ class ResponsesActivity : AppCompatActivity() {
         setContentView(binding.root)
         viewModel.emNavProcessor = EMNavProcessor(this, survey)
 
-
         adapter = ResponseListAdapter({ response: Response ->
             startActivity(SurveyActivity.createIntent(this, survey, response.id))
         }, { response: Response ->
             viewModel.deleteResponse(response.id)
         })
+        val lm = LinearLayoutManager(binding.root.context)
         binding.recycler.adapter = adapter
-        binding.recycler.layoutManager = LinearLayoutManager(binding.root.context)
-
+        binding.recycler.layoutManager = lm
+        binding.swipe.setOnRefreshListener {
+            viewModel.refresh()
+        }
+        binding.recycler.addOnScrollListener(
+            PaginationScrollListener(lm, viewModel::shouldLoadNextPage, viewModel::loadNext)
+        )
 
         lifecycleScope.launch {
             viewModel.responses.collect { state ->
                 adapter.submitList(state)
             }
         }
+        lifecycleScope.launch {
+            viewModel.isLoading.collect { isVisible ->
+                binding.swipe.isRefreshing = isVisible
+            }
+        }
 
         title = getString(R.string.title_activity_responses)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
+        viewModel.fetchResponses(survey)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -66,17 +77,33 @@ class ResponsesActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.fetchResponses(survey)
-    }
-
-
     companion object {
         private const val SURVEY = "survey"
         fun createIntent(context: Context, survey: SurveyData): Intent =
             Intent(context, ResponsesActivity::class.java).apply {
                 putExtra(SURVEY, survey as Parcelable)
             }
+    }
+}
+
+class PaginationScrollListener(
+    private val layoutManager: LinearLayoutManager,
+    private val shouldLoadMore: () -> Boolean,
+    private val onLoadMore: () -> Unit,
+) :
+    RecyclerView.OnScrollListener() {
+
+    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+        super.onScrolled(recyclerView, dx, dy)
+        val visibleItemCount: Int = layoutManager.childCount
+        val totalItemCount: Int = layoutManager.itemCount
+        val firstVisibleItemPosition: Int = layoutManager.findFirstVisibleItemPosition()
+        if (shouldLoadMore()) {
+            if (visibleItemCount + firstVisibleItemPosition >= totalItemCount - 4
+                && firstVisibleItemPosition >= 0
+            ) {
+                onLoadMore()
+            }
+        }
     }
 }

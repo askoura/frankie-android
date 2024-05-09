@@ -28,12 +28,12 @@ interface ResponseDao {
 
     @Query(
         "UPDATE response SET " +
-                  "response_values = :values," +
-                  "events = :events," +
-                  "startDate = :startDate," +
-                  "submitDate = :submitDate," +
-                  "lang = :lang," +
-                  " navigation_index = :navigationIndex WHERE id == :id"
+                "response_values = :values," +
+                "events = :events," +
+                "startDate = :startDate," +
+                "submitDate = :submitDate," +
+                "lang = :lang," +
+                " navigation_index = :navigationIndex WHERE id == :id"
     )
     suspend fun update(
         values: Map<String, Any>,
@@ -47,6 +47,13 @@ interface ResponseDao {
 
     @Query("SELECT * FROM response WHERE userId = :userId AND surveyId = :surveyId")
     suspend fun getAllByUserAndSurvey(userId: String, surveyId: String): List<Response>
+
+    @Query(
+        "SELECT * FROM response WHERE userId = :userId AND surveyId = :surveyId LIMIT 10 " +
+                "OFFSET (:page*:perPage)"
+    )
+    suspend fun getByUserAndSurvey(userId: String, surveyId: String, page: Int, perPage: Int):
+            List<Response>
 
     @Transaction
     suspend fun addEvent(responseId: String, event: ResponseEvent) {
