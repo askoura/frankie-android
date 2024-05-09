@@ -28,12 +28,12 @@ android {
             keyAlias 'debug'
             keyPassword = 'Ow0%I!TUwDONAejpS^XF'
         }
-        debug {
-            storeFile file('../keystore/debug.keystore')
-            storePassword = 'KSr3#V^^heD7g1mIO!m9'
-            keyAlias 'debug'
-            keyPassword = 'Ow0%I!TUwDONAejpS^XF'
-        }
+//        debug {
+//            storeFile file('../keystore/debug.keystore')
+//            storePassword = 'KSr3#V^^heD7g1mIO!m9'
+//            keyAlias 'debug'
+//            keyPassword = 'Ow0%I!TUwDONAejpS^XF'
+//        }
     }
 
     buildTypes {
