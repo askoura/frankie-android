@@ -92,7 +92,9 @@ dependencies {
     def room_version = "2.5.0"
 
     implementation project(':expressionmanager')
-    implementation project(':scriptengine')
+    implementation(project(':scriptengine')) {
+        exclude group: 'org.graalvm.js', module: 'js'
+    }
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'com.google.android.gms:play-services-auth:21.0.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
