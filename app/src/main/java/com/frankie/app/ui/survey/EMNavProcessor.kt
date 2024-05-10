@@ -63,6 +63,7 @@ class EMNavProcessor(
     private fun getActivity(): Activity = webView.context as Activity
 
     private var scriptLoaded = false
+
     init {
         webView.clearCache(true)
         webView.settings.javaScriptEnabled = true
@@ -159,26 +160,28 @@ class EMNavProcessor(
         val schema = validationJsonOutput.schema.filter { it.columnName == ColumnName.VALUE }.map {
             it.componentCode
         }
-        val labels = validationJsonOutput.survey.labels("",validationJsonOutput.survey.defaultLang())
+        val labels =
+            validationJsonOutput.survey.labels("", validationJsonOutput.survey.defaultLang())
         return values.map { response ->
-            val newValues = mutableMapOf<String,String>()
+            val newValues = mutableMapOf<String, String>()
             val oldValues = response.values
             val maskedValues = maskedValuesUseCase(
                 response.values,
                 validationJsonOutput
             )
-            schema.forEach { column->
+            schema.forEach { column ->
                 val key = "$column.value"
-                oldValues[key]?.let { value->
+                oldValues[key]?.let { value ->
                     val newKey = labels[column]?.stripHTMLTags() ?: column
-                    val newValue = maskedValues[Dependency(column,ReservedCode.MaskedValue)]?.toString() ?:
-                    value
-                        .toString()
+                    val newValue =
+                        maskedValues[Dependency(column, ReservedCode.MaskedValue)]?.toString()
+                            ?: value
+                                .toString()
                     newValues[newKey] = newValue
                 }
             }
 
-           response.copy(values = newValues)
+            response.copy(values = newValues)
         }
     }
 
@@ -207,12 +210,10 @@ class EMNavProcessor(
             try {
                 (webView.context as Activity).runOnUiThread {
                     webView.evaluateJavascript("JSON.parse(navigate($script))") { value ->
-                        value?.let {
-                            thread {
-                                continuation.resume(
-                                    navigationUseCaseWrapperImpl.processNavigationResult(value)
-                                )
-                            }
+                        thread {
+                            continuation.resume(
+                                navigationUseCaseWrapperImpl.processNavigationResult(value)
+                            )
                         }
                     }
                 }
@@ -252,12 +253,11 @@ class EMNavProcessor(
         val script = navigationUseCaseWrapperImpl.getNavigationScript()
         (webView.context as Activity).runOnUiThread {
             webView.evaluateJavascript("JSON.parse(navigate($script))") { value ->
-                value?.let {
+                thread {
                     try {
                         onSuccess(
-                            navigationUseCaseWrapperImpl.processNavigationResult(
-                                value
-                            ), lang, additionalLang
+                            navigationUseCaseWrapperImpl.processNavigationResult(value!!),
+                            lang, additionalLang
                         )
                     } catch (e: Exception) {
                         onError(e)
@@ -448,7 +448,7 @@ fun NavigationJsonOutput.with(
     additionalLang: List<SurveyLang>,
     saveTimings: Boolean
 )
-    : ApiNavigationOutput {
+        : ApiNavigationOutput {
     return ApiNavigationOutput(
         survey,
         state,
