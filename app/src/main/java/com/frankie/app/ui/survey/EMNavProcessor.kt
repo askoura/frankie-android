@@ -5,7 +5,9 @@ import android.app.Activity
 import android.content.Context
 import android.util.Base64
 import android.util.Log
-import android.webkit.*
+import android.webkit.WebSettings
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.frankie.app.business.settings.SharedPrefsManagerImpl
@@ -16,21 +18,43 @@ import com.frankie.app.db.model.Response.Companion.STORED_FILENAME_KEY
 import com.frankie.app.ui.common.FileUtils
 import com.frankie.expressionmanager.ext.ScriptUtils
 import com.frankie.expressionmanager.ext.labels
-import com.frankie.expressionmanager.model.*
-import com.frankie.expressionmanager.usecase.*
+import com.frankie.expressionmanager.model.ColumnName
+import com.frankie.expressionmanager.model.Dependency
+import com.frankie.expressionmanager.model.NavigationDirection
+import com.frankie.expressionmanager.model.NavigationIndex
+import com.frankie.expressionmanager.model.NavigationInfo
+import com.frankie.expressionmanager.model.NavigationUseCaseInput
+import com.frankie.expressionmanager.model.ReservedCode
+import com.frankie.expressionmanager.model.ResponseEvent
+import com.frankie.expressionmanager.model.SurveyLang
+import com.frankie.expressionmanager.model.SurveyMode
+import com.frankie.expressionmanager.usecase.MaskedValuesUseCase
+import com.frankie.expressionmanager.usecase.NavigationJsonOutput
+import com.frankie.expressionmanager.usecase.NavigationUseCaseWrapperImpl
+import com.frankie.expressionmanager.usecase.ScriptEngine
+import com.frankie.expressionmanager.usecase.ValidationJsonOutput
+import com.frankie.expressionmanager.usecase.additionalLang
+import com.frankie.expressionmanager.usecase.availableLangByCode
+import com.frankie.expressionmanager.usecase.defaultLang
+import com.frankie.expressionmanager.usecase.defaultSurveyLang
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.InputStream
 import java.net.URLConnection
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
+import kotlin.concurrent.thread
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-import kotlinx.coroutines.*
 
 @SuppressLint("SetJavaScriptEnabled")
 class EMNavProcessor(
     activityContext: Context,
-    val survey: SurveyData
+    val survey: SurveyData,
+    onScriptLoaded: () -> Unit
 ) {
     private val webView = WebView(activityContext)
     private var responseId: UUID? = null
@@ -38,11 +62,21 @@ class EMNavProcessor(
 
     private fun getActivity(): Activity = webView.context as Activity
 
+    private var scriptLoaded = false
     init {
         webView.clearCache(true)
         webView.settings.javaScriptEnabled = true
         webView.settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
         webView.settings.domStorageEnabled = true
+        webView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                if (!scriptLoaded) {
+                    scriptLoaded = true
+                    onScriptLoaded()
+                }
+            }
+        }
         loadJavaScript(ScriptUtils().engineScript)
     }
 
@@ -51,7 +85,6 @@ class EMNavProcessor(
         val data = javascript.toByteArray(charset("UTF-8"))
         val base64 = Base64.encodeToString(data, Base64.DEFAULT)
         webView.loadUrl("data:text/html;charset=utf-8;base64,$base64")
-
     }
 
     fun start(
@@ -159,7 +192,6 @@ class EMNavProcessor(
     ): Map<Dependency, Any> {
 
         return suspendCoroutine { continuation ->
-
             val navigationUseCaseWrapperImpl = MaskedValuesUseCase(
                 object : ScriptEngine {
                     override fun executeScript(method: String, script: String): String {
@@ -176,9 +208,11 @@ class EMNavProcessor(
                 (webView.context as Activity).runOnUiThread {
                     webView.evaluateJavascript("JSON.parse(navigate($script))") { value ->
                         value?.let {
-                            continuation.resume(
-                                navigationUseCaseWrapperImpl.processNavigationResult(value)
-                            )
+                            thread {
+                                continuation.resume(
+                                    navigationUseCaseWrapperImpl.processNavigationResult(value)
+                                )
+                            }
                         }
                     }
                 }
