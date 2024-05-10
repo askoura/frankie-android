@@ -33,8 +33,6 @@ class ResponsesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityResponsesBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        viewModel.emNavProcessor = EMNavProcessor(this, survey)
-
         adapter = ResponseListAdapter({ response: Response ->
             startActivity(SurveyActivity.createIntent(this, survey, response.id))
         }, { response: Response ->
@@ -61,9 +59,12 @@ class ResponsesActivity : AppCompatActivity() {
             }
         }
 
+        viewModel.emNavProcessor = EMNavProcessor(this, survey) {
+            viewModel.fetchResponses(survey)
+        }
+
         title = getString(R.string.title_activity_responses)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        viewModel.fetchResponses(survey)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

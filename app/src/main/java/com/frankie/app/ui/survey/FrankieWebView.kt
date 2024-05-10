@@ -8,9 +8,13 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import android.util.AttributeSet
 import android.util.Log
-import android.webkit.*
+import android.webkit.JavascriptInterface
+import android.webkit.MimeTypeMap
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.core.content.FileProvider
-import androidx.webkit.*
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -18,7 +22,10 @@ import com.frankie.app.BuildConfig
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.ui.common.FileUtils
 import com.frankie.expressionmanager.ext.ScriptUtils
-import com.frankie.expressionmanager.model.*
+import com.frankie.expressionmanager.model.NavigationDirection
+import com.frankie.expressionmanager.model.NavigationIndex
+import com.frankie.expressionmanager.model.ResponseEvent
+import com.frankie.expressionmanager.model.jacksonKtMapper
 import id.zelory.compressor.Compressor
 import id.zelory.compressor.constraint.destination
 import id.zelory.compressor.constraint.size
@@ -307,12 +314,13 @@ class FrankieWebView
 
     fun loadSurvey(surveyData: SurveyData, responseId: String?) {
         survey = surveyData
-        emNavProcessor = EMNavProcessor(context, survey)
-        this.responseId = responseId
         val data = context.assets.open("$REACT_APP_BUILD_FOLDER/index.html").bufferedReader().use {
             it.readText()
         }
-        loadDataWithBaseURL(CUSTOM_DOMAIN, data, null, null, null)
+        this.responseId = responseId
+        emNavProcessor = EMNavProcessor(context, survey) {
+            loadDataWithBaseURL(CUSTOM_DOMAIN, data, null, null, null)
+        }
     }
 
     fun onBack(onBackHandler: (Boolean) -> Unit) {
