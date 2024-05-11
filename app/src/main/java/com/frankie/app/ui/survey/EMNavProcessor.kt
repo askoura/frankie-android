@@ -32,25 +32,24 @@ import com.frankie.expressionmanager.usecase.MaskedValuesUseCase
 import com.frankie.expressionmanager.usecase.NavigationJsonOutput
 import com.frankie.expressionmanager.usecase.NavigationUseCaseWrapperImpl
 import com.frankie.expressionmanager.usecase.ScriptEngine
-import com.frankie.expressionmanager.usecase.ValidationJsonOutput
 import com.frankie.expressionmanager.usecase.additionalLang
 import com.frankie.expressionmanager.usecase.availableLangByCode
 import com.frankie.expressionmanager.usecase.defaultLang
 import com.frankie.expressionmanager.usecase.defaultSurveyLang
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.io.InputStream
 import java.net.URLConnection
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.util.*
+import java.util.UUID
 import kotlin.concurrent.thread
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @SuppressLint("SetJavaScriptEnabled")
 class EMNavProcessor(
@@ -155,7 +154,7 @@ class EMNavProcessor(
         ) { navListener.onError(it) }
     }
 
-     fun maskedValues(
+    fun maskedValues(
         values: List<Response>,
     ): Flow<Response> {
         val validationJsonOutput = FileUtils.getValidationJson(getActivity(), survey.id)!!
@@ -164,6 +163,17 @@ class EMNavProcessor(
         }
         val labels =
             validationJsonOutput.survey.labels("", validationJsonOutput.survey.defaultLang())
+
+        val maskedValuesUseCaseImpl = measure("init useCase") {
+            MaskedValuesUseCase(
+                object : ScriptEngine {
+                    override fun executeScript(method: String, script: String): String {
+                        throw IllegalStateException("Should not resort to Script engine")
+                    }
+                },
+                validationJsonOutput = validationJsonOutput,
+            )
+        }
         return flow {
             values.forEach { response ->
                 val newValues = mutableMapOf<String, String>()
@@ -171,8 +181,8 @@ class EMNavProcessor(
                 val start = System.currentTimeMillis()
 
                 val maskedValues = maskedValuesUseCase(
-                    response.values,
-                    validationJsonOutput
+                    maskedValuesUseCaseImpl,
+                    response.values
                 )
                 Log.d("time", "maskedUseCase ${System.currentTimeMillis() - start}")
 
@@ -199,23 +209,15 @@ class EMNavProcessor(
     }
 
     private suspend fun maskedValuesUseCase(
+        navigationUseCaseImpl: MaskedValuesUseCase,
         values: Map<String, Any>,
-        validationJsonOutput: ValidationJsonOutput,
     ): Map<Dependency, Any> {
 
         return suspendCoroutine { continuation ->
-            val navigationUseCaseWrapperImpl = measure("init useCase") {MaskedValuesUseCase(
-                object : ScriptEngine {
-                    override fun executeScript(method: String, script: String): String {
-                        throw IllegalStateException("Should not resort to Script engine")
-                    }
-                },
-                validationJsonOutput = validationJsonOutput,
-                useCaseInput = NavigationUseCaseInput(
-                    values
-                ),
-            )}
-            val script = measure("Get script") { navigationUseCaseWrapperImpl.getNavigationScript() }
+
+            val script = measure("Get script") {
+                navigationUseCaseImpl.getNavigationScript(NavigationUseCaseInput(values = values))
+            }
             try {
                 val start = System.currentTimeMillis()
 
@@ -223,8 +225,8 @@ class EMNavProcessor(
                     webView.evaluateJavascript("JSON.parse(navigate($script))") { value ->
                         Log.d("time", "javascript ${System.currentTimeMillis() - start}")
                         thread {
-                            val result =measure("processResults") {
-                                navigationUseCaseWrapperImpl.processNavigationResult(value)
+                            val result = measure("processResults") {
+                                navigationUseCaseImpl.processNavigationResult(value)
                             }
                             continuation.resume(
                                 result
@@ -466,7 +468,7 @@ fun NavigationJsonOutput.with(
     additionalLang: List<SurveyLang>,
     saveTimings: Boolean
 )
-        : ApiNavigationOutput {
+    : ApiNavigationOutput {
     return ApiNavigationOutput(
         survey,
         state,
