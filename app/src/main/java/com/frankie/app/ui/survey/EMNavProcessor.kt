@@ -165,10 +165,14 @@ class EMNavProcessor(
         return values.map { response ->
             val newValues = mutableMapOf<String, String>()
             val oldValues = response.values
+            val start = System.currentTimeMillis()
+
             val maskedValues = maskedValuesUseCase(
                 response.values,
                 validationJsonOutput
             )
+            Log.e("time", "maskedUseCase ${System.currentTimeMillis() - start}")
+
             schema.forEach { column ->
                 val key = "$column.value"
                 oldValues[key]?.let { value ->
@@ -195,7 +199,7 @@ class EMNavProcessor(
     ): Map<Dependency, Any> {
 
         return suspendCoroutine { continuation ->
-            val navigationUseCaseWrapperImpl = MaskedValuesUseCase(
+            val navigationUseCaseWrapperImpl = measure("init useCase") {MaskedValuesUseCase(
                 object : ScriptEngine {
                     override fun executeScript(method: String, script: String): String {
                         throw IllegalStateException("Should not resort to Script engine")
@@ -205,14 +209,20 @@ class EMNavProcessor(
                 useCaseInput = NavigationUseCaseInput(
                     values
                 ),
-            )
-            val script = navigationUseCaseWrapperImpl.getNavigationScript()
+            )}
+            val script = measure("Get script") { navigationUseCaseWrapperImpl.getNavigationScript() }
             try {
+                val start = System.currentTimeMillis()
+
                 (webView.context as Activity).runOnUiThread {
                     webView.evaluateJavascript("JSON.parse(navigate($script))") { value ->
+                        Log.e("time", "javascript ${System.currentTimeMillis() - start}")
                         thread {
-                            continuation.resume(
+                            val result =measure("processResults") {
                                 navigationUseCaseWrapperImpl.processNavigationResult(value)
+                            }
+                            continuation.resume(
+                                result
                             )
                         }
                     }
@@ -222,7 +232,6 @@ class EMNavProcessor(
             }
         }
     }
-
 
     private fun navigationUseCase(
         navigationUseCaseInput: NavigationUseCaseInput,
@@ -473,3 +482,10 @@ data class ApiNavigationOutput(
     val additionalLang: List<SurveyLang>?,
     val saveTimings: Boolean
 )
+
+fun <T> measure(name: String, block: () -> T): T {
+    val start = System.currentTimeMillis().apply { }
+    val result = block()
+    Log.e("time", "$name " + "${System.currentTimeMillis() - start}")
+    return result
+}
