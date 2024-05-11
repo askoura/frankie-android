@@ -53,7 +53,7 @@ import kotlin.coroutines.suspendCoroutine
 @SuppressLint("SetJavaScriptEnabled")
 class EMNavProcessor(
     activityContext: Context,
-    val survey: SurveyData,
+    private val survey: SurveyData,
     onScriptLoaded: () -> Unit
 ) {
     private val webView = WebView(activityContext)
@@ -423,6 +423,10 @@ class EMNavProcessor(
         return responseUploadFile
     }
 
+    fun destroy() {
+        webView.destroy()
+    }
+
     companion object {
         private const val TAG = "EMNavProcessor"
     }
@@ -468,10 +472,4 @@ data class ApiNavigationOutput(
     val lang: SurveyLang,
     val additionalLang: List<SurveyLang>?,
     val saveTimings: Boolean
-)
-
-
-data class ResponseMaskedValues(
-    val responseId: String,
-    val values: Map<Dependency, Any>
 )
