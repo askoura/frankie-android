@@ -199,7 +199,7 @@ class EMNavProcessor(
     ): Map<Dependency, Any> {
 
         return suspendCoroutine { continuation ->
-            val navigationUseCaseWrapperImpl = MaskedValuesUseCase(
+            val navigationUseCaseWrapperImpl = measure("init useCase") {MaskedValuesUseCase(
                 object : ScriptEngine {
                     override fun executeScript(method: String, script: String): String {
                         throw IllegalStateException("Should not resort to Script engine")
@@ -209,8 +209,8 @@ class EMNavProcessor(
                 useCaseInput = NavigationUseCaseInput(
                     values
                 ),
-            )
-            val script = navigationUseCaseWrapperImpl.getNavigationScript()
+            )}
+            val script = measure("Get script") { navigationUseCaseWrapperImpl.getNavigationScript() }
             try {
                 val start = System.currentTimeMillis()
 
@@ -218,10 +218,11 @@ class EMNavProcessor(
                     webView.evaluateJavascript("JSON.parse(navigate($script))") { value ->
                         Log.e("time", "javascript ${System.currentTimeMillis() - start}")
                         thread {
+                            val result =measure("processResults") {
+                                navigationUseCaseWrapperImpl.processNavigationResult(value)
+                            }
                             continuation.resume(
-                                measure("processResults") {
-                                    navigationUseCaseWrapperImpl.processNavigationResult(value)
-                                }
+                                result
                             )
                         }
                     }
