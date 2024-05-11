@@ -49,6 +49,8 @@ import java.util.*
 import kotlin.concurrent.thread
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 @SuppressLint("SetJavaScriptEnabled")
 class EMNavProcessor(
@@ -153,40 +155,43 @@ class EMNavProcessor(
         ) { navListener.onError(it) }
     }
 
-    suspend fun maskedValues(
+     fun maskedValues(
         values: List<Response>,
-    ): List<Response> {
+    ): Flow<Response> {
         val validationJsonOutput = FileUtils.getValidationJson(getActivity(), survey.id)!!
         val schema = validationJsonOutput.schema.filter { it.columnName == ColumnName.VALUE }.map {
             it.componentCode
         }
         val labels =
             validationJsonOutput.survey.labels("", validationJsonOutput.survey.defaultLang())
-        return values.map { response ->
-            val newValues = mutableMapOf<String, String>()
-            val oldValues = response.values
-            val start = System.currentTimeMillis()
+        return flow {
+            values.forEach { response ->
+                val newValues = mutableMapOf<String, String>()
+                val oldValues = response.values
+                val start = System.currentTimeMillis()
 
-            val maskedValues = maskedValuesUseCase(
-                response.values,
-                validationJsonOutput
-            )
-            Log.e("time", "maskedUseCase ${System.currentTimeMillis() - start}")
+                val maskedValues = maskedValuesUseCase(
+                    response.values,
+                    validationJsonOutput
+                )
+                Log.d("time", "maskedUseCase ${System.currentTimeMillis() - start}")
 
-            schema.forEach { column ->
-                val key = "$column.value"
-                oldValues[key]?.let { value ->
-                    val newKey = labels[column]?.stripHTMLTags() ?: column
-                    val newValue =
-                        maskedValues[Dependency(column, ReservedCode.MaskedValue)]?.toString()
-                            ?: value
-                                .toString()
-                    newValues[newKey] = newValue
+                schema.forEach { column ->
+                    val key = "$column.value"
+                    oldValues[key]?.let { value ->
+                        val newKey = labels[column]?.stripHTMLTags() ?: column
+                        val newValue =
+                            maskedValues[Dependency(column, ReservedCode.MaskedValue)]?.toString()
+                                ?: value
+                                    .toString()
+                        newValues[newKey] = newValue
+                    }
                 }
-            }
 
-            response.copy(values = newValues)
+                emit(response.copy(values = newValues))
+            }
         }
+
     }
 
     private fun String.stripHTMLTags(): String {
@@ -216,7 +221,7 @@ class EMNavProcessor(
 
                 (webView.context as Activity).runOnUiThread {
                     webView.evaluateJavascript("JSON.parse(navigate($script))") { value ->
-                        Log.e("time", "javascript ${System.currentTimeMillis() - start}")
+                        Log.d("time", "javascript ${System.currentTimeMillis() - start}")
                         thread {
                             val result =measure("processResults") {
                                 navigationUseCaseWrapperImpl.processNavigationResult(value)
@@ -486,6 +491,6 @@ data class ApiNavigationOutput(
 fun <T> measure(name: String, block: () -> T): T {
     val start = System.currentTimeMillis().apply { }
     val result = block()
-    Log.e("time", "$name " + "${System.currentTimeMillis() - start}")
+    Log.d("time", "$name " + "${System.currentTimeMillis() - start}")
     return result
 }

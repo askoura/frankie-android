@@ -67,20 +67,18 @@ class ResponsesViewModel(
                     if (newList.size < PER_PAGE) {
                         lastPageReached = true
                     }
-                    val maskedValues = emNavProcessor.maskedValues(newList)
                     val count = newList.count { it.submitDate != null && !it.isSynced }
                     val quotaExceeded = surveyData.quotaExceeded(count)
-                    Log.e(
-                        "time",
-                        (System.currentTimeMillis() - start).toString() + " $this@ResponsesViewModel"
-                    )
-                    _responses.update {
-                        it.toMutableList().apply {
-                            addAll(maskedValues.map { response ->
-                                ResponseItem(response, editEnabled = !quotaExceeded)
-                            })
+                    emNavProcessor.maskedValues(newList).collect { response ->
+                        _responses.update {
+                            it.toMutableList()
+                                .apply { add(ResponseItem(response, editEnabled = !quotaExceeded)) }
                         }
                     }
+                    Log.d(
+                        "time",
+                        "loadNext ${System.currentTimeMillis() - start}"
+                    )
                 }
             _isLoading.update { false }
         }
