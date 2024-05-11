@@ -94,17 +94,13 @@ class FrankieWebView
                     )
                 } else {
                     return try {
-                        val data =
-                            context.assets.open(
-                                url.replace(
-                                    CUSTOM_DOMAIN,
-                                    "$REACT_APP_BUILD_FOLDER/"
-                                )
+                        val data = context.assets.open(
+                            url.replace(
+                                CUSTOM_DOMAIN, "$REACT_APP_BUILD_FOLDER/"
                             )
+                        )
                         WebResourceResponse(
-                            getMimeTypeFromExtension(extension),
-                            "utf-8",
-                            data
+                            getMimeTypeFromExtension(extension), "utf-8", data
                         )
                     } catch (e: FileNotFoundException) {
                         null
@@ -130,7 +126,8 @@ class FrankieWebView
                     surveyActivity?.stopRecording()
                 }
                 val string = mapper.writeValueAsString(apiNavigationOutput)
-                loadUrl("javascript:navigateOffline($string)")
+
+                loadUrlOnUiThread("javascript:navigateOffline($string)")
             }
 
             override fun onError(error: Throwable) {
@@ -165,7 +162,7 @@ class FrankieWebView
                     override fun onSuccess(apiNavigationOutput: ApiNavigationOutput) {
                         val string = mapper.writeValueAsString(apiNavigationOutput)
                         surveyActivity?.onResponseIdReceived(apiNavigationOutput.responseId.toString())
-                        loadUrl("javascript:navigateOffline($string)")
+                        loadUrlOnUiThread("javascript:navigateOffline($string)")
                     }
 
                     override fun onError(error: Throwable) {
@@ -174,8 +171,7 @@ class FrankieWebView
                 })
             } else {
                 navigate(
-                    mapper,
-                    NavigateRequest(
+                    mapper, NavigateRequest(
                         responseId = UUID.fromString(responseId),
                         navigationDirection = NavigationDirection.Resume
                     )
@@ -190,8 +186,8 @@ class FrankieWebView
             operationKey = key
             val uuid = UUID.randomUUID()
             val file = FileUtils.getResponseFile(context, uuid.toString(), survey.id)
-            saverUri = FileProvider
-                .getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", file)
+            saverUri =
+                FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", file)
             surveyActivity?.takePhoto(saverUri!!)
         }
 
@@ -207,8 +203,11 @@ class FrankieWebView
                 val intent = Intent(Intent.ACTION_VIEW)
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 val file = FileUtils.getResponseFile(context, fileName, survey.id)
-                val uri = FileProvider
-                    .getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", file)
+                val uri = FileProvider.getUriForFile(
+                    context,
+                    BuildConfig.APPLICATION_ID + ".provider",
+                    file
+                )
                 intent.setDataAndType(uri, "*/*")
                 context.startActivity(intent)
             }
@@ -233,25 +232,19 @@ class FrankieWebView
         @JavascriptInterface
         fun uploadFile(key: String, fileName: String) {
             context.contentResolver.openInputStream(saverUri!!)?.let {
-                val uploadFile =
-                    emNavProcessor.uploadFile(key, fileName, it)
+                val uploadFile = emNavProcessor.uploadFile(key, fileName, it)
                 val string = jacksonKtMapper.writeValueAsString(uploadFile)
                 resetFileUploadVariables()
-                (context as Activity).runOnUiThread {
-                    loadUrl("javascript:onFileUploaded($string)")
-                }
+                loadUrlOnUiThread("javascript:onFileUploaded($string)")
             }
 
         }
 
         @JavascriptInterface
         fun uploadDataUrl(key: String, dataUrl: String, fileName: String) {
-            val uploadFile =
-                emNavProcessor.uploadDataUrl(key, dataUrl, fileName)
+            val uploadFile = emNavProcessor.uploadDataUrl(key, dataUrl, fileName)
             val string = jacksonKtMapper.writeValueAsString(uploadFile)
-            (context as Activity).runOnUiThread {
-                loadUrl("javascript:onDataUrlUploaded($string)")
-            }
+            loadUrlOnUiThread("javascript:onDataUrlUploaded($string)")
         }
 
         @JavascriptInterface
@@ -281,17 +274,12 @@ class FrankieWebView
     private fun getRuntimeJs(): WebResourceResponse {
         val script = FileUtils.getValidationJson(context, survey.id)?.script
         return WebResourceResponse(
-            "text/javascript",
-            "utf-8",
-            200,
-            "OK",
-            mutableMapOf(
+            "text/javascript", "utf-8", 200, "OK", mutableMapOf(
                 "Access-Control-Allow-Origin" to "*",
                 "Access-Control-Allow-Methods" to "GET,POST,PUT,DELETE",
                 "Access-Control-Allow-Credentials" to "true",
                 "Access-Control-Allow-Headers" to "access-control-allow-origin"
-            ),
-            (script + "\n" + ScriptUtils().commonScript).byteInputStream()
+            ), (script + "\n" + ScriptUtils().commonScript).byteInputStream()
         )
     }
 
@@ -302,12 +290,7 @@ class FrankieWebView
             return null
         }
         return WebResourceResponse(
-            "",
-            "utf-8",
-            200,
-            "OK",
-            mutableMapOf("Access-Control-Allow-Origin" to "*"),
-            inputStream
+            "", "utf-8", 200, "OK", mutableMapOf("Access-Control-Allow-Origin" to "*"), inputStream
         )
     }
 
@@ -341,10 +324,7 @@ class FrankieWebView
             val shouldCompress = isSizeViolated(size, true)
             val uuid = UUID.fromString(saverUri.toString().substringAfterLast("/"))
             val result = emNavProcessor.saveFileResponse(
-                fileName = "captured-image.jpg",
-                uuid = uuid,
-                fileSize = size,
-                key = operationKey!!
+                fileName = "captured-image.jpg", uuid = uuid, fileSize = size, key = operationKey!!
             )
             val finalSize = if (shouldCompress) {
                 compress(
@@ -355,15 +335,13 @@ class FrankieWebView
                 result.size
             }
             Log.d("blah", "after")
-            (context as Activity).runOnUiThread {
-                loadUrl(
-                    "javascript:onPhotoCaptured$operationKey(${
-                        jacksonKtMapper.writeValueAsString(
-                            result.copy(size = finalSize)
-                        )
-                    })"
-                )
-            }
+            loadUrlOnUiThread(
+                "javascript:onPhotoCaptured$operationKey(${
+                    jacksonKtMapper.writeValueAsString(
+                        result.copy(size = finalSize)
+                    )
+                })"
+            )
 
         } finally {
             stream?.close()
@@ -383,8 +361,12 @@ class FrankieWebView
     }
 
     fun onBarcodeScanned(contents: String) {
+        loadUrlOnUiThread("javascript:onBarcodeScanned$operationKey(\"$contents\")")
+    }
+
+    private fun loadUrlOnUiThread(url: String) {
         (context as Activity).runOnUiThread {
-            loadUrl("javascript:onBarcodeScanned$operationKey(\"$contents\")")
+            loadUrl(url)
         }
     }
 
@@ -399,19 +381,15 @@ class FrankieWebView
                 return
             }
             val result = emNavProcessor.uploadFile(
-                key = operationKey!!,
-                fileName = "captured-video.mp4",
-                byteArray = byteArray
+                key = operationKey!!, fileName = "captured-video.mp4", byteArray = byteArray
             )
-            (context as Activity).runOnUiThread {
-                loadUrl(
-                    "javascript:onVideoCaptured$operationKey(${
-                        jacksonKtMapper.writeValueAsString(
-                            result
-                        )
-                    })"
-                )
-            }
+            loadUrlOnUiThread(
+                "javascript:onVideoCaptured$operationKey(${
+                    jacksonKtMapper.writeValueAsString(
+                        result
+                    )
+                })"
+            )
 
         } finally {
             stream?.close()
@@ -427,9 +405,7 @@ class FrankieWebView
         } ?: false
         if (sizeViolated) {
             surveyActivity?.showMaxSizeValidation(
-                sizeInKb.toInt(),
-                maxSizeKb!!,
-                compressionPossible
+                sizeInKb.toInt(), maxSizeKb!!, compressionPossible
             )
         }
         return sizeViolated
@@ -441,10 +417,9 @@ class FrankieWebView
             val cursor = context.contentResolver.query(uri, null, null, null, null)
 
             if (cursor != null && cursor.moveToFirst()) {
-                val displayName =
-                    cursor.getString(
-                        cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                    )
+                val displayName = cursor.getString(
+                    cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                )
                 val size = cursor.getLong(cursor.getColumnIndex(OpenableColumns.SIZE))
                 if (isSizeViolated(size)) {
                     resetFileUploadVariables()
@@ -453,7 +428,7 @@ class FrankieWebView
                 val fileType = context.contentResolver.getType(uri)
                 saverUri = uri
                 cursor.close()
-                loadUrl("javascript:onFileSelected$operationKey(\"$displayName\", $size, \"$fileType\")")
+                loadUrlOnUiThread("javascript:onFileSelected$operationKey(\"$displayName\", $size, " + "\"$fileType\")")
             }
         } catch (e: Exception) {
             resetFileUploadVariables()

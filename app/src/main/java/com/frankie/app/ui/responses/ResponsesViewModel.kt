@@ -1,5 +1,6 @@
 package com.frankie.app.ui.responses
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.frankie.app.AppEvent
@@ -62,12 +63,17 @@ class ResponsesViewModel(
             _isLoading.update { true }
             responsesRepository.getResponses(surveyData.id, currentPage++, PER_PAGE)
                 .let { newList ->
+                    val start = System.currentTimeMillis()
                     if (newList.size < PER_PAGE) {
                         lastPageReached = true
                     }
                     val maskedValues = emNavProcessor.maskedValues(newList)
                     val count = newList.count { it.submitDate != null && !it.isSynced }
                     val quotaExceeded = surveyData.quotaExceeded(count)
+                    Log.e(
+                        "time",
+                        (System.currentTimeMillis() - start).toString() + " $this@ResponsesViewModel"
+                    )
                     _responses.update {
                         it.toMutableList().apply {
                             addAll(maskedValues.map { response ->
@@ -92,6 +98,11 @@ class ResponsesViewModel(
                 }
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        emNavProcessor.destroy()
     }
 
     companion object {
