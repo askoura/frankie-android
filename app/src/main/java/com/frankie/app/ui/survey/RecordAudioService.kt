@@ -123,6 +123,7 @@ class AudioRecordingService : Service() {
             ContextCompat.startForegroundService(context, intent)
         }
 
+        /** will cause crash if there is no permission as it also calls startForegroundService */
         fun stop(context: Context) {
             val stopIntent = Intent(context, AudioRecordingService::class.java)
             stopIntent.action = STOP_FOREGROUND_ACTION
