@@ -1,5 +1,6 @@
 package com.frankie.app.di
 
+import android.app.NotificationManager
 import android.content.Context
 import androidx.work.WorkManager
 import com.frankie.app.BuildConfig
@@ -20,6 +21,8 @@ import com.frankie.app.ui.common.error.ErrorDisplayManager
 import com.frankie.app.ui.common.error.ErrorDisplayManagerImpl
 import com.frankie.app.ui.common.error.ErrorProcessor
 import com.frankie.app.ui.common.error.ErrorProcessorImpl
+import com.frankie.app.ui.notification.FrankieNotificationManager
+import com.frankie.app.ui.notification.FrankieNotificationManagerImpl
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import org.koin.android.ext.koin.androidContext
@@ -36,14 +39,19 @@ val androidModule = module {
     single { get<FrankieDb>().surveyDataDao() }
     single { get<FrankieDb>().permissionDao() }
     single { get<FrankieDb>().responseDao() }
+    single<NotificationManager> {
+        get<Context>(named("appContext"))
+            .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    }
+    single<FrankieNotificationManager> {
+        FrankieNotificationManagerImpl(get(named("appContext")), get())
+    }
     single { WorkManager.getInstance(get()) }
     single<BackgroundSync> { BackgroundSyncImpl(get()) }
     single<ConnectivityChecker> { ConnectivityCheckerImpl(get()) }
     single {
         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(BuildConfig.AUTH_CLIENT_ID)
-            .requestEmail()
-            .build()
+            .requestIdToken(BuildConfig.AUTH_CLIENT_ID).requestEmail().build()
     }
     single { GoogleSignIn.getClient(androidContext(), get()) }
     factory<ErrorProcessor> { ErrorProcessorImpl(get()) }
