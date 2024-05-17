@@ -1,9 +1,6 @@
 package com.frankie.app.ui.survey
 
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -12,15 +9,13 @@ import android.os.Build
 import android.os.IBinder
 import android.os.Parcelable
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
-import com.frankie.app.R
 import com.frankie.app.business.parcelable
 import com.frankie.app.business.responses.ResponseRepository
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.ui.common.FileUtils
+import com.frankie.app.ui.notification.FrankieNotificationManager
 import com.frankie.expressionmanager.model.ResponseEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,10 +24,13 @@ import org.koin.android.ext.android.inject
 import java.io.IOException
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.util.UUID
+import java.util.*
 
 
 class AudioRecordingService : Service() {
+
+    private val frankieNotificationManager by inject<FrankieNotificationManager>()
+
     private var mediaRecorder: MediaRecorder? = null
 
     private val responseRepository: ResponseRepository by inject()
@@ -40,7 +38,6 @@ class AudioRecordingService : Service() {
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
-
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         startForegroundService()
@@ -67,45 +64,7 @@ class AudioRecordingService : Service() {
     }
 
     private fun startForegroundService() {
-        val channelId =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                createNotificationChannel()
-            } else {
-                ""
-            }
-
-
-        val notification: Notification = NotificationCompat.Builder(this, channelId)
-            .setContentTitle("Audio Recording")
-            .setContentText("Recording audio...")
-            .setForegroundServiceBehavior(FOREGROUND_SERVICE_IMMEDIATE)
-            .setSmallIcon(R.drawable.baseline_record_voice_over_24)
-            .build()
-
-        startForeground(1, notification)
-    }
-
-    private fun createNotificationChannel(): String {
-        val channelId = "recording_channel"
-        val channelName = "Recording Channel"
-        val channelDescription = "Audio Recording Channel"
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-            val channel = NotificationChannel(
-                channelId,
-                channelName,
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            channel.description = channelDescription
-
-            notificationManager.createNotificationChannel(channel)
-            return channelId
-        } else {
-            // For devices running on older Android versions, return an empty channel ID
-            return ""
-        }
+        startForeground(1, frankieNotificationManager.createAudioRecordingNotification())
     }
 
     private fun startRecording(surveyId: String, responseId: String) {

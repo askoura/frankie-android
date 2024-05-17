@@ -68,6 +68,13 @@
 FirebaseAnalytics uses an advertising ID. You can restrict this use in the device settings of your mobile device: Settings&gt; Google&gt; Ads&gt; Reset Advertising ID.</string>
     <string name="consent_firebase_title">Firebase</string>
     <string name="login_as_guest">Try app as guest</string>
-    <string name="notification_uploader_title">Uploading...</string>
+    <string name="notification_channel_uploader_name">Upload progress</string>
+    <string name="notification_channel_uploader_description">Survey responses upload
+        progress</string>
+    <string name="notification_channel_audio_rec_name">Audio recording</string>
+    <string name="notification_channel_audio_rec_description">Audio recording status</string>
+    <string name="notification_uploader_title">Uploading…</string>
     <string name="notification_uploader_description">Upload with server in progress</string>
+    <string name="notification_audio_recording_title">Audio Recording</string>
+    <string name="notification_audio_recording_description">Recording audio in progress…</string>
 </resources>
