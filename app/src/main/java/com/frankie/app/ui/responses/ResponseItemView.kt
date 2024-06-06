@@ -24,11 +24,11 @@ class ResponseItemView @JvmOverloads constructor(
     }
 
     fun bind(
-        responseItem: ResponseItem,
+        responseItem: ResponseItemData,
         onResumeClicked: (Response) -> Unit,
         onDeleteClicked: (Response) -> Unit
     ) {
-        val response = responseItem.responses
+        val response = responseItem.responseValue
         binding.edit.visibility = if (response.submitDate == null) VISIBLE else GONE
         binding.edit.isEnabled = responseItem.editEnabled
         binding.edit.setEnabledTint(context, responseItem.editEnabled)

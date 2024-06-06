@@ -20,11 +20,8 @@ class ResponsesViewModel(
     private val eventBus: EventBus,
 ) : ViewModel() {
     private lateinit var surveyData: SurveyData
-    private val _responses = MutableStateFlow<List<ResponseItem>>(emptyList())
-    val responses = _responses.asStateFlow()
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
-    private var lastPageReached = false
+    private val _responsesScreenData = MutableStateFlow(ResponsesScreenState())
+    val responsesScreenData = _responsesScreenData.asStateFlow()
     lateinit var emNavProcessor: EMNavProcessor
     private var currentPage: Int = 0
 
@@ -39,40 +36,52 @@ class ResponsesViewModel(
         }
     }
 
-    fun shouldLoadNextPage() = !_isLoading.value && !lastPageReached
-
     fun fetchResponses(surveyData: SurveyData) {
         this.surveyData = surveyData
+        _responsesScreenData.update {
+            it.copy(
+                completeResponsesCount = surveyData
+                    .localCompleteResponsesCount, inCompleteResponsesCount = surveyData
+                    .totalResponseCount - surveyData.localCompleteResponsesCount
+            )
+        }
         refresh()
     }
 
     fun refresh() {
         viewModelScope.launch {
-            currentPage = 0
-            lastPageReached = false
-            _responses.update { emptyList() }
-            loadNext()
+            if (!_responsesScreenData.value.isLoading) {
+                currentPage = 0
+                _responsesScreenData.update { it.copy(isComplete = false, responses = emptyList()) }
+                loadNext()
+            }
         }
     }
 
     fun loadNext() {
-        if (!shouldLoadNextPage()) {
+        if (!_responsesScreenData.value.shouldLoad()) {
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
-            _isLoading.update { true }
+            _responsesScreenData.update { it.copy(isLoading = true) }
             responsesRepository.getResponses(surveyData.id, currentPage++, PER_PAGE)
                 .let { newList ->
                     val start = System.currentTimeMillis()
-                    if (newList.size < PER_PAGE) {
-                        lastPageReached = true
-                    }
                     val count = newList.count { it.submitDate != null && !it.isSynced }
                     val quotaExceeded = surveyData.quotaExceeded(count)
                     emNavProcessor.maskedValues(newList).collect { response ->
-                        _responses.update {
-                            it.toMutableList()
-                                .apply { add(ResponseItem(response, editEnabled = !quotaExceeded)) }
+                        _responsesScreenData.update {
+                            it.copy(isLoading = false,
+                                isComplete = newList.size < PER_PAGE,
+                                responses = it.responses.toMutableList()
+                                    .apply {
+                                        add(
+                                            ResponseItemData(
+                                                response,
+                                                editEnabled = !quotaExceeded
+                                            )
+                                        )
+                                    })
                         }
                     }
                     Log.d(
@@ -80,19 +89,18 @@ class ResponsesViewModel(
                         "loadNext ${System.currentTimeMillis() - start}"
                     )
                 }
-            _isLoading.update { false }
         }
     }
 
     fun deleteResponse(responseId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             responsesRepository.deleteResponse(responseId).let {
-                _responses.update { responses ->
-                    val list = responses.filter { it.responses.id != responseId }
+                _responsesScreenData.update { screenData ->
+                    val list = screenData.responses.filter { it.responseValue.id != responseId }
                     val count =
-                        list.count { it.responses.submitDate != null && !it.responses.isSynced }
+                        list.count { it.responseValue.submitDate != null && !it.responseValue.isSynced }
                     val quotaExceeded = surveyData.quotaExceeded(count)
-                    list.map { it.copy(editEnabled = !quotaExceeded) }
+                    screenData.copy(responses = list.map { it.copy(editEnabled = !quotaExceeded) })
                 }
             }
         }
@@ -108,4 +116,4 @@ class ResponsesViewModel(
     }
 }
 
-data class ResponseItem(val responses: Response, val editEnabled: Boolean)
+data class ResponseItemData(val responseValue: Response, val editEnabled: Boolean)

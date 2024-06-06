@@ -35,6 +35,14 @@
     <string name="response_start_date">Start Date: %s</string>
     <string name="response_submit_date">Submit Date: %s</string>
     <string name="response_lang">Language: %s</string>
+    <string name="responses_screen_complete_responses">Complete responses</string>
+    <string name="responses_screen_incomplete_responses">Incomplete responses</string>
+    <string name="responses_screen_last_sync_time">Last sync: </string>
+    <string name="responses_screen_sync_button">Sync</string>
+    <string name="response_item_started">Started</string>
+    <string name="response_item_completed">Completed</string>
+    <string name="response_item_synced">Synced</string>
+    <string name="response_item_language">Language</string>
     <string name="permission_denied">Permission Denied!!</string>
     <string name="canceled">Cancelled</string>
     <string name="press_back_to_exit">\"Press back again to exit.</string>
@@ -77,4 +85,6 @@ FirebaseAnalytics uses an advertising ID. You can restrict this use in the devic
     <string name="notification_uploader_description">Upload with server in progress</string>
     <string name="notification_audio_recording_title">Audio Recording</string>
     <string name="notification_audio_recording_description">Recording audio in progress…</string>
+    <string name="sync_time_never">Never</string>
+    <string name="back">Back</string>
 </resources>
