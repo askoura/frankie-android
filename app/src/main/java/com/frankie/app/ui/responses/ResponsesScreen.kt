@@ -44,6 +44,7 @@ import java.time.Month
 
 
 data class ResponsesScreenState(
+    val isSyncing: Boolean = false,
     val isLoading: Boolean = false,
     val responses: List<ResponseItemData> = listOf(),
     val completeResponsesCount: Int = 0,
@@ -142,8 +143,10 @@ private fun ResponseItem(
                 fontWeight = FontWeight.SemiBold,
                 text = responseItem.responseValue.id
             )
-            IconButton(onClick = { onEditClicked(responseItem.responseValue.id) }) {
-                Icon(Icons.Filled.Edit, contentDescription = "Edit")
+            if (responseItem.editEnabled) {
+                IconButton(onClick = { onEditClicked(responseItem.responseValue.id) }) {
+                    Icon(Icons.Filled.Edit, contentDescription = "Edit")
+                }
             }
             IconButton(onClick = { onDeleteClicked(responseItem.responseValue.id) }) {
                 Icon(Icons.Filled.Delete, contentDescription = "Delete")

@@ -7,6 +7,7 @@ import com.frankie.app.AppEvent
 import com.frankie.app.EventBus
 import com.frankie.app.business.responses.ResponseRepository
 import com.frankie.app.business.survey.SurveyData
+import com.frankie.app.business.survey.UploadSurveyResponsesUseCase
 import com.frankie.app.db.model.Response
 import com.frankie.app.ui.survey.EMNavProcessor
 import kotlinx.coroutines.Dispatchers
@@ -18,6 +19,7 @@ import kotlinx.coroutines.launch
 class ResponsesViewModel(
     private val responsesRepository: ResponseRepository,
     private val eventBus: EventBus,
+    private val uploadSurveyResponsesUseCase: UploadSurveyResponsesUseCase
 ) : ViewModel() {
     private lateinit var surveyData: SurveyData
     private val _responsesScreenData = MutableStateFlow(ResponsesScreenState())
@@ -40,12 +42,25 @@ class ResponsesViewModel(
         this.surveyData = surveyData
         _responsesScreenData.update {
             it.copy(
-                completeResponsesCount = surveyData
-                    .localCompleteResponsesCount, inCompleteResponsesCount = surveyData
-                    .totalResponseCount - surveyData.localCompleteResponsesCount
+                completeResponsesCount = surveyData.localCompleteResponsesCount,
+                inCompleteResponsesCount = surveyData.localResponsesCount - surveyData.localCompleteResponsesCount
             )
         }
         refresh()
+    }
+
+    fun sync() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _responsesScreenData.update { it.copy(isSyncing = true) }
+            try {
+                uploadSurveyResponsesUseCase.uploadSurvey(surveyId = surveyData.id)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                _responsesScreenData.update { it.copy(isSyncing = false) }
+                fetchResponses(surveyData)
+            }
+        }
     }
 
     fun refresh() {
