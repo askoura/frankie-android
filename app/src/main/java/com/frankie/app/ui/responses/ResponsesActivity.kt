@@ -20,8 +20,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.frankie.app.R
 import com.frankie.app.business.parcelable
 import com.frankie.app.business.survey.SurveyData
@@ -86,29 +84,6 @@ class ResponsesActivity : ComponentActivity() {
         }
     }
 
-//        binding = ActivityResponsesBinding.inflate(layoutInflater)
-//        setContentView(binding.root)
-//        adapter = ResponseListAdapter({ response: Response ->
-//        }, { response: Response ->
-//            viewModel.deleteResponse(response.id)
-//        })
-//        val lm = LinearLayoutManager(binding.root.context)
-//        binding.recycler.adapter = adapter
-//        binding.recycler.layoutManager = lm
-//        binding.swipe.setOnRefreshListener {
-//            viewModel.refresh()
-//        }
-//        binding.recycler.addOnScrollListener(
-//            PaginationScrollListener(lm, viewModel::shouldLoadNextPage, viewModel::loadNext)
-//        )
-//
-
-//
-
-//
-//        title = getString(R.string.title_activity_responses)
-//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
@@ -126,24 +101,5 @@ class ResponsesActivity : ComponentActivity() {
             Intent(context, ResponsesActivity::class.java).apply {
                 putExtra(SURVEY, survey as Parcelable)
             }
-    }
-}
-
-class PaginationScrollListener(
-    private val layoutManager: LinearLayoutManager,
-    private val shouldLoadMore: () -> Boolean,
-    private val onLoadMore: () -> Unit,
-) : RecyclerView.OnScrollListener() {
-
-    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-        super.onScrolled(recyclerView, dx, dy)
-        val visibleItemCount: Int = layoutManager.childCount
-        val totalItemCount: Int = layoutManager.itemCount
-        val firstVisibleItemPosition: Int = layoutManager.findFirstVisibleItemPosition()
-        if (shouldLoadMore()) {
-            if (visibleItemCount + firstVisibleItemPosition >= totalItemCount - 4 && firstVisibleItemPosition >= 0) {
-                onLoadMore()
-            }
-        }
     }
 }

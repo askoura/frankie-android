@@ -28,7 +28,9 @@ data class SurveyData(
     val saveTimings: Boolean,
     val backgroundAudio: Boolean,
     val recordGps: Boolean,
-    val isSyncing: Boolean = false
+    val isSyncing: Boolean = false,
+    val description: String,
+    val imageUrl: String
 ) : Parcelable {
 
     private val scheduled: Boolean
@@ -82,27 +84,28 @@ data class SurveyData(
         ): SurveyData {
             return SurveyData(
                 id = survey.id,
-                survey.creationDate,
-                survey.lastModified,
-                survey.startDate,
-                survey.endDate,
-                survey.name,
-                survey.status,
-                survey.usage,
-                survey.surveyQuota,
-                survey.userQuota,
-                currentPublishInfo,
-                newVersionAvailable,
-                responsesCount,
-                completeResponsesCount,
-                unsyncedCount,
-                survey.syncedResponseCount,
-                survey.totalResponseCount,
-                survey.saveTimings,
-                survey.backgroundAudio,
-                survey.recordGps,
-
-                )
+                creationDate = survey.creationDate,
+                lastModified = survey.lastModified,
+                startDate = survey.startDate,
+                endDate = survey.endDate,
+                name = survey.name,
+                status = survey.status,
+                usage = survey.usage,
+                surveyQuota = survey.surveyQuota,
+                userQuota = survey.userQuota,
+                publishInfo = currentPublishInfo,
+                newVersionAvailable = newVersionAvailable,
+                localResponsesCount = responsesCount,
+                localCompleteResponsesCount = completeResponsesCount,
+                localUnsyncedResponsesCount = unsyncedCount,
+                syncedResponseCount = survey.syncedResponseCount,
+                totalResponseCount = survey.totalResponseCount,
+                saveTimings = survey.saveTimings,
+                backgroundAudio = survey.backgroundAudio,
+                recordGps = survey.recordGps,
+                description = survey.description ?: "",
+                imageUrl = survey.imageUrl ?: ""
+            )
         }
     }
 }

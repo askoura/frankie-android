@@ -64,6 +64,11 @@
             android:theme="@style/Theme.Frankie.NoActionBar" />
 
         <activity
+            android:name=".ui.survey.SurveyInfoActivity"
+            android:exported="false"
+            android:label="" />
+
+        <activity
             android:name="com.frankie.app.ui.main.MainActivity"
             android:exported="false"
             android:label="" />

@@ -34,7 +34,9 @@ data class Survey(
     @JsonProperty("userQuota") val userQuota: Int,
     @JsonProperty("saveTimings") val saveTimings: Boolean,
     @JsonProperty("backgroundAudio") val backgroundAudio: Boolean,
-    @JsonProperty("recordGps") val recordGps: Boolean
+    @JsonProperty("recordGps") val recordGps: Boolean,
+    @JsonProperty("imageUrl") val imageUrl: String?,
+    @JsonProperty("description") val description: String?
 )
 
 data class UploadResponseRequestData(

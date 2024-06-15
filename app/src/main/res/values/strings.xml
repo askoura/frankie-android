@@ -87,4 +87,22 @@ FirebaseAnalytics uses an advertising ID. You can restrict this use in the devic
     <string name="notification_audio_recording_description">Recording audio in progress…</string>
     <string name="sync_time_never">Never</string>
     <string name="back">Back</string>
+    <string name="survey_creation_date">Created</string>
+    <string name="survey_last_modified">Last modified</string>
+    <string name="survey_start_date">Starts</string>
+    <string name="survey_end_date">Ends</string>
+    <string name="survey_new_version_available">New version available</string>
+    <string name="survey_local_responses">Total local responses</string>
+    <string name="survey_local_complete_responses">Complete responses</string>
+    <string name="survey_local_incomplete_responses">Incomplete responses</string>
+    <string name="survey_synced_responses">Synced responses</string>
+    <string name="survey_unsynced_responses">To sync responses</string>
+    <string name="survey_stats_quota">Quota</string>
+    <string name="survey_stats_user_quota">User quota</string>
+    <string name="survey_save_timings">Save timings</string>
+    <string name="enabled">Enabled</string>
+    <string name="disabled">Disabled</string>
+    <string name="survey_background_audio">Audio recording</string>
+    <string name="survey_record_gps">Location tracking</string>
+    <string name="survey_status">Status</string>
 </resources>

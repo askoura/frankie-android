@@ -24,6 +24,7 @@ import com.frankie.app.ui.common.visibleOrGone
 import com.frankie.app.ui.login.LoginActivity
 import com.frankie.app.ui.responses.ResponsesActivity
 import com.frankie.app.ui.survey.SurveyActivity
+import com.frankie.app.ui.survey.SurveyInfoActivity
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.getViewModel
@@ -104,7 +105,11 @@ class MainFragment : Fragment() {
                     )
                 )
             },
-            onInfoClicked = { },
+            onInfoClicked = { surveyData ->
+                startActivity(
+                    SurveyInfoActivity.createIntent(binding.root.context, surveyData)
+                )
+            },
             onUploadClicked = {
                 viewModel.uploadSurveyResponses()
             })

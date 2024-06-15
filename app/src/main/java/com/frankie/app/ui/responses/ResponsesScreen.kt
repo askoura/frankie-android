@@ -1,6 +1,5 @@
 package com.frankie.app.ui.responses
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,15 +26,14 @@ import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.frankie.app.R
 import com.frankie.app.db.model.Response
+import com.frankie.app.ui.common.compose.boldDescriptionString
+import com.frankie.app.ui.common.compose.boldValueString
 import com.frankie.app.ui.common.theme.Color
 import com.frankie.app.ui.common.toFormattedString
 import com.frankie.expressionmanager.model.NavigationIndex
@@ -173,7 +171,6 @@ private fun ResponseItem(
                     R.string.response_item_synced,
                     responseItem.responseValue.isSynced.toString()
                 )
-
             )
             StatText(
                 modifier = Modifier.weight(1f),
@@ -184,12 +181,12 @@ private fun ResponseItem(
             )
         }
         responseItem.responseValue.values.forEach { (key, value) ->
-            StatText(text = buildAnnotatedString {
-                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                    append("$key: ")
-                }
-                append(value.toString())
-            })
+            StatText(
+                text = boldDescriptionString(
+                    description = key,
+                    value = value.toString()
+                )
+            )
         }
     }
 }
@@ -206,19 +203,6 @@ private fun StatText(
     )
 }
 
-@Composable
-private fun boldValueString(@StringRes descriptionRes: Int, value: String) =
-    buildAnnotatedString {
-        append(stringResource(descriptionRes))
-        append(": ")
-        withStyle(
-            SpanStyle(
-                fontWeight = FontWeight.Bold
-            )
-        ) {
-            append(value)
-        }
-    }
 
 @Preview(showBackground = true)
 @Composable
