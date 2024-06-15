@@ -22,9 +22,9 @@ val mainModule = module {
     single<UploadSurveyResponsesUseCase> {
         UploadSurveyResponsesUseCaseImpl(
             get(), get(), get(),
-            get()
+            get(), get()
         )
     }
     single<DownloadManager> { DownloadManagerImpl(get(named("appContext")), get()) }
-    viewModel { MainViewModel(get(), get(), get(), get(),  get(), get(), get()) }
+    viewModel { MainViewModel(get(), get(), get(), get(), get(), get(), get()) }
 }

@@ -6,8 +6,6 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.frankie.app.db.model.Response
-import com.frankie.app.db.permission.PermissionDao
-import com.frankie.app.db.permission.PermissionEntity
 import com.frankie.app.db.survey.SurveyDao
 import com.frankie.app.db.survey.SurveyDataEntity
 
@@ -16,7 +14,6 @@ import com.frankie.app.db.survey.SurveyDataEntity
     entities = [
         Response::class,
         SurveyDataEntity::class,
-        PermissionEntity::class
     ],
     version = 1,
     exportSchema = false
@@ -32,8 +29,6 @@ import com.frankie.app.db.survey.SurveyDataEntity
 abstract class FrankieDb : RoomDatabase() {
     abstract fun responseDao(): ResponseDao
     abstract fun surveyDataDao(): SurveyDao
-    abstract fun permissionDao(): PermissionDao
-
     companion object {
 
         @Volatile

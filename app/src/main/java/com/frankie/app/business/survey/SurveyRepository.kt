@@ -1,16 +1,16 @@
 package com.frankie.app.business.survey
 
+import android.content.Context
 import com.frankie.app.api.survey.PublishInfo
 import com.frankie.app.api.survey.Survey
 import com.frankie.app.api.survey.SurveyDesign
 import com.frankie.app.api.survey.SurveyService
 import com.frankie.app.api.survey.UploadResponseRequestData
 import com.frankie.app.db.ResponseDao
-import com.frankie.app.db.permission.PermissionDao
-import com.frankie.app.db.permission.PermissionEntity
 import com.frankie.app.db.survey.PublishInfoEntity
 import com.frankie.app.db.survey.SurveyDao
 import com.frankie.app.db.survey.SurveyDataEntity
+import com.frankie.app.ui.common.FileUtils
 import com.frankie.expressionmanager.model.DataType
 import com.frankie.expressionmanager.model.jacksonKtMapper
 import com.frankie.expressionmanager.usecase.ValidationOutput
@@ -27,7 +27,8 @@ interface SurveyRepository {
 
     suspend fun getSurveyDbEntity(surveyId: String): SurveyDataEntity?
     fun getSurveyList(): Flow<List<SurveyData>>
-    suspend fun getOfflineSurveyList(includeGuest: Boolean = true): List<SurveyData>
+    suspend fun shouldSync(): Boolean
+    suspend fun getOfflineSurveyList(): List<SurveyData>
 
     suspend fun getOfflineSurvey(surveyId: String): SurveyData
     fun getSurveyFile(surveyId: String, resourceId: String): Flow<Result<DataStream>>
@@ -54,18 +55,19 @@ interface SurveyRepository {
     suspend fun updateSurveyInDB(survey: Survey)
 
     suspend fun surveyDesign(surveyData: SurveyData): SurveyDesign
+    suspend fun clearSurveyFiles()
 
     sealed class DataStream {
         class Chunk(val bytes: ByteArray) : DataStream()
-        object End : DataStream()
+        data object End : DataStream()
     }
 }
 
 class SurveyRepositoryImpl(
     private val service: SurveyService,
     private val surveyDao: SurveyDao,
+    private val context: Context,
     private val responseDao: ResponseDao,
-    private val permissionDao: PermissionDao,
     private val sessionManager: SessionManager
 ) : SurveyRepository {
 
@@ -74,62 +76,82 @@ class SurveyRepositoryImpl(
 
     override fun getSurveyList(): Flow<List<SurveyData>> {
         return flow {
+            val offlineSurveys = getOfflineSurveyList()
+            emit(offlineSurveys)
             val list =
                 if (sessionManager.isGuest()) service.getGuestSurveyList() else service.getSurveyList()
             val surveyList = list.map { survey ->
-                val design = if (sessionManager.isGuest()) service.getGuestSurveyDesign(
-                    survey.id,
-                    PublishInfo()
-                )
-                else service.getSurveyDesign(survey.id, PublishInfo())
-                val savedSurvey = surveyDao.getSurveyDataById(survey.id)
-                val count = responseDao.countByUserAndSurvey(
-                    surveyId = survey.id,
-                    userId = sessionManager.getUserIdOrThrow()
-                )
-                val responseCount = responseDao.countCompleteByUserAndSurvey(
-                    surveyId = survey.id,
-                    userId = sessionManager.getUserIdOrThrow()
-                )
-                val unsyncedCount = responseDao.countUnsyncedByUserAndSurvey(
-                    surveyId = survey.id,
-                    userId = sessionManager.getUserIdOrThrow()
-                )
-                val newVersionAvailable = savedSurvey?.publishInfoEntity?.toPublishInfo()
-                    ?.let { it != design.publishInfo }
-                    ?: true
-                val surveyData = SurveyData.fromSurveyAndDesign(
-                    survey,
-                    savedSurvey?.publishInfoEntity?.toPublishInfo() ?: PublishInfo(),
-                    newVersionAvailable,
-                    count,
-                    responseCount,
-                    unsyncedCount
-                )
-                val fileQuestions = jacksonKtMapper.treeToValue(
-                    design.validationJsonOutput,
-                    ValidationOutput::class.java
-                )
-                    .schema.filter { it.dataType == DataType.FILE }
-                    .map { it.componentCode }
-
-                saveSurveyToDB(surveyData, fileQuestions)
-                surveyData
+                val offlineSurvey = offlineSurveys.firstOrNull { it.id == survey.id }
+                return@map if (survey.publishInfo.requiresUpdates(offlineSurvey?.publishInfo)) {
+                    offlineSurvey!!
+                } else {
+                    getSurveyDesign(survey, offlineSurvey)
+                }
             }
-
-            deletePermissionsForUserNotInList(surveyList)
-
+            offlineSurveys
+                .filter { offlineSurvey -> !surveyList.any { it.id == offlineSurvey.id } }
+                .forEach {
+                    deleteSurvey(it.id)
+                }
             emit(surveyList)
         }.flowOn(Dispatchers.IO)
     }
 
-    override suspend fun getOfflineSurveyList(includeGuest: Boolean): List<SurveyData> {
-        val userId = sessionManager.getUserIdOrThrow()
-        if (includeGuest) {
-            surveyDao.getAllSurveyData(sessionManager.getUserIdOrThrow())
+    override suspend fun shouldSync(): Boolean {
+        return !sessionManager.isGuest() && getOfflineSurveyList().any {
+            it
+                .localUnsyncedResponsesCount > 0
+        }
+    }
+
+    private suspend fun deleteSurvey(surveyId: String) {
+        FileUtils.deleteSurveyDirectory(context, surveyId)
+        surveyDao.deleteById(surveyId)
+    }
+
+    private suspend fun getSurveyDesign(survey: Survey, offlineSurvey: SurveyData?): SurveyData {
+        val design = if (sessionManager.isGuest()) {
+            service.getGuestSurveyDesign(survey.id, PublishInfo())
         } else {
-            surveyDao.getAllSurveyDataExcludeGuest(sessionManager.getUserIdOrThrow())
-        }.let { list ->
+            service.getSurveyDesign(survey.id, PublishInfo())
+        }
+        val count = responseDao.countByUserAndSurvey(
+            surveyId = survey.id,
+            userId = sessionManager.getUserIdOrThrow()
+        )
+        val responseCount = responseDao.countCompleteByUserAndSurvey(
+            surveyId = survey.id,
+            userId = sessionManager.getUserIdOrThrow()
+        )
+        val unsyncedCount = responseDao.countUnsyncedByUserAndSurvey(
+            surveyId = survey.id,
+            userId = sessionManager.getUserIdOrThrow()
+        )
+        val newVersionAvailable = offlineSurvey?.publishInfo?.toPublishInfo()
+            ?.let { it != design.publishInfo }
+            ?: true
+        val surveyData = SurveyData.fromSurveyAndDesign(
+            survey,
+            offlineSurvey?.publishInfo?.toPublishInfo() ?: PublishInfo(),
+            newVersionAvailable,
+            count,
+            responseCount,
+            unsyncedCount
+        )
+        val fileQuestions = jacksonKtMapper.treeToValue(
+            design.validationJsonOutput,
+            ValidationOutput::class.java
+        )
+            .schema.filter { it.dataType == DataType.FILE }
+            .map { it.componentCode }
+
+        saveSurveyToDB(surveyData, fileQuestions)
+        return surveyData
+    }
+
+    override suspend fun getOfflineSurveyList(): List<SurveyData> {
+        val userId = sessionManager.getUserIdOrThrow()
+        surveyDao.getAllSurveyData().let { list ->
             return list.map {
                 it.toSurveyData(
                     responseDao.countByUserAndSurvey(userId, it.id),
@@ -154,12 +176,6 @@ class SurveyRepositoryImpl(
 
     override suspend fun saveSurveyToDB(surveyData: SurveyData, fileQuestions: List<String>) {
         surveyDao.insert(surveyData.toSurveyDataEntity(fileQuestions))
-        permissionDao.insert(
-            PermissionEntity(
-                userId = sessionManager.getUserIdOrThrow(),
-                surveyId = surveyData.id
-            )
-        )
     }
 
     override suspend fun updateSurveyToDB(surveyData: SurveyData, fileQuestions: List<String>) {
@@ -172,18 +188,18 @@ class SurveyRepositoryImpl(
         } ?: throw IllegalStateException("Survey not found with id: ${survey.id}")
     }
 
-    private suspend fun deletePermissionsForUserNotInList(surveyList: List<SurveyData>) {
-        permissionDao.deletePermissionsForUserNotInList(
-            sessionManager.getUserIdOrThrow(),
-            surveyList.map { it.id })
-    }
-
     override suspend fun surveyDesign(surveyData: SurveyData): SurveyDesign {
         return if (sessionManager.isGuest()) service.getGuestSurveyDesign(
             surveyData.id, surveyData
                 .publishInfo
         )
         else service.getSurveyDesign(surveyData.id, surveyData.publishInfo)
+    }
+
+    override suspend fun clearSurveyFiles() {
+        surveyDao.getAllSurveyData().forEach {
+            FileUtils.deleteSurveyDirectory(context, it.id)
+        }
     }
 
     override fun getSurveyFile(
@@ -298,5 +314,9 @@ fun PublishInfo.toPublishInfoEntity(): PublishInfoEntity {
 
 fun PublishInfoEntity.toPublishInfo(): PublishInfo {
     return PublishInfo(version, subVersion, timeLastModified)
+}
+
+fun PublishInfo.toPublishInfo(): PublishInfo {
+    return PublishInfo(version, subVersion, lastModified)
 }
 

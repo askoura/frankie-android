@@ -21,13 +21,17 @@ class UploadSurveyResponsesUseCaseImpl(
     private val appContext: Context,
     private val responseRepository: ResponseRepository,
     private val surveyRepository: SurveyRepository,
+    private val sessionManager: SessionManager,
     private val eventBus: EventBus
 ) : UploadSurveyResponsesUseCase {
 
     override suspend fun invoke() {
         try {
+            if (sessionManager.isGuest()) {
+                return
+            }
             eventBus.emitEvent(AppEvent.UploadingResponse(true))
-            surveyRepository.getOfflineSurveyList(includeGuest = false)
+            surveyRepository.getOfflineSurveyList()
                 .filter {
                     it.surveyStatus == SurveyStatus.ACTIVE &&
                         it.localUnsyncedResponsesCount > 0
