@@ -16,12 +16,10 @@ import android.os.Looper
 import android.os.Parcelable
 import android.os.PersistableBundle
 import android.provider.MediaStore
-import android.webkit.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.lifecycle.coroutineScope
 import com.frankie.app.R
@@ -29,7 +27,7 @@ import com.frankie.app.business.parcelable
 import com.frankie.app.business.responses.ResponseRepository
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.databinding.ActivitySurveyBinding
-import com.frankie.expressionmanager.model.*
+import com.frankie.expressionmanager.model.ResponseEvent
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -44,7 +42,6 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.util.*
 
 
 class SurveyActivity : AppCompatActivity() {
@@ -57,7 +54,6 @@ class SurveyActivity : AppCompatActivity() {
     private var requestingLocationUpdates = false
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val responseRepository: ResponseRepository by inject()
-
 
     val survey: SurveyData
         get() = intent.parcelable(EXTRA_SURVEY)
@@ -167,8 +163,7 @@ class SurveyActivity : AppCompatActivity() {
         if (checkSelfPermission(this, permission.CAMERA)
             != PERMISSION_GRANTED
         ) {
-            val permissions = arrayOf(permission.CAMERA)
-            ActivityCompat.requestPermissions(this, permissions, REQUEST_CAMERA_PERMISSION)
+            requestCameraPermission.launch(permission.CAMERA)
         } else {
             onGranted()
         }
@@ -193,19 +188,17 @@ class SurveyActivity : AppCompatActivity() {
                         )
                     )
             }
-            ActivityCompat.requestPermissions(
-                this,
-                permissions.toTypedArray(),
-                REQUEST_RECORDING_PERMISSION
-            )
+            requestRecordingPermissionsLauncher.launch(permissions.toTypedArray())
         } else {
-            recordAudio()
             recordLocation()
+            recordAudio()
         }
     }
 
+    private var audioServiceStarted: Boolean = false
     private fun recordAudio() {
         if (survey.backgroundAudio) {
+            audioServiceStarted = true
             AudioRecordingService.start(this, survey, responseId)
         }
     }
@@ -219,46 +212,16 @@ class SurveyActivity : AppCompatActivity() {
     }
 
     fun stopRecording() {
-        AudioRecordingService.stop(this)
+        if (audioServiceStarted) {
+            AudioRecordingService.stop(this)
+            audioServiceStarted = false
+        }
         stopLocationUpdates()
     }
 
     override fun onDestroy() {
         stopRecording()
         super.onDestroy()
-    }
-
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_CAMERA_PERMISSION) {
-            if (grantResults.isNotEmpty() &&
-                grantResults[0] == PERMISSION_GRANTED
-            ) {
-                if (photoUri != null) {
-                    takePhotoOnPermissionGranted()
-                } else {
-                    takeVideoOnPermissionGranted()
-                }
-
-            } else {
-                notifyPermissionDenied()
-            }
-        } else if (requestCode == REQUEST_RECORDING_PERMISSION) {
-            if (grantResults.isNotEmpty() &&
-                grantResults[permissions.indexOf(RECORD_AUDIO)] == PERMISSION_GRANTED &&
-                grantResults[permissions.indexOf(ACCESS_FINE_LOCATION)] == PERMISSION_GRANTED
-            ) {
-                recordAudio()
-                recordLocation()
-            } else {
-                notifyRecordPermissionDenied()
-            }
-        }
     }
 
     fun pickFromGallery(mimeTypes: String?) {
@@ -283,7 +246,7 @@ class SurveyActivity : AppCompatActivity() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
             addFlags(
                 Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                          Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
             )
             putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
         }
@@ -294,7 +257,7 @@ class SurveyActivity : AppCompatActivity() {
         val intent = Intent(MediaStore.ACTION_VIDEO_CAPTURE).apply {
             addFlags(
                 Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                          Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
             )
         }
         videoLauncher.launch(intent)
@@ -309,6 +272,33 @@ class SurveyActivity : AppCompatActivity() {
     fun takeVideo() {
         getCameraPermission { takeVideoOnPermissionGranted() }
     }
+
+    private val requestRecordingPermissionsLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { results ->
+            if (results.all { it.value }) {
+                recordLocation()
+                recordAudio()
+            } else {
+                notifyRecordPermissionDenied()
+            }
+        }
+
+    private val requestCameraPermission = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            if (photoUri != null) {
+                takePhotoOnPermissionGranted()
+            } else {
+                takeVideoOnPermissionGranted()
+            }
+        } else {
+            notifyPermissionDenied()
+        }
+    }
+
 
     private val photoLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -428,8 +418,6 @@ class SurveyActivity : AppCompatActivity() {
         private const val EXTRA_SURVEY = "survey"
         private const val RESPONSE_ID = "response_id"
         private const val REQUESTING_LOCATION_UPDATES_KEY = "requesting_location_updates_key"
-        private const val REQUEST_CAMERA_PERMISSION = 1
-        private const val REQUEST_RECORDING_PERMISSION = 2
         fun createIntent(context: Context, survey: SurveyData): Intent =
             Intent(context, SurveyActivity::class.java).apply {
                 putExtra(EXTRA_SURVEY, survey as Parcelable)
