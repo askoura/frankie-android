@@ -30,7 +30,7 @@ data class SurveyData(
     val recordGps: Boolean,
     val isSyncing: Boolean = false,
     val description: String,
-    val imageUrl: String
+    val imageUrl: String,
 ) : Parcelable {
 
     private val scheduled: Boolean
@@ -46,6 +46,15 @@ data class SurveyData(
                 else -> SurveyStatus.ACTIVE
             }
         }
+
+    val isPlayEnabled: Boolean
+        get() = !newVersionAvailable
+                && publishInfo.version > 0
+                && !quotaExceeded()
+                && surveyStatus == SurveyStatus.ACTIVE
+
+    val isSyncEnabled get() = isSyncing && localUnsyncedResponsesCount > 0
+    val isResponsesEnabled get() = localResponsesCount > 0
 
     fun quotaExceeded(newUnsyncedCount: Int? = null): Boolean {
         val finalUnsyncedCount = newUnsyncedCount ?: localUnsyncedResponsesCount
@@ -103,7 +112,8 @@ data class SurveyData(
                 saveTimings = survey.saveTimings,
                 backgroundAudio = survey.backgroundAudio,
                 recordGps = survey.recordGps,
-                description = survey.description ?: "",
+                description = survey.description
+                    ?: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
                 imageUrl = survey.imageUrl ?: ""
             )
         }

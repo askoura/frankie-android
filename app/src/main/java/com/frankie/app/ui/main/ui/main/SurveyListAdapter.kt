@@ -11,7 +11,7 @@ class SurveyListAdapter(
         private val onPlayClicked: (SurveyData) -> Unit,
         private val onResponsesClicked: (SurveyData) -> Unit,
         private val onInfoClicked: (SurveyData) -> Unit,
-        private val onUploadClicked: (SurveyData) -> Unit
+        private val onDownloadClicked: (SurveyData) -> Unit
 ) : ListAdapter<SurveyData, SurveyListAdapter.ViewHolder>(SurveyDiffCallBack()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -31,13 +31,14 @@ class SurveyListAdapter(
             RecyclerView.ViewHolder(surveyListItemView) {
 
         fun bind(surveyData: SurveyData) {
-            surveyListItemView.bind(
+
+            surveyListItemView.setup(
                     surveyData = surveyData,
                     onSyncClicked = onSyncClicked,
                     onPlayClicked = onPlayClicked,
                     onInfoClicked = onInfoClicked,
                     onResponsesClicked = onResponsesClicked,
-                    onUploadClicked = onUploadClicked
+                onDownloadClicked = onDownloadClicked
             )
         }
     }

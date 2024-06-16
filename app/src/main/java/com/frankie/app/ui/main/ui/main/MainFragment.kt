@@ -86,8 +86,9 @@ class MainFragment : Fragment() {
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
-        adapter = SurveyListAdapter(onSyncClicked = { surveyData ->
-            viewModel.syncSurveyForOffline(surveyData)
+        adapter = SurveyListAdapter(
+            onDownloadClicked = { surveyData ->
+                viewModel.downloadSurveyForOffline(surveyData)
         },
             onPlayClicked = { surveyData ->
                 startActivity(
@@ -110,7 +111,7 @@ class MainFragment : Fragment() {
                     SurveyInfoActivity.createIntent(binding.root.context, surveyData)
                 )
             },
-            onUploadClicked = {
+            onSyncClicked = {
                 viewModel.uploadSurveyResponses()
             })
         binding.recycler.adapter = adapter

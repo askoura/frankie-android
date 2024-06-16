@@ -88,7 +88,7 @@ FirebaseAnalytics uses an advertising ID. You can restrict this use in the devic
     <string name="sync_time_never">Never</string>
     <string name="back">Back</string>
     <string name="survey_creation_date">Created</string>
-    <string name="survey_last_modified">Last modified</string>
+    <string name="survey_last_modified">Last updated</string>
     <string name="survey_start_date">Starts</string>
     <string name="survey_end_date">Ends</string>
     <string name="survey_new_version_available">New version available</string>
@@ -105,4 +105,69 @@ FirebaseAnalytics uses an advertising ID. You can restrict this use in the devic
     <string name="survey_background_audio">Audio recording</string>
     <string name="survey_record_gps">Location tracking</string>
     <string name="survey_status">Status</string>
+    <string name="survey_update_available">New version available</string>
+    <string name="survey_item_button_responses">Responses \n%d (%d Complete)</string>
+    <string name="survey_item_button_info">Info</string>
+    <plurals name="time_interval_days_ago">
+        <item quantity="one">yesterday</item>
+        <item quantity="other">%d days ago</item>
+        <item quantity="zero">%d days ago</item>
+    </plurals>
+    <plurals name="time_interval_hours_ago">
+        <item quantity="one">1 hour ago</item>
+        <item quantity="other">%d hours ago</item>
+        <item quantity="zero">%d hours ago</item>
+    </plurals>
+    <plurals name="time_interval_minutes_ago">
+        <item quantity="one">1 minute ago</item>
+        <item quantity="other">%d minutes ago</item>
+        <item quantity="zero">%d minutes ago</item>
+    </plurals>
+    <plurals name="time_interval_months_ago">
+        <item quantity="one">last month</item>
+        <item quantity="other">%d months ago</item>
+        <item quantity="zero">%d months ago</item>
+    </plurals>
+    <plurals name="time_interval_weeks_ago">
+        <item quantity="one">last week</item>
+        <item quantity="other">%d weeks ago</item>
+        <item quantity="zero">%d weeks ago</item>
+    </plurals>
+    <plurals name="time_interval_years_ago">
+        <item quantity="one">last year</item>
+        <item quantity="other">%d years ago</item>
+        <item quantity="zero">%d years ago</item>
+    </plurals>
+    <plurals name="time_interval_in_days">
+        <item quantity="one">tomorrow</item>
+        <item quantity="other">In %d days</item>
+        <item quantity="zero">In %d days</item>
+    </plurals>
+    <plurals name="time_interval_in_hours">
+        <item quantity="one">next hour</item>
+        <item quantity="other">in %d hours</item>
+        <item quantity="zero">in %d hours</item>
+    </plurals>
+    <plurals name="time_interval_in_months">
+        <item quantity="one">next month</item>
+        <item quantity="other">in %d months ago</item>
+        <item quantity="zero">%d months ago</item>
+    </plurals>
+    <plurals name="time_interval_in_weeks">
+        <item quantity="one">last week</item>
+        <item quantity="other">in %d weeks</item>
+        <item quantity="zero">in %d weeks</item>
+    </plurals>
+    <plurals name="time_interval_in_years">
+        <item quantity="one">next year</item>
+        <item quantity="other">in %d years</item>
+        <item quantity="zero">in %d years</item>
+    </plurals>
+    <string name="time_interval_just_now">Just now</string>
+    <string name="survey_item_expires">Expires</string>
+    <string name="today">Today</string>
+    <string name="survey_item_quota_left">Quota left: %d</string>
+    <string name="survey_item_button_start">Start</string>
+    <string name="survey_item_button_download">Download</string>
+    <string name="survey_item_button_sync">Sync</string>
 </resources>

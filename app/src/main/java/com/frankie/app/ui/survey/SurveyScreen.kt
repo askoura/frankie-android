@@ -2,6 +2,12 @@ package com.frankie.app.ui.survey
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,17 +16,24 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,6 +42,7 @@ import com.frankie.app.R
 import com.frankie.app.api.survey.PublishInfo
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.ui.common.compose.boldValueString
+import com.frankie.app.ui.common.toElapsedTime
 import com.frankie.app.ui.common.toFormattedString
 import java.time.LocalDateTime
 import java.time.Month
@@ -55,6 +69,135 @@ fun SurveyInfoScreen(surveyData: SurveyData) {
     }
 }
 
+@Composable
+fun SurveyListItem(
+    surveyData: SurveyData,
+    onResponsesClick: (SurveyData) -> Unit = {},
+    onInfoClick: (SurveyData) -> Unit = {},
+    onStartClick: (SurveyData) -> Unit = {},
+    onSyncClick: (SurveyData) -> Unit = {},
+    onDownloadClick: (SurveyData) -> Unit = {}
+) {
+    Column {
+        SurveyPhoto(title = surveyData.name, imageUrl = surveyData.imageUrl)
+        if (surveyData.description.isNotEmpty()) {
+            SurveyDescription(text = surveyData.description, maxLines = 3)
+        }
+        Column(modifier = Modifier.padding(16.dp)) {
+            SurveyStats(iconRes = R.drawable.ic_calendar, text = buildAnnotatedString {
+                append(
+                    "${stringResource(id = R.string.survey_last_modified)} ${
+                        surveyData
+                            .lastModified.toElapsedTime()
+                    }"
+                )
+            })
+            if (surveyData.endDate != null) {
+                SurveyStats(iconRes = R.drawable.ic_stopwatch, text = buildAnnotatedString {
+                    append(stringResource(id = R.string.survey_item_expires))
+                })
+            }
+            if (surveyData.surveyQuota >= 0) {
+                SurveyStats(iconRes = R.drawable.ic_stopwatch, text = buildAnnotatedString {
+                    append(
+                        stringResource(
+                            id = R.string.survey_item_quota_left,
+                            surveyData.surveyQuota
+                        )
+                    )
+                })
+            }
+        }
+        Row {
+            TextButton(
+                modifier = Modifier.weight(1f),
+                onClick = { onResponsesClick(surveyData) },
+                enabled = surveyData.isResponsesEnabled
+            ) {
+                Text(fontSize = 20.sp, text = buildAnnotatedString {
+                    val text = stringResource(
+                        id = R.string.survey_item_button_responses,
+                        surveyData.localResponsesCount,
+                        surveyData.localCompleteResponsesCount
+                    )
+                    append(text.substringBefore(" "))
+                    withStyle(SpanStyle(fontSize = 16.sp)) {
+                        append(text.substringAfter(" "))
+                    }
+                })
+            }
+            TextButton(
+                modifier = Modifier.weight(1f),
+                onClick = { onInfoClick(surveyData) },
+            ) {
+                Text(fontSize = 20.sp, text = stringResource(id = R.string.survey_item_button_info))
+            }
+        }
+        Row {
+            TextButton(
+                modifier = Modifier.weight(1f),
+                onClick = { onDownloadClick(surveyData) }
+
+            ) {
+                Text(fontSize = 20.sp, text = buildAnnotatedString {
+                    append(stringResource(id = R.string.survey_item_button_download))
+                })
+            }
+
+            SyncButton(
+                modifier = Modifier.weight(1f),
+                isSyncing = surveyData.isSyncing,
+                isEnabled = surveyData.isSyncEnabled,
+                onSyncClick = { onSyncClick(surveyData) }
+            )
+        }
+        Button(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            onClick = { onStartClick(surveyData) },
+            enabled = surveyData.isPlayEnabled
+        ) {
+            Text(
+                text = stringResource(id = R.string.survey_item_button_start),
+                fontSize = 24.sp
+            )
+        }
+    }
+}
+
+@Composable
+private fun SyncButton(
+    modifier: Modifier,
+    isSyncing: Boolean,
+    isEnabled: Boolean,
+    onSyncClick: () -> Unit = {}
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "alpha_animation")
+
+    val alpha by infiniteTransition.animateFloat(
+        initialValue = 0.4f,
+        targetValue = 1.0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 500, easing = LinearOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ), label = "alpha_animation"
+    )
+
+    val displayedAlpha = if (isSyncing) alpha else 1.0f
+    TextButton(
+        modifier = modifier,
+        onClick = onSyncClick,
+        enabled = isEnabled
+    ) {
+        Text(
+            modifier = Modifier.alpha(displayedAlpha),
+            fontSize = 20.sp,
+            text = stringResource(id = R.string.survey_item_button_sync)
+        )
+    }
+}
+
+
+// TODO: show update available
 @Composable
 private fun SurveyData.getSurveyStats() = listOf(
     SurveyStatsData(
@@ -205,41 +348,41 @@ private fun SurveyStats(
 }
 
 @Composable
-@Preview
-private fun PreviewSurveyPhoto() {
-    SurveyPhoto(
-        title = "This is my survey",
-        "https://www.mojkvart.hr/idnthumb.ashx?src=%2Flang%2Fstranica%2Flogo%2Flogo_672023.jpg&mw=398&mh=208&crop=0&forceDimension=1&hash=637123499480553706&level=201"
-    )
+@Preview(showBackground = true)
+fun PreviewSurveyListItem() {
+    SurveyListItem(getPreviewSurveyData())
 }
 
 @Composable
 @Preview(showBackground = true)
-private fun PreviewSurveyInfoScreen() {
+fun PreviewSurveyInfoScreen(
+) {
     SurveyInfoScreen(
-        surveyData = SurveyData(
-            id = "someID",
-            creationDate = LocalDateTime.of(2020, Month.MARCH, 2, 2, 1, 2),
-            lastModified = LocalDateTime.now(), startDate = LocalDateTime.now().minusDays(1),
-            endDate = LocalDateTime.now().plusDays(5),
-            name = "My survey",
-            status = "Aktivan",
-            usage = "ki zna",
-            surveyQuota = 20,
-            userQuota = 1,
-            publishInfo = PublishInfo(),
-            newVersionAvailable = false,
-            localResponsesCount = 10,
-            localCompleteResponsesCount = 8,
-            localUnsyncedResponsesCount = 3,
-            syncedResponseCount = 5,
-            totalResponseCount = 10,
-            saveTimings = true,
-            backgroundAudio = true,
-            recordGps = true,
-            description = "Lorem Ipsum is simply dummy text of the printing and typesetting " +
-                    "industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
-            imageUrl = "https://www.mojkvart.hr/idnthumb.ashx?src=%2Flang%2Fstranica%2Flogo%2Flogo_672023.jpg&mw=398&mh=208&crop=0&forceDimension=1&hash=637123499480553706&level=201"
-        )
+        surveyData = getPreviewSurveyData()
     )
 }
+
+private fun getPreviewSurveyData() = SurveyData(
+    id = "someID",
+    creationDate = LocalDateTime.of(2020, Month.MARCH, 2, 2, 1, 2),
+    lastModified = LocalDateTime.now(), startDate = LocalDateTime.now().minusDays(1),
+    endDate = LocalDateTime.now().plusDays(5),
+    name = "My survey",
+    status = "Aktivan",
+    usage = "ki zna",
+    surveyQuota = 20,
+    userQuota = 1,
+    publishInfo = PublishInfo(),
+    newVersionAvailable = true,
+    localResponsesCount = 10,
+    localCompleteResponsesCount = 8,
+    localUnsyncedResponsesCount = 3,
+    syncedResponseCount = 5,
+    totalResponseCount = 10,
+    saveTimings = true,
+    backgroundAudio = true,
+    recordGps = true,
+    description = "Lorem Ipsum is simply dummy text of the printing and typesetting " +
+            "industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+    imageUrl = "https://www.mojkvart.hr/idnthumb.ashx?src=%2Flang%2Fstranica%2Flogo%2Flogo_672023.jpg&mw=398&mh=208&crop=0&forceDimension=1&hash=637123499480553706&level=201"
+)
