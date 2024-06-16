@@ -82,7 +82,7 @@ class SurveyRepositoryImpl(
                 if (sessionManager.isGuest()) service.getGuestSurveyList() else service.getSurveyList()
             val surveyList = list.map { survey ->
                 val offlineSurvey = offlineSurveys.firstOrNull { it.id == survey.id }
-                return@map if (survey.publishInfo.requiresUpdates(offlineSurvey?.publishInfo)) {
+                return@map if (survey.publishInfo?.requiresUpdates(offlineSurvey?.publishInfo) == true   ) {
                     offlineSurvey!!
                 } else {
                     getSurveyDesign(survey, offlineSurvey)
