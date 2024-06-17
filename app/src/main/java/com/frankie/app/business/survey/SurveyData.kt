@@ -53,7 +53,6 @@ data class SurveyData(
                 && !quotaExceeded()
                 && surveyStatus == SurveyStatus.ACTIVE
 
-    val isSyncEnabled get() = isSyncing && localUnsyncedResponsesCount > 0
     val isResponsesEnabled get() = localResponsesCount > 0
 
     fun quotaExceeded(newUnsyncedCount: Int? = null): Boolean {

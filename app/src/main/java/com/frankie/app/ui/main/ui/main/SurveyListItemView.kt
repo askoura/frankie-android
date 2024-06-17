@@ -15,7 +15,6 @@ class SurveyListItemView(
 ) : AbstractComposeView(context, attrs, defStyle) {
 
     var surveyData: SurveyData? = null
-    var onSyncClicked: (SurveyData) -> Unit = {}
     var onPlayClicked: (SurveyData) -> Unit = {}
     var onResponsesClicked: (SurveyData) -> Unit = {}
     var onInfoClicked: (SurveyData) -> Unit = {}
@@ -23,7 +22,6 @@ class SurveyListItemView(
 
     fun setup(
         surveyData: SurveyData,
-        onSyncClicked: (SurveyData) -> Unit,
         onPlayClicked: (SurveyData) -> Unit,
         onResponsesClicked: (SurveyData) -> Unit,
         onInfoClicked: (SurveyData) -> Unit,
@@ -31,7 +29,6 @@ class SurveyListItemView(
     ) {
         this.surveyData = surveyData
         this.onPlayClicked = onPlayClicked
-        this.onSyncClicked = onSyncClicked
         this.onDownloadClicked = onDownloadClicked
         this.onResponsesClicked = onResponsesClicked
         this.onInfoClicked = onInfoClicked
@@ -46,7 +43,6 @@ class SurveyListItemView(
                 onInfoClick = onInfoClicked,
                 onDownloadClick = onDownloadClicked,
                 onStartClick = onPlayClicked,
-                onSyncClick = onSyncClicked
             )
         }
     }

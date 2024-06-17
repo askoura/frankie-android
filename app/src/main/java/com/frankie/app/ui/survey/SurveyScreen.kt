@@ -67,7 +67,6 @@ fun SurveyListItem(
     onResponsesClick: (SurveyData) -> Unit = {},
     onInfoClick: (SurveyData) -> Unit = {},
     onStartClick: (SurveyData) -> Unit = {},
-    onSyncClick: (SurveyData) -> Unit = {},
     onDownloadClick: (SurveyData) -> Unit = {}
 ) {
     Column {
@@ -90,7 +89,9 @@ fun SurveyListItem(
                 })
             }
             if (surveyData.surveyQuota >= 0) {
-                SurveyStats(iconRes = R.drawable.ic_stopwatch, text = buildAnnotatedString {
+                SurveyStats(
+                    iconRes = R.drawable.ic_baseline_assignment_24,
+                    text = buildAnnotatedString {
                     append(
                         stringResource(
                             id = R.string.survey_item_quota_left,

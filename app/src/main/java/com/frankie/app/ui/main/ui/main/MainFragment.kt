@@ -110,9 +110,6 @@ class MainFragment : Fragment() {
                 startActivity(
                     SurveyInfoActivity.createIntent(binding.root.context, surveyData)
                 )
-            },
-            onSyncClicked = {
-                viewModel.uploadSurveyResponses()
             })
         binding.recycler.adapter = adapter
         binding.recycler.layoutManager = LinearLayoutManager(binding.root.context)

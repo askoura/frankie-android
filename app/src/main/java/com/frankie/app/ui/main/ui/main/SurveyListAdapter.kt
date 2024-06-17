@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.frankie.app.business.survey.SurveyData
 
 class SurveyListAdapter(
-        private val onSyncClicked: (SurveyData) -> Unit,
         private val onPlayClicked: (SurveyData) -> Unit,
         private val onResponsesClicked: (SurveyData) -> Unit,
         private val onInfoClicked: (SurveyData) -> Unit,
@@ -34,7 +33,6 @@ class SurveyListAdapter(
 
             surveyListItemView.setup(
                     surveyData = surveyData,
-                    onSyncClicked = onSyncClicked,
                     onPlayClicked = onPlayClicked,
                     onInfoClicked = onInfoClicked,
                     onResponsesClicked = onResponsesClicked,
