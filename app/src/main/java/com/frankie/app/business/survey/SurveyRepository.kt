@@ -117,16 +117,9 @@ class SurveyRepositoryImpl(
         }
         val count = responseDao.countByUserAndSurvey(
             surveyId = survey.id,
-            userId = sessionManager.getUserIdOrThrow()
         )
-        val responseCount = responseDao.countCompleteByUserAndSurvey(
-            surveyId = survey.id,
-            userId = sessionManager.getUserIdOrThrow()
-        )
-        val unsyncedCount = responseDao.countUnsyncedByUserAndSurvey(
-            surveyId = survey.id,
-            userId = sessionManager.getUserIdOrThrow()
-        )
+        val responseCount = responseDao.countCompleteByUserAndSurvey(survey.id)
+        val unsyncedCount = responseDao.countUnsyncedByUserAndSurvey(survey.id)
         val newVersionAvailable = offlineSurvey?.publishInfo?.toPublishInfo()
             ?.let { it != design.publishInfo }
             ?: true
@@ -150,13 +143,12 @@ class SurveyRepositoryImpl(
     }
 
     override suspend fun getOfflineSurveyList(): List<SurveyData> {
-        val userId = sessionManager.getUserIdOrThrow()
         surveyDao.getAllSurveyData().let { list ->
             return list.map {
                 it.toSurveyData(
-                    responseDao.countByUserAndSurvey(userId, it.id),
-                    responseDao.countCompleteByUserAndSurvey(userId, it.id),
-                    responseDao.countUnsyncedByUserAndSurvey(userId, it.id)
+                    responseDao.countByUserAndSurvey(it.id),
+                    responseDao.countCompleteByUserAndSurvey(it.id),
+                    responseDao.countUnsyncedByUserAndSurvey(it.id)
                 )
             }
         }
@@ -165,12 +157,11 @@ class SurveyRepositoryImpl(
 
 
     override suspend fun getOfflineSurvey(surveyId: String): SurveyData {
-        val userId = sessionManager.getUserIdOrThrow()
         val survey = surveyDao.getSurveyDataById(surveyId)!!
         return survey.toSurveyData(
-            responseDao.countByUserAndSurvey(userId, survey.id),
-            responseDao.countCompleteByUserAndSurvey(userId, survey.id),
-            responseDao.countUnsyncedByUserAndSurvey(userId, survey.id)
+            responseDao.countByUserAndSurvey(survey.id),
+            responseDao.countCompleteByUserAndSurvey(survey.id),
+            responseDao.countUnsyncedByUserAndSurvey(survey.id)
         )
     }
 

@@ -112,7 +112,7 @@ class UploadSurveyResponsesUseCaseImpl(
             values = response.values,
             startDate = response.startDate,
             submitDate = response.submitDate,
-            userId = response.userId,
+            userId = sessionManager.getUserIdOrThrow(),
             navigationIndex = response.navigationIndex
         )
         val result =

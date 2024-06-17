@@ -45,15 +45,11 @@ interface ResponseDao {
         id: String
     )
 
-    @Query("SELECT * FROM response WHERE userId = :userId AND surveyId = :surveyId")
-    suspend fun getAllByUserAndSurvey(userId: String, surveyId: String): List<Response>
+    @Query("SELECT * FROM response WHERE surveyId = :surveyId")
+    suspend fun getAllByUserAndSurvey(surveyId: String): List<Response>
 
-    @Query(
-        "SELECT * FROM response WHERE userId = :userId AND surveyId = :surveyId LIMIT 10 " +
-                "OFFSET (:page*:perPage)"
-    )
-    suspend fun getByUserAndSurvey(userId: String, surveyId: String, page: Int, perPage: Int):
-            List<Response>
+    @Query("SELECT * FROM response WHERE  surveyId = :surveyId LIMIT 10 OFFSET (:page*:perPage)")
+    suspend fun getByUserAndSurvey(surveyId: String, page: Int, perPage: Int): List<Response>
 
     @Transaction
     suspend fun addEvent(responseId: String, event: ResponseEvent) {
@@ -73,14 +69,14 @@ interface ResponseDao {
     }
 
 
-    @Query("SELECT COUNT(*) FROM response WHERE userId = :userId AND surveyId = :surveyId")
-    suspend fun countByUserAndSurvey(userId: String, surveyId: String): Int
+    @Query("SELECT COUNT(*) FROM response WHERE surveyId = :surveyId")
+    suspend fun countByUserAndSurvey(surveyId: String): Int
 
-    @Query("SELECT COUNT(*) FROM response WHERE userId = :userId AND surveyId = :surveyId AND submitDate IS NOT NULL")
-    suspend fun countCompleteByUserAndSurvey(userId: String, surveyId: String): Int
+    @Query("SELECT COUNT(*) FROM response WHERE surveyId = :surveyId AND submitDate IS NOT NULL")
+    suspend fun countCompleteByUserAndSurvey(surveyId: String): Int
 
-    @Query("SELECT COUNT(*) FROM response WHERE userId = :userId AND surveyId = :surveyId AND is_synced = 0 AND submitDate IS NOT NULL")
-    suspend fun countUnsyncedByUserAndSurvey(userId: String, surveyId: String): Int
+    @Query("SELECT COUNT(*) FROM response WHERE surveyId = :surveyId AND is_synced = 0 AND submitDate IS NOT NULL")
+    suspend fun countUnsyncedByUserAndSurvey(surveyId: String): Int
 
     @Query("UPDATE response SET is_synced = 1 WHERE id = :responseId")
     suspend fun markResponseAsSynced(responseId: String)

@@ -39,8 +39,6 @@ data class Response(
 
     val submitDate: LocalDateTime?,
 
-    val userId: String,
-
     @ColumnInfo(name = "response_values")
     val values: Map<String, Any>,
 
