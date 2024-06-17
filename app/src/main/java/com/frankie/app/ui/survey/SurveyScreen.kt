@@ -2,12 +2,6 @@ package com.frankie.app.ui.survey
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,10 +15,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -133,66 +125,28 @@ fun SurveyListItem(
                 Text(fontSize = 20.sp, text = stringResource(id = R.string.survey_item_button_info))
             }
         }
-        Row {
-            TextButton(
-                modifier = Modifier.weight(1f),
+        if (surveyData.newVersionAvailable) {
+            Button(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
                 onClick = { onDownloadClick(surveyData) }
-
             ) {
-                Text(fontSize = 20.sp, text = buildAnnotatedString {
-                    append(stringResource(id = R.string.survey_item_button_download))
-                })
+                Text(
+                    text = stringResource(id = R.string.survey_item_button_start),
+                    fontSize = 24.sp
+                )
             }
-
-            SyncButton(
-                modifier = Modifier.weight(1f),
-                isSyncing = surveyData.isSyncing,
-                isEnabled = surveyData.isSyncEnabled,
-                onSyncClick = { onSyncClick(surveyData) }
-            )
+        } else {
+            Button(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                onClick = { onStartClick(surveyData) },
+                enabled = surveyData.isPlayEnabled
+            ) {
+                Text(
+                    text = stringResource(id = R.string.survey_item_button_start),
+                    fontSize = 24.sp
+                )
+            }
         }
-        Button(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            onClick = { onStartClick(surveyData) },
-            enabled = surveyData.isPlayEnabled
-        ) {
-            Text(
-                text = stringResource(id = R.string.survey_item_button_start),
-                fontSize = 24.sp
-            )
-        }
-    }
-}
-
-@Composable
-private fun SyncButton(
-    modifier: Modifier,
-    isSyncing: Boolean,
-    isEnabled: Boolean,
-    onSyncClick: () -> Unit = {}
-) {
-    val infiniteTransition = rememberInfiniteTransition(label = "alpha_animation")
-
-    val alpha by infiniteTransition.animateFloat(
-        initialValue = 0.4f,
-        targetValue = 1.0f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 500, easing = LinearOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ), label = "alpha_animation"
-    )
-
-    val displayedAlpha = if (isSyncing) alpha else 1.0f
-    TextButton(
-        modifier = modifier,
-        onClick = onSyncClick,
-        enabled = isEnabled
-    ) {
-        Text(
-            modifier = Modifier.alpha(displayedAlpha),
-            fontSize = 20.sp,
-            text = stringResource(id = R.string.survey_item_button_sync)
-        )
     }
 }
 
