@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId "com.frankie.app"
-        minSdk 21
+        minSdk 24
         targetSdk 34
         versionCode 1
         versionName "1.0"
@@ -41,7 +41,7 @@ android {
             debuggable false
             minifyEnabled true
             shrinkResources true
-            buildConfigField "String", "SERVER_URL", "\"https://api.staging-frankiesurveys.com\""
+            buildConfigField "String", "SERVER_URL", "\"https://stg.api.qlarr.com\""
             buildConfigField "String", "AUTH_CLIENT_ID", "\"464768435207-e2rkf9h0fjbcnhh2egkj3e9bkvub2p4o.apps.googleusercontent.com\""
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
@@ -63,7 +63,7 @@ android {
         staging {
             initWith buildTypes.debug
             buildConfigField "String", "AUTH_CLIENT_ID", "\"464768435207-e2rkf9h0fjbcnhh2egkj3e9bkvub2p4o.apps.googleusercontent.com\""
-            buildConfigField "String", "SERVER_URL", "\"https://api.staging-frankiesurveys.com\""
+            buildConfigField "String", "SERVER_URL", "\"https://stg.api.qlarr.com\""
             applicationIdSuffix ".debug"
             debuggable true
         }
@@ -86,20 +86,20 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.annotation:annotation:1.7.1'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
+    implementation 'androidx.annotation:annotation:1.8.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.2'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2'
     def room_version = "2.5.0"
 
     implementation project(':expressionmanager')
     implementation(project(':scriptengine')) {
         exclude group: 'org.graalvm.js', module: 'js'
     }
-    implementation 'androidx.core:core-ktx:1.12.0'
-    implementation 'com.google.android.gms:play-services-auth:21.0.0'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.11.0'
-    implementation "com.google.android.gms:play-services-location:21.1.0"
+    implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'com.google.android.gms:play-services-auth:21.2.0'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation "com.google.android.gms:play-services-location:21.3.0"
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.7.7'
     implementation 'androidx.navigation:navigation-ui-ktx:2.7.7'
@@ -109,23 +109,25 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    implementation "androidx.webkit:webkit:1.10.0"
+    implementation "androidx.webkit:webkit:1.11.0"
     //    last version supporting android api 21
     implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.13.5'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.5'
 
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1'
 
     def koinVersion = "3.5.0"
     implementation "io.insert-koin:koin-android:$koinVersion"
     implementation "io.insert-koin:koin-androidx-workmanager:$koinVersion"
 
     def retrofitVersion = "2.9.0"
+    //noinspection GradleDependency
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-jackson:$retrofitVersion"
 
     def okhttp_version = "4.11.0"
+    //noinspection GradleDependency
     implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
     //noinspection GradleDependency
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
@@ -146,7 +148,7 @@ dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
 
     // firebase
-    implementation platform('com.google.firebase:firebase-bom:32.2.3')
+    implementation platform('com.google.firebase:firebase-bom:33.1.0')
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation("com.google.firebase:firebase-crashlytics-ktx")
 
