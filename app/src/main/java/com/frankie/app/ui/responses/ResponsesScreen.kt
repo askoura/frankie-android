@@ -212,7 +212,7 @@ private fun PreviewResponseScreen() {
         NavigationIndex.End(""), true, "Eng", "someSurveyID", LocalDateTime.of(
             2024, Month.MARCH, 26,
             2, 15
-        ), submitDate = LocalDateTime.now(), userId = "userId",
+        ), submitDate = LocalDateTime.now(),
         values = mapOf(
             "Q1" to "Value1", "Q2" to "Answer2", "Q3" to "little longer answer",
             "Question4" to "Little longer answer, still going... And still la lalala.", "Key" to
@@ -251,7 +251,7 @@ private fun PreviewResponseItem() {
         NavigationIndex.End(""), true, "Eng", "someSurveyID", LocalDateTime.of(
             2024, Month.MARCH, 26,
             2, 15
-        ), submitDate = LocalDateTime.now(), userId = "userId", values = mapOf(), 1, listOf()
+        ), submitDate = LocalDateTime.now(), values = mapOf(), 1, listOf()
     )
     ResponseItem(ResponseItemData(response, true))
 }
