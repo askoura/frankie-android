@@ -26,6 +26,13 @@ object FileUtils {
         }
         return File(folder, fileName)
     }
+     fun deleteSurveyDirectory(
+        context: Context,
+        surveyId: String,
+    ): Boolean {
+        val folder = File(context.filesDir, surveyId)
+        return  folder.exists() && folder.isDirectory && folder.deleteRecursively()
+    }
 
     private fun encode(fileName: String) =
         URLEncoder.encode(URLDecoder.decode(fileName, "UTF-8"), "UTF-8")

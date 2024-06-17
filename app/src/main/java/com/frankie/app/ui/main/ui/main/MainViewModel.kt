@@ -86,10 +86,7 @@ class MainViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             _state.update { _state.value.copy(isLoading = _firstLoad.value || triggeredByUser) }
             _firstLoad.value = false
-            merge(
-                flow { emit(surveyRepository.getOfflineSurveyList()) },
-                surveyRepository.getSurveyList()
-            ).catch {
+            surveyRepository.getSurveyList().catch {
                 if (triggeredByUser || _firstLoad.value) {
                     processError(it)
                 }
@@ -135,9 +132,7 @@ class MainViewModel(
 
     fun uploadSurveyResponses() {
         viewModelScope.launch(Dispatchers.IO) {
-            val canSync = surveyRepository.getOfflineSurveyList(includeGuest = false)
-                .any { it.localUnsyncedResponsesCount > 0 }
-            if (canSync) {
+            if (surveyRepository.shouldSync()) {
                 backgroundSync.startSurveySync()
             }
         }

@@ -9,8 +9,8 @@ interface SessionManager {
     fun getUserIdOrThrow(): String
     fun saveSession(loginResponse: LoginResponse)
     fun saveUserAsGuest()
+    fun isGuest(): Boolean
 
-    fun isGuest(): Boolean = getUserIdOrThrow() == SessionManagerImpl.GUEST_USER_ID
 }
 
 class SessionManagerImpl(private val sharedPrefsManager: SharedPrefsManager) : SessionManager {
@@ -28,7 +28,11 @@ class SessionManagerImpl(private val sharedPrefsManager: SharedPrefsManager) : S
     }
 
     override fun saveUserAsGuest() {
-        sharedPrefsManager.userId = GUEST_USER_ID
+        sharedPrefsManager.isGuest = true
+    }
+
+    override fun isGuest(): Boolean {
+        return sharedPrefsManager.isGuest
     }
 
     companion object {

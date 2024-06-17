@@ -15,19 +15,14 @@ interface ResponseRepository {
 
 class ResponseRepositoryImpl(
     private val responseDao: ResponseDao,
-    private val sessionManager: SessionManager
 ) : ResponseRepository {
 
     override suspend fun getResponses(surveyId: String): List<Response> {
-        return responseDao.getAllByUserAndSurvey(sessionManager.getUserIdOrThrow(), surveyId)
+        return responseDao.getAllByUserAndSurvey(surveyId)
     }
 
     override suspend fun getResponses(surveyId: String, page: Int, perPage: Int): List<Response> {
-        return responseDao.getByUserAndSurvey(
-            sessionManager.getUserIdOrThrow(),
-            surveyId,
-            page, perPage
-        )
+        return responseDao.getByUserAndSurvey(surveyId, page, perPage)
     }
 
     override suspend fun deleteResponse(responseId: String) {
