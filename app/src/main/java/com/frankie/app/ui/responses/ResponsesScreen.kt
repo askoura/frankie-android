@@ -212,7 +212,15 @@ private fun PreviewResponseScreen() {
         NavigationIndex.End(""), true, "Eng", "someSurveyID", LocalDateTime.of(
             2024, Month.MARCH, 26,
             2, 15
-        ), submitDate = LocalDateTime.now(), userId = "userId", values = mapOf(), 1, listOf()
+        ), submitDate = LocalDateTime.now(), userId = "userId",
+        values = mapOf(
+            "Q1" to "Value1", "Q2" to "Answer2", "Q3" to "little longer answer",
+            "Question4" to "Little longer answer, still going... And still la lalala.", "Key" to
+                    "Value "
+        ),
+        version
+        = 1,
+        events = emptyList()
     )
     ResponsesScreen(
         modifier = Modifier,
@@ -222,7 +230,11 @@ private fun PreviewResponseScreen() {
         onDeleteClicked = {},
         screenState = ResponsesScreenState(
             isLoading = false,
-            responses = listOf(ResponseItemData(response, true)),
+            responses = listOf(
+                ResponseItemData(response, true),
+                ResponseItemData(response, true),
+                ResponseItemData(response, true)
+            ),
             completeResponsesCount = 3,
             inCompleteResponsesCount = 2,
             lastSyncTime = LocalDateTime.now(),
