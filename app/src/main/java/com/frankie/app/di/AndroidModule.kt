@@ -37,7 +37,6 @@ val androidModule = module {
     single<ConsentSettings> { ConsentSettingsImpl(get(named("appContext")), get()) }
     single { FrankieDb.getDatabase(get(named("appContext"))) }
     single { get<FrankieDb>().surveyDataDao() }
-    single { get<FrankieDb>().permissionDao() }
     single { get<FrankieDb>().responseDao() }
     single<NotificationManager> {
         get<Context>(named("appContext"))

@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 
 interface SharedPrefsManager {
     val isActiveTokenAvailable: Boolean
+    var isGuest: Boolean
     var activeToken: String?
     var refreshToken: String?
     var userId: String?
@@ -14,12 +15,15 @@ interface SharedPrefsManager {
 }
 
 class SharedPrefsManagerImpl(context: Context) : SharedPrefsManager {
-    private val preferences: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     private val editor: SharedPreferences.Editor = preferences.edit()
 
     override val isActiveTokenAvailable: Boolean
         get() = !activeToken.isNullOrEmpty() && !refreshToken.isNullOrEmpty()
-
+    override var isGuest: Boolean
+        get() = getBoolean(KEY_IS_GUEST, false)
+        set(value) = saveBoolean(KEY_IS_GUEST, value)
     override var refreshToken: String?
         get() = getString(KEY_REFRESH_TOKEN)
         set(value) = saveString(KEY_REFRESH_TOKEN, value)
@@ -58,6 +62,7 @@ class SharedPrefsManagerImpl(context: Context) : SharedPrefsManager {
         private const val PREFS_NAME = "frankie_prefs"
         private const val KEY_ACTIVE_TOKEN = "active_token"
         private const val KEY_REFRESH_TOKEN = "refresh_token"
+        private const val KEY_IS_GUEST = "is_guest"
         private const val KEY_USER_ID = "user_id"
     }
 }

@@ -10,7 +10,6 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.frankie.app.business.settings.SharedPrefsManagerImpl
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.db.FrankieDb
 import com.frankie.app.db.model.Response
@@ -288,7 +287,6 @@ class EMNavProcessor(
         result: NavigationJsonOutput
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-            val userId = SharedPrefsManagerImpl(getActivity()).userId!!
             frankieDb.responseDao().insert(
                 Response(
                     id = responseId.toString(),
@@ -299,7 +297,6 @@ class EMNavProcessor(
                     startDate = LocalDateTime.now(ZoneOffset.UTC),
                     submitDate = null,
                     isSynced = false,
-                    userId = userId,
                     values = result.toSave,
                     events = if (survey.saveTimings) listOf(result.event) else emptyList()
                 )

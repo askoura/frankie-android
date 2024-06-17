@@ -13,4 +13,8 @@ data class PublishInfo(
     companion object {
         const val LAST_MODIFIED_INITIAL = "1970-01-01 00:00:00"
     }
+
+    fun requiresUpdates(publishInfo: PublishInfo?): Boolean {
+        return version != publishInfo?.version || subVersion != publishInfo.subVersion
+    }
 }

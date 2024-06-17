@@ -15,7 +15,7 @@ import java.time.LocalDateTime
             entity = SurveyDataEntity::class,
             parentColumns = ["id"],
             childColumns = ["surveyId"],
-            onDelete = ForeignKey.NO_ACTION
+            onDelete = ForeignKey.CASCADE
         )
     ]
 )
@@ -38,8 +38,6 @@ data class Response(
     val startDate: LocalDateTime,
 
     val submitDate: LocalDateTime?,
-
-    val userId: String,
 
     @ColumnInfo(name = "response_values")
     val values: Map<String, Any>,
