@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import com.frankie.app.R
 import com.frankie.app.business.parcelable
 import com.frankie.app.business.survey.SurveyData
+import com.frankie.app.ui.common.theme.FrankieTheme
 import com.frankie.app.ui.survey.EMNavProcessor
 import com.frankie.app.ui.survey.SurveyActivity
 import org.koin.androidx.viewmodel.ext.android.getViewModel
@@ -45,41 +46,40 @@ class ResponsesActivity : ComponentActivity() {
         setContent {
             val responsesScreenData by viewModel.responsesScreenData.collectAsState()
 
-            Scaffold(topBar = {
-                TopAppBar(title = {
-                    Text(
-                        text = stringResource(
-                            id = R.string.title_activity_responses
-                        )
-                    )
-                }, navigationIcon = {
-                    IconButton(onClick = { onBackPressedDispatcher.onBackPressed() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(id = R.string.back)
-                        )
-                    }
-                })
-            }) { padding ->
-                ResponsesScreen(
-                    modifier = Modifier
-                        .padding(padding),
-                    onLoadNext = viewModel::loadNext,
-                    onSyncClicked = {
-
-                    },
-                    onEditClicked = { id ->
-                        startActivity(
-                            SurveyActivity.createIntent(
-                                this@ResponsesActivity, survey, id
+            FrankieTheme {
+                Scaffold(topBar = {
+                    TopAppBar(title = {
+                        Text(
+                            text = stringResource(
+                                id = R.string.title_activity_responses
                             )
                         )
-                    },
-                    onDeleteClicked = { id ->
-                        viewModel.deleteResponse(id)
-                    },
-                    screenState = responsesScreenData
-                )
+                    }, navigationIcon = {
+                        IconButton(onClick = { onBackPressedDispatcher.onBackPressed() }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(id = R.string.back)
+                            )
+                        }
+                    })
+                }) { padding ->
+                    ResponsesScreen(
+                        modifier = Modifier
+                            .padding(padding),
+                        onLoadNext = viewModel::loadNext,
+                        onEditClicked = { id ->
+                            startActivity(
+                                SurveyActivity.createIntent(
+                                    this@ResponsesActivity, survey, id
+                                )
+                            )
+                        },
+                        onDeleteClicked = { id ->
+                            viewModel.deleteResponse(id)
+                        },
+                        screenState = responsesScreenData
+                    )
+                }
             }
         }
     }

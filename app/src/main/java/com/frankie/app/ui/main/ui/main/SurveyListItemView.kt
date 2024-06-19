@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.AbstractComposeView
 import com.frankie.app.business.survey.SurveyData
+import com.frankie.app.ui.common.theme.FrankieTheme
 import com.frankie.app.ui.survey.SurveyListItem
 
 
@@ -37,13 +38,15 @@ class SurveyListItemView(
     @Composable
     override fun Content() {
         surveyData?.let {
-            SurveyListItem(
-                surveyData = it,
-                onResponsesClick = onResponsesClicked,
-                onInfoClick = onInfoClicked,
-                onDownloadClick = onDownloadClicked,
-                onStartClick = onPlayClicked,
-            )
+            FrankieTheme {
+                SurveyListItem(
+                    surveyData = it,
+                    onResponsesClick = onResponsesClicked,
+                    onInfoClick = onInfoClicked,
+                    onDownloadClick = onDownloadClicked,
+                    onStartClick = onPlayClicked,
+                )
+            }
         }
     }
 

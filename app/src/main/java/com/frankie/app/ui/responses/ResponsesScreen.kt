@@ -1,11 +1,8 @@
 package com.frankie.app.ui.responses
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,7 +10,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -22,7 +18,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -35,6 +30,7 @@ import com.frankie.app.db.model.Response
 import com.frankie.app.ui.common.compose.boldDescriptionString
 import com.frankie.app.ui.common.compose.boldValueString
 import com.frankie.app.ui.common.theme.Color
+import com.frankie.app.ui.common.theme.FrankieTheme
 import com.frankie.app.ui.common.toFormattedString
 import com.frankie.expressionmanager.model.NavigationIndex
 import java.time.LocalDateTime
@@ -57,7 +53,6 @@ data class ResponsesScreenState(
 fun ResponsesScreen(
     modifier: Modifier,
     onLoadNext: () -> Unit,
-    onSyncClicked: () -> Unit,
     onEditClicked: (String) -> Unit,
     onDeleteClicked: (String) -> Unit,
     screenState: ResponsesScreenState
@@ -102,19 +97,6 @@ fun ResponsesScreen(
                         ?: stringResource(id = R.string.sync_time_never)
                 )
             )
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                contentAlignment = Center
-            ) {
-                Button(
-                    modifier = Modifier.defaultMinSize(minWidth = 140.dp),
-                    onClick = onSyncClicked
-                ) {
-                    Text(text = stringResource(R.string.responses_screen_sync_button))
-                }
-            }
         }
 
         items(screenState.responses) {
@@ -222,25 +204,26 @@ private fun PreviewResponseScreen() {
         = 1,
         events = emptyList()
     )
-    ResponsesScreen(
-        modifier = Modifier,
-        onLoadNext = { },
-        onSyncClicked = { },
-        onEditClicked = {},
-        onDeleteClicked = {},
-        screenState = ResponsesScreenState(
-            isLoading = false,
-            responses = listOf(
-                ResponseItemData(response, true),
-                ResponseItemData(response, true),
-                ResponseItemData(response, true)
-            ),
-            completeResponsesCount = 3,
-            inCompleteResponsesCount = 2,
-            lastSyncTime = LocalDateTime.now(),
-            isComplete = false
+    FrankieTheme {
+        ResponsesScreen(
+            modifier = Modifier,
+            onLoadNext = { },
+            onEditClicked = {},
+            onDeleteClicked = {},
+            screenState = ResponsesScreenState(
+                isLoading = false,
+                responses = listOf(
+                    ResponseItemData(response, true),
+                    ResponseItemData(response, true),
+                    ResponseItemData(response, true)
+                ),
+                completeResponsesCount = 3,
+                inCompleteResponsesCount = 2,
+                lastSyncTime = LocalDateTime.now(),
+                isComplete = false
+            )
         )
-    )
+    }
 }
 
 @Preview(showBackground = true)
@@ -253,5 +236,7 @@ private fun PreviewResponseItem() {
             2, 15
         ), submitDate = LocalDateTime.now(), values = mapOf(), 1, listOf()
     )
-    ResponseItem(ResponseItemData(response, true))
+    FrankieTheme {
+        ResponseItem(ResponseItemData(response, true))
+    }
 }

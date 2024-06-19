@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.frankie.app.business.parcelable
 import com.frankie.app.business.survey.SurveyData
+import com.frankie.app.ui.common.theme.FrankieTheme
 
 class SurveyInfoActivity : ComponentActivity() {
 
@@ -15,7 +16,9 @@ class SurveyInfoActivity : ComponentActivity() {
         val surveyData: SurveyData = intent.parcelable(EXTRA_SURVEY)
             ?: throw IllegalArgumentException("Survey is missing!")
         setContent {
-            SurveyInfoScreen(surveyData = surveyData)
+            FrankieTheme {
+                SurveyInfoScreen(surveyData = surveyData)
+            }
         }
     }
 

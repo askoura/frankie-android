@@ -37,7 +37,7 @@
     <string name="response_lang">Language: %s</string>
     <string name="responses_screen_complete_responses">Complete responses</string>
     <string name="responses_screen_incomplete_responses">Incomplete responses</string>
-    <string name="responses_screen_last_sync_time">Last sync: </string>
+    <string name="responses_screen_last_sync_time">Last sync</string>
     <string name="responses_screen_sync_button">Sync</string>
     <string name="response_item_started">Started</string>
     <string name="response_item_completed">Completed</string>
