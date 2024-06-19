@@ -91,20 +91,20 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.annotation:annotation:1.7.1'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
-    def room_version = "2.5.0"
+    implementation 'androidx.annotation:annotation:1.8.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.2'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2'
+    def room_version = '2.6.1'
 
     implementation project(':expressionmanager')
     implementation(project(':scriptengine')) {
         exclude group: 'org.graalvm.js', module: 'js'
     }
-    implementation 'androidx.core:core-ktx:1.12.0'
-    implementation 'com.google.android.gms:play-services-auth:21.0.0'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.11.0'
-    implementation "com.google.android.gms:play-services-location:21.1.0"
+    implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'com.google.android.gms:play-services-auth:21.2.0'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'com.google.android.gms:play-services-location:21.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.7.7'
     implementation 'androidx.navigation:navigation-ui-ktx:2.7.7'
@@ -114,25 +114,25 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    implementation "androidx.webkit:webkit:1.10.0"
+    implementation "androidx.webkit:webkit:1.11.0"
     //    last version supporting android api 21
-    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.13.5'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.5'
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.17.1'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.1'
 
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1'
 
-    def koinVersion = "3.5.0"
+    def koinVersion = '3.5.6'
     implementation "io.insert-koin:koin-android:$koinVersion"
     implementation "io.insert-koin:koin-androidx-workmanager:$koinVersion"
 
     implementation("io.coil-kt:coil-compose:2.6.0")
 
-    def retrofitVersion = "2.9.0"
+    def retrofitVersion = '2.11.0'
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-jackson:$retrofitVersion"
 
-    def okhttp_version = "4.11.0"
+    def okhttp_version = '4.12.0'
     implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
     //noinspection GradleDependency
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
@@ -153,12 +153,12 @@ dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
 
     // firebase
-    implementation platform('com.google.firebase:firebase-bom:32.2.3')
+    implementation platform('com.google.firebase:firebase-bom:33.1.0')
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation("com.google.firebase:firebase-crashlytics-ktx")
 
     // compose
-    implementation platform('androidx.compose:compose-bom:2024.05.00')
+    implementation platform('androidx.compose:compose-bom:2024.06.00')
     implementation 'androidx.compose.material3:material3'
     implementation 'androidx.activity:activity-compose'
     // Android Studio Preview support
