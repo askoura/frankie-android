@@ -63,13 +63,14 @@ fun SurveyInfoScreen(surveyData: SurveyData) {
 
 @Composable
 fun SurveyListItem(
+    modifier: Modifier = Modifier,
     surveyData: SurveyData,
     onResponsesClick: (SurveyData) -> Unit = {},
     onInfoClick: (SurveyData) -> Unit = {},
     onStartClick: (SurveyData) -> Unit = {},
     onDownloadClick: (SurveyData) -> Unit = {}
 ) {
-    Column {
+    Column(modifier = modifier) {
         SurveyPhoto(title = surveyData.name, imageUrl = surveyData.imageUrl)
         if (surveyData.description.isNotEmpty()) {
             SurveyDescription(text = surveyData.description, maxLines = 3)
@@ -132,7 +133,7 @@ fun SurveyListItem(
                 onClick = { onDownloadClick(surveyData) }
             ) {
                 Text(
-                    text = stringResource(id = R.string.survey_item_button_start),
+                    text = stringResource(id = R.string.survey_item_button_download),
                     fontSize = 24.sp
                 )
             }
@@ -305,7 +306,7 @@ private fun SurveyStats(
 @Composable
 @Preview(showBackground = true)
 fun PreviewSurveyListItem() {
-    SurveyListItem(getPreviewSurveyData())
+    SurveyListItem(surveyData = getPreviewSurveyData())
 }
 
 @Composable
