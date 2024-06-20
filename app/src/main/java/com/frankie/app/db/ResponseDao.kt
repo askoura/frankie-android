@@ -20,6 +20,9 @@ interface ResponseDao {
     @Insert(onConflict = REPLACE)
     suspend fun insert(response: Response)
 
+    @Query("DELETE FROM response WHERE surveyId = :surveyId")
+    suspend fun deleteBySurveyId(surveyId: String)
+
     @Query("DELETE FROM response WHERE id = :responseId")
     suspend fun deleteById(responseId: String)
 
@@ -28,12 +31,12 @@ interface ResponseDao {
 
     @Query(
         "UPDATE response SET " +
-                "response_values = :values," +
-                "events = :events," +
-                "startDate = :startDate," +
-                "submitDate = :submitDate," +
-                "lang = :lang," +
-                " navigation_index = :navigationIndex WHERE id == :id"
+            "response_values = :values," +
+            "events = :events," +
+            "startDate = :startDate," +
+            "submitDate = :submitDate," +
+            "lang = :lang," +
+            " navigation_index = :navigationIndex WHERE id == :id"
     )
     suspend fun update(
         values: Map<String, Any>,

@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId "com.frankie.app"
-        minSdk 21
+        minSdk 24
         targetSdk 34
         versionCode 1
         versionName "1.0"
@@ -63,7 +63,7 @@ android {
         staging {
             initWith buildTypes.debug
             buildConfigField "String", "AUTH_CLIENT_ID", "\"464768435207-e2rkf9h0fjbcnhh2egkj3e9bkvub2p4o.apps.googleusercontent.com\""
-            buildConfigField "String", "SERVER_URL", "\"https://stg.console.qlarr.com\""
+            buildConfigField "String", "SERVER_URL", "\"https://stg.api.qlarr.com\""
             applicationIdSuffix ".debug"
             debuggable true
         }

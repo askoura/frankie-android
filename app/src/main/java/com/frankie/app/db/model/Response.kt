@@ -15,7 +15,7 @@ import java.time.LocalDateTime
             entity = SurveyDataEntity::class,
             parentColumns = ["id"],
             childColumns = ["surveyId"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.NO_ACTION
         )
     ]
 )

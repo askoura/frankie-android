@@ -107,6 +107,7 @@ class SurveyRepositoryImpl(
     private suspend fun deleteSurvey(surveyId: String) {
         FileUtils.deleteSurveyDirectory(context, surveyId)
         surveyDao.deleteById(surveyId)
+        responseDao.deleteBySurveyId(surveyId)
     }
 
     private suspend fun getSurveyDesign(survey: Survey, offlineSurvey: SurveyData?): SurveyData {
