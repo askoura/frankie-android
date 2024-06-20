@@ -49,20 +49,6 @@ class ResponsesViewModel(
         refresh()
     }
 
-    fun sync() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _responsesScreenData.update { it.copy(isSyncing = true) }
-            try {
-                uploadSurveyResponsesUseCase.uploadSurvey(surveyId = surveyData.id)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            } finally {
-                _responsesScreenData.update { it.copy(isSyncing = false) }
-                fetchResponses(surveyData)
-            }
-        }
-    }
-
     fun refresh() {
         viewModelScope.launch {
             if (!_responsesScreenData.value.isLoading) {
@@ -93,7 +79,8 @@ class ResponsesViewModel(
                                         add(
                                             ResponseItemData(
                                                 response,
-                                                editEnabled = !quotaExceeded
+                                                editEnabled = !quotaExceeded && response
+                                                    .submitDate == null
                                             )
                                         )
                                     })
