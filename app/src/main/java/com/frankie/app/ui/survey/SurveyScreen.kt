@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -34,6 +33,7 @@ import com.frankie.app.R
 import com.frankie.app.api.survey.PublishInfo
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.ui.common.compose.boldValueString
+import com.frankie.app.ui.common.theme.PrimaryActionButton
 import com.frankie.app.ui.common.toElapsedTime
 import com.frankie.app.ui.common.toFormattedString
 import java.time.LocalDateTime
@@ -128,26 +128,14 @@ fun SurveyListItem(
             }
         }
         if (surveyData.newVersionAvailable) {
-            Button(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                onClick = { onDownloadClick(surveyData) }
-            ) {
-                Text(
-                    text = stringResource(id = R.string.survey_item_button_download),
-                    fontSize = 24.sp
-                )
-            }
+            PrimaryActionButton(modifier = Modifier.align(Alignment.CenterHorizontally),
+                textRes = R.string.survey_item_button_download,
+                onClick = { onDownloadClick(surveyData) })
         } else {
-            Button(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                onClick = { onStartClick(surveyData) },
-                enabled = surveyData.isPlayEnabled
-            ) {
-                Text(
-                    text = stringResource(id = R.string.survey_item_button_start),
-                    fontSize = 24.sp
-                )
-            }
+            PrimaryActionButton(modifier = Modifier.align(Alignment.CenterHorizontally),
+                textRes = R.string.survey_item_button_start,
+                enabled = surveyData.isPlayEnabled,
+                onClick = { onStartClick(surveyData) })
         }
     }
 }
