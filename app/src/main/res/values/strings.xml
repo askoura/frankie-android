@@ -2,6 +2,7 @@
     <string name="app_name">Qlarr</string>
     <string name="title_activity_login">Sign in</string>
     <string name="title_activity_responses">Responses</string>
+    <string name="title_activity_info">Info</string>
     <string name="login_hint_email">Email</string>
     <string name="login_hint_password">Password</string>
     <string name="login_button_login">Sign in</string>

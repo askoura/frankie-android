@@ -40,8 +40,8 @@ import java.time.LocalDateTime
 import java.time.Month
 
 @Composable
-fun SurveyInfoScreen(surveyData: SurveyData) {
-    Column {
+fun SurveyInfoScreen(modifier: Modifier = Modifier, surveyData: SurveyData) {
+    Column(modifier = modifier) {
         SurveyPhoto(title = surveyData.name, imageUrl = surveyData.imageUrl)
         if (surveyData.description.isNotEmpty()) {
             SurveyDescription(text = surveyData.description)
