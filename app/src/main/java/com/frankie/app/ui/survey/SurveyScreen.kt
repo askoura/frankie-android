@@ -3,6 +3,7 @@ package com.frankie.app.ui.survey
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,21 +11,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,7 +34,10 @@ import com.frankie.app.R
 import com.frankie.app.api.survey.PublishInfo
 import com.frankie.app.business.survey.SurveyData
 import com.frankie.app.ui.common.compose.boldValueString
+import com.frankie.app.ui.common.theme.Colors
+import com.frankie.app.ui.common.theme.FrankieTheme
 import com.frankie.app.ui.common.theme.PrimaryActionButton
+import com.frankie.app.ui.common.theme.SecondaryActionButton
 import com.frankie.app.ui.common.toElapsedTime
 import com.frankie.app.ui.common.toFormattedString
 import java.time.LocalDateTime
@@ -42,7 +46,7 @@ import java.time.Month
 @Composable
 fun SurveyInfoScreen(modifier: Modifier = Modifier, surveyData: SurveyData) {
     Column(modifier = modifier) {
-        SurveyPhoto(title = surveyData.name, imageUrl = surveyData.imageUrl)
+        SurveyPhoto(imageUrl = surveyData.imageUrl)
         if (surveyData.description.isNotEmpty()) {
             SurveyDescription(text = surveyData.description)
         }
@@ -70,76 +74,90 @@ fun SurveyListItem(
     onStartClick: (SurveyData) -> Unit = {},
     onDownloadClick: (SurveyData) -> Unit = {}
 ) {
-    Column(modifier = modifier) {
-        SurveyPhoto(title = surveyData.name, imageUrl = surveyData.imageUrl)
-        if (surveyData.description.isNotEmpty()) {
-            SurveyDescription(text = surveyData.description, maxLines = 3)
-        }
-        Column(modifier = Modifier.padding(16.dp)) {
-            SurveyStats(iconRes = R.drawable.ic_calendar, text = buildAnnotatedString {
-                append(
-                    "${stringResource(id = R.string.survey_last_modified)} ${
-                        surveyData
-                            .lastModified.toElapsedTime()
-                    }"
-                )
-            })
-            if (surveyData.endDate != null) {
-                SurveyStats(iconRes = R.drawable.ic_stopwatch, text = buildAnnotatedString {
-                    append(stringResource(id = R.string.survey_item_expires))
-                })
-            }
-            if (surveyData.surveyQuota >= 0) {
-                SurveyStats(
-                    iconRes = R.drawable.ic_baseline_assignment_24,
-                    text = buildAnnotatedString {
-                    append(
-                        stringResource(
-                            id = R.string.survey_item_quota_left,
-                            surveyData.surveyQuota
-                        )
-                    )
-                })
-            }
-        }
-        Row {
-            TextButton(
-                modifier = Modifier.weight(1f),
-                onClick = { onResponsesClick(surveyData) },
-                enabled = surveyData.isResponsesEnabled
-            ) {
-                Text(fontSize = 20.sp, text = buildAnnotatedString {
-                    val text = stringResource(
-                        id = R.string.survey_item_button_responses,
-                        surveyData.localResponsesCount,
-                        surveyData.localCompleteResponsesCount
-                    )
-                    append(text.substringBefore(" "))
-                    withStyle(SpanStyle(fontSize = 16.sp)) {
-                        append(text.substringAfter(" "))
+    Surface(modifier.padding(vertical = 4.dp)) {
+        Card() {
+            Column(modifier = Modifier.padding(bottom = 8.dp)) {
+                SurveyPhoto(imageUrl = surveyData.imageUrl)
+                SurveyTitleAndInfo(
+                    text = surveyData.name,
+                    onInfoClick = { onInfoClick(surveyData) })
+                if (surveyData.description.isNotEmpty()) {
+                    SurveyDescription(text = surveyData.description, maxLines = 3)
+                }
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        SurveyStats(iconRes = R.drawable.ic_calendar, text = buildAnnotatedString {
+                            append(
+                                "${stringResource(id = R.string.survey_last_modified)} ${
+                                    surveyData
+                                        .lastModified.toElapsedTime()
+                                }"
+                            )
+                        })
+                        if (surveyData.endDate != null) {
+                            SurveyStats(
+                                iconRes = R.drawable.ic_stopwatch,
+                                text = buildAnnotatedString {
+                                    append(stringResource(id = R.string.survey_item_expires))
+                                })
+                        }
+                        if (surveyData.surveyQuota >= 0) {
+                            SurveyStats(
+                                iconRes = R.drawable.ic_baseline_assignment_24,
+                                text = buildAnnotatedString {
+                                    append(
+                                        stringResource(
+                                            id = R.string.survey_item_quota_left,
+                                            surveyData.surveyQuota
+                                        )
+                                    )
+                                })
+                        }
                     }
-                })
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    if (surveyData.isResponsesEnabled) {
+                        SecondaryActionButton(
+                            modifier = Modifier.padding(end = 8.dp),
+                            text = buildAnnotatedString {
+//                        val text = stringResource(
+//                            id = R.string.survey_item_button_responses,
+//                            surveyData.localResponsesCount,
+//                            surveyData.localCompleteResponsesCount
+//                        )
+//                        append(text.substringBefore(" "))
+//                        withStyle(SpanStyle(fontSize = 16.sp)) {
+//                            append(text.substringAfter(" "))
+//                        }
+                                append(stringResource(id = R.string.survey_item_button_responses_single_line))
+                            }, onClick = { onResponsesClick(surveyData) }
+                        )
+                    }
+                    if (surveyData.newVersionAvailable) {
+                        PrimaryActionButton(modifier = Modifier,
+                            textRes = R.string.survey_item_button_download,
+                            onClick = { onDownloadClick(surveyData) })
+                    } else {
+                        PrimaryActionButton(modifier = Modifier,
+                            textRes = R.string.survey_item_button_start,
+                            enabled = surveyData.isPlayEnabled,
+                            onClick = { onStartClick(surveyData) })
+                    }
+                }
             }
-            TextButton(
-                modifier = Modifier.weight(1f),
-                onClick = { onInfoClick(surveyData) },
-            ) {
-                Text(fontSize = 20.sp, text = stringResource(id = R.string.survey_item_button_info))
-            }
-        }
-        if (surveyData.newVersionAvailable) {
-            PrimaryActionButton(modifier = Modifier.align(Alignment.CenterHorizontally),
-                textRes = R.string.survey_item_button_download,
-                onClick = { onDownloadClick(surveyData) })
-        } else {
-            PrimaryActionButton(modifier = Modifier.align(Alignment.CenterHorizontally),
-                textRes = R.string.survey_item_button_start,
-                enabled = surveyData.isPlayEnabled,
-                onClick = { onStartClick(surveyData) })
         }
     }
 }
-
 
 // TODO: show update available
 @Composable
@@ -240,18 +258,43 @@ private fun SurveyDescription(
     modifier: Modifier = Modifier, text: String, maxLines: Int = Int.MAX_VALUE
 ) {
     Text(
-        modifier = modifier.padding(8.dp), text = text, maxLines = maxLines,
+        modifier = modifier.padding(vertical = 4.dp, horizontal = 8.dp), text = text, maxLines =
+        maxLines,
         fontSize = 16.sp
     )
 }
 
 @Composable
-private fun SurveyPhoto(title: String, imageUrl: String) {
+private fun SurveyTitleAndInfo(
+    modifier: Modifier = Modifier, text: String, onInfoClick: () -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically, modifier =
+        modifier.padding(vertical = 0.dp, horizontal = 8.dp)
+    ) {
+        Text(
+            modifier = Modifier.weight(1f),
+            text = text,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold
+        )
+        IconButton(onClick = onInfoClick) {
+            Icon(
+                modifier = Modifier.size(48.dp),
+                painter = painterResource(id = R.drawable.ic_outline_info_24),
+                contentDescription = null
+            )
+        }
+    }
+}
+
+@Composable
+private fun SurveyPhoto(imageUrl: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(200.dp)
-            .background(Color.LightGray),
+            .background(Colors.LightGray),
         contentAlignment = Alignment.BottomStart
     ) {
         Icon(
@@ -266,12 +309,12 @@ private fun SurveyPhoto(title: String, imageUrl: String) {
             contentScale = ContentScale.Crop,
             contentDescription = null
         )
-        Text(
-            modifier = Modifier.padding(16.dp), text = title, fontSize = 24.sp, fontWeight =
-            FontWeight.Bold,
-            color =
-            Color.White
-        )
+//        Text(
+//            modifier = Modifier.padding(16.dp), text = title, fontSize = 24.sp, fontWeight =
+//            FontWeight.Bold,
+//            color =
+//            Color.White
+//        )
     }
 }
 
@@ -294,7 +337,9 @@ private fun SurveyStats(
 @Composable
 @Preview(showBackground = true)
 fun PreviewSurveyListItem() {
-    SurveyListItem(surveyData = getPreviewSurveyData())
+    FrankieTheme {
+        SurveyListItem(surveyData = getPreviewSurveyData())
+    }
 }
 
 @Composable

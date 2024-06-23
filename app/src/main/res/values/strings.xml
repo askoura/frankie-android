@@ -108,6 +108,7 @@ FirebaseAnalytics uses an advertising ID. You can restrict this use in the devic
     <string name="survey_status">Status</string>
     <string name="survey_update_available">New version available</string>
     <string name="survey_item_button_responses">Responses \n%d (%d Complete)</string>
+    <string name="survey_item_button_responses_single_line">Responses</string>
     <string name="survey_item_button_info">Info</string>
     <plurals name="time_interval_days_ago">
         <item quantity="one">yesterday</item>

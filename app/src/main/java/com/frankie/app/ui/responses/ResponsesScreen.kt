@@ -29,7 +29,7 @@ import com.frankie.app.R
 import com.frankie.app.db.model.Response
 import com.frankie.app.ui.common.compose.boldDescriptionString
 import com.frankie.app.ui.common.compose.boldValueString
-import com.frankie.app.ui.common.theme.Color
+import com.frankie.app.ui.common.theme.Colors
 import com.frankie.app.ui.common.theme.FrankieTheme
 import com.frankie.app.ui.common.toFormattedString
 import com.frankie.expressionmanager.model.NavigationIndex
@@ -115,7 +115,7 @@ private fun ResponseItem(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .background(Color.LightBlue)
+                .background(Colors.LightBlue)
                 .padding(start = 16.dp)
         ) {
             Text(

@@ -9,7 +9,8 @@ fun FrankieTheme(
 ) {
     MaterialTheme(
         colorScheme = MaterialTheme.colorScheme.copy(
-            primary = Color.Primary, secondary = Color.Secondary
+            primary = Colors.Primary, secondary = Colors.Secondary,
+            surfaceVariant = Colors.SurfaceVariant
         ),
         content = content
     )
