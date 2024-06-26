@@ -1,15 +1,18 @@
 package com.frankie.app.ui.responses
 
+import android.app.Application
+import android.content.Context
 import android.util.Log
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.frankie.app.AppEvent
 import com.frankie.app.EventBus
 import com.frankie.app.business.responses.ResponseRepository
 import com.frankie.app.business.survey.SurveyData
-import com.frankie.app.business.survey.UploadSurveyResponsesUseCase
 import com.frankie.app.db.model.Response
+import com.frankie.app.ui.common.FileUtils
 import com.frankie.app.ui.survey.EMNavProcessor
+import com.frankie.expressionmanager.model.ResponseEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,10 +20,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ResponsesViewModel(
+    application: Application,
     private val responsesRepository: ResponseRepository,
     private val eventBus: EventBus,
-    private val uploadSurveyResponsesUseCase: UploadSurveyResponsesUseCase
-) : ViewModel() {
+) : AndroidViewModel(application) {
     private lateinit var surveyData: SurveyData
     private val _responsesScreenData = MutableStateFlow(ResponsesScreenState())
     val responsesScreenData = _responsesScreenData.asStateFlow()
@@ -76,11 +79,25 @@ class ResponsesViewModel(
                                 isComplete = newList.size < PER_PAGE,
                                 responses = it.responses.toMutableList()
                                     .apply {
+                                        val audioRecording = response.events
+                                            .filterIsInstance<ResponseEvent.VoiceRecording>()
+                                            .firstOrNull()
+
                                         add(
                                             ResponseItemData(
                                                 response,
                                                 editEnabled = !quotaExceeded && response
-                                                    .submitDate == null
+                                                    .submitDate == null,
+                                                audioRecordingData = audioRecording?.let { recording ->
+                                                    val filePath = recording.getFilePath(
+                                                        context = this@ResponsesViewModel.getApplication(),
+                                                        surveyId = surveyData.id
+                                                    )
+                                                    AudioRecordingData(
+                                                        FileUtils.getDuration(filePath) ?: 0,
+                                                        filePath
+                                                    )
+                                                }
                                             )
                                         )
                                     })
@@ -118,4 +135,12 @@ class ResponsesViewModel(
     }
 }
 
-data class ResponseItemData(val responseValue: Response, val editEnabled: Boolean)
+data class ResponseItemData(
+    val responseValue: Response, val editEnabled: Boolean, val
+    audioRecordingData: AudioRecordingData? = null
+)
+
+data class AudioRecordingData(val audioDuration: Long, val audioPath: String)
+
+private fun ResponseEvent.VoiceRecording.getFilePath(context: Context, surveyId: String) =
+    FileUtils.getResponseFile(context, fileName, surveyId).absolutePath

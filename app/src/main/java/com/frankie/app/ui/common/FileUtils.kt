@@ -1,7 +1,7 @@
 package com.frankie.app.ui.common
 
 import android.content.Context
-import android.webkit.MimeTypeMap
+import android.media.MediaMetadataRetriever
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.frankie.expressionmanager.model.jacksonKtMapper
 import com.frankie.expressionmanager.usecase.ValidationJsonOutput
@@ -67,9 +67,12 @@ object FileUtils {
         )
     }
 
-    fun getMimeType(fileName: String): String? {
-        val extension = MimeTypeMap.getFileExtensionFromUrl(fileName)
-        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+    fun getDuration(path: String): Long? {
+        val mediaMetadataRetriever = MediaMetadataRetriever()
+        mediaMetadataRetriever.setDataSource(path)
+        val durationStr =
+            mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+        return durationStr?.toLongOrNull()
     }
 
     enum class FileType(private val folderName: String) {
