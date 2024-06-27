@@ -13,7 +13,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.media3.exoplayer.ExoPlayer
 import com.frankie.app.R
 import com.frankie.app.business.parcelable
 import com.frankie.app.business.survey.SurveyData
@@ -26,7 +25,6 @@ import org.koin.androidx.viewmodel.ext.android.getViewModel
 class ResponsesActivity : ComponentActivity() {
 
     private val viewModel by lazy { getViewModel<ResponsesViewModel>() }
-    private val exoPlayer by lazy { ExoPlayer.Builder(this).build() }
 
     val survey: SurveyData
         get() = intent.parcelable(SURVEY) ?: throw IllegalArgumentException("Survey is required")
@@ -61,8 +59,10 @@ class ResponsesActivity : ComponentActivity() {
                         onDeleteClicked = { id ->
                             viewModel.deleteResponse(id)
                         },
-                        exoPlayer = exoPlayer,
-                        screenState = responsesScreenData
+                        screenState = responsesScreenData,
+                        onPlayClicked = viewModel::onPlayClicked,
+                        onPauseClicked = viewModel::onPauseClicked,
+                        onSeekToo = viewModel::onSeekToo
                     )
                 }
             }
@@ -71,12 +71,12 @@ class ResponsesActivity : ComponentActivity() {
 
     override fun onStop() {
         super.onStop()
-        exoPlayer.stop()
+        viewModel.onPauseClicked()
     }
 
     override fun onDestroy() {
+        viewModel.release()
         super.onDestroy()
-        exoPlayer.release()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

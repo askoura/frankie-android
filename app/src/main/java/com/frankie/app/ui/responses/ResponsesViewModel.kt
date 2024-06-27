@@ -5,6 +5,8 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
 import com.frankie.app.AppEvent
 import com.frankie.app.EventBus
 import com.frankie.app.business.responses.ResponseRepository
@@ -28,6 +30,7 @@ class ResponsesViewModel(
     private val _responsesScreenData = MutableStateFlow(ResponsesScreenState())
     val responsesScreenData = _responsesScreenData.asStateFlow()
     lateinit var emNavProcessor: EMNavProcessor
+    private val exoPlayer by lazy { ExoPlayer.Builder(application).build() }
     private var currentPage: Int = 0
 
     init {
@@ -125,6 +128,67 @@ class ResponsesViewModel(
         }
     }
 
+    private var currentMediaPath = ""
+    fun onPlayClicked(responseItemData: ResponseItemData) {
+        responseItemData.audioRecordingData?.audioPath?.let { path ->
+            if (currentMediaPath != path) {
+                currentMediaPath = path
+                exoPlayer.stop()
+                exoPlayer.removeMediaItems(0, exoPlayer.mediaItemCount)
+                exoPlayer.addMediaItem(MediaItem.fromUri(path))
+                exoPlayer.prepare()
+            }
+
+            exoPlayer.play()
+            _responsesScreenData.update { state ->
+                state.copy(responses = state.responses.map {
+                    if (responseItemData.responseValue.id == it
+                            .responseValue.id
+                    ) {
+                        it.copy(audioRecordingData = it.audioRecordingData?.copy(isPlaying = true))
+                    } else {
+                        it
+                    }
+                })
+            }
+        }
+    }
+
+    fun onPauseClicked() {
+        exoPlayer.pause()
+        _responsesScreenData.update { state ->
+            state.copy(responses = state.responses.map {
+                if (it.audioRecordingData?.isPlaying == true) {
+                    it.copy(audioRecordingData = it.audioRecordingData.copy(isPlaying = false))
+                } else {
+                    it
+                }
+            })
+        }
+    }
+
+    fun release() {
+        exoPlayer.release()
+    }
+
+    fun onSeekToo(responseItemData: ResponseItemData, position: Long) {
+        _responsesScreenData.update { state ->
+            state.copy(responses = state.responses.map {
+                if (responseItemData.responseValue.id == it.responseValue.id
+                ) {
+                    it.copy(audioRecordingData = it.audioRecordingData?.copy(currentTime = position))
+                } else {
+                    it
+                }
+            })
+        }
+        responseItemData.audioRecordingData?.audioPath?.let { path ->
+            if (currentMediaPath == path) {
+                exoPlayer.seekTo(position)
+            }
+        }
+    }
+
     override fun onCleared() {
         super.onCleared()
         emNavProcessor.destroy()
@@ -140,7 +204,10 @@ data class ResponseItemData(
     audioRecordingData: AudioRecordingData? = null
 )
 
-data class AudioRecordingData(val audioDuration: Long, val audioPath: String)
+data class AudioRecordingData(
+    val audioDuration: Long, val audioPath: String, val isPlaying:
+    Boolean = false, val currentTime: Long = 0
+)
 
 private fun ResponseEvent.VoiceRecording.getFilePath(context: Context, surveyId: String) =
     FileUtils.getResponseFile(context, fileName, surveyId).absolutePath
