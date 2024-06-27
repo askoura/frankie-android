@@ -23,17 +23,17 @@ android {
 
     signingConfigs {
         release {
-            storeFile file('../keystore/debug.keystore')
-            storePassword = 'KSr3#V^^heD7g1mIO!m9'
-            keyAlias 'debug'
-            keyPassword = 'Ow0%I!TUwDONAejpS^XF'
+            storeFile file(project.property("KEYSTORE_FILE"))
+            storePassword project.property("KEYSTORE_PASSWORD")
+            keyAlias project.property("KEY_ALIAS")
+            keyPassword project.property("KEY_PASSWORD")
         }
-//        debug {
-//            storeFile file('../keystore/debug.keystore')
-//            storePassword = 'KSr3#V^^heD7g1mIO!m9'
-//            keyAlias 'debug'
-//            keyPassword = 'Ow0%I!TUwDONAejpS^XF'
-//        }
+        debug {
+            storeFile file(project.property("KEYSTORE_FILE"))
+            storePassword project.property("KEYSTORE_PASSWORD")
+            keyAlias project.property("KEY_ALIAS")
+            keyPassword project.property("KEY_PASSWORD")
+        }
     }
 
     buildTypes {
