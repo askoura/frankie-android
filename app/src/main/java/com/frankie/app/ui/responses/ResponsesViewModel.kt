@@ -129,6 +129,8 @@ class ResponsesViewModel(
     }
 
     private var currentMediaPath = ""
+
+    // TODO show proper timing when playing
     fun onPlayClicked(responseItemData: ResponseItemData) {
         responseItemData.audioRecordingData?.audioPath?.let { path ->
             if (currentMediaPath != path) {
