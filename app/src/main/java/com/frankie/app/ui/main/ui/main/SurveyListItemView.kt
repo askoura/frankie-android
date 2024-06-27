@@ -36,6 +36,7 @@ class SurveyListItemView(
         this.onDownloadClicked = onDownloadClicked
         this.onResponsesClicked = onResponsesClicked
         this.onInfoClicked = onInfoClicked
+        disposeComposition()
     }
 
     @Composable

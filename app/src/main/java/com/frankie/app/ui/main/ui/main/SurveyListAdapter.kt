@@ -30,7 +30,6 @@ class SurveyListAdapter(
             RecyclerView.ViewHolder(surveyListItemView) {
 
         fun bind(surveyData: SurveyData) {
-
             surveyListItemView.setup(
                     surveyData = surveyData,
                     onPlayClicked = onPlayClicked,
