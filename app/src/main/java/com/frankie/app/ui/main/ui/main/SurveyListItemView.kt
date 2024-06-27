@@ -44,7 +44,7 @@ class SurveyListItemView(
         surveyData?.let {
             FrankieTheme {
                 SurveyListItem(
-                    modifier = Modifier.padding(bottom = 16.dp),
+                    modifier = Modifier.padding(bottom = 8.dp, start = 8.dp, end = 8.dp),
                     surveyData = it,
                     onResponsesClick = onResponsesClicked,
                     onInfoClick = onInfoClicked,
