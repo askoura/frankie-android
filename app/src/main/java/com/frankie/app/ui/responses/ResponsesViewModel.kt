@@ -137,19 +137,24 @@ class ResponsesViewModel(
     // TODO show proper timing when playing
     fun onPlayClicked(responseItemData: ResponseItemData) {
         responseItemData.audioRecordingData?.audioPath?.let { path ->
-            if (currentMediaPath != path) {
-                currentMediaPath = path
-                exoPlayer.stop()
-                exoPlayer.removeMediaItems(0, exoPlayer.mediaItemCount)
-                exoPlayer.addMediaItem(MediaItem.fromUri(path))
-                exoPlayer.prepare()
-            }
+            when {
+                currentMediaPath != path -> {
+                    currentMediaPath = path
+                    exoPlayer.stop()
+                    exoPlayer.removeMediaItems(0, exoPlayer.mediaItemCount)
+                    exoPlayer.addMediaItem(MediaItem.fromUri(path))
+                    exoPlayer.prepare()
+                }
 
+                exoPlayer.currentPosition <= responseItemData.audioRecordingData
+                    .audioDuration -> {
+                    exoPlayer.seekTo(0)
+                }
+            }
             exoPlayer.play()
             timingHandler.post(object : Runnable {
                 override fun run() {
                     _responsesScreenData.update { state ->
-                        Log.e("exoplayer", exoPlayer.currentPosition.toString())
                         state.copy(responses = state.responses.map {
                             if (responseItemData.responseValue.id == it
                                     .responseValue.id
@@ -157,7 +162,7 @@ class ResponsesViewModel(
                                 it.copy(
                                     audioRecordingData = it.audioRecordingData?.copy
                                         (
-                                        isPlaying = true,
+                                        isPlaying = exoPlayer.isPlaying,
                                         currentTime = exoPlayer.currentPosition.roundToThousand()
                                     )
                                 )
