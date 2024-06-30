@@ -36,6 +36,8 @@ data class Survey(
     @JsonProperty("backgroundAudio") val backgroundAudio: Boolean,
     @JsonProperty("recordGps") val recordGps: Boolean,
     @JsonProperty("publishInfo") val publishInfo: PublishInfo?,
+    @JsonProperty("imageUrl") val imageUrl: String?,
+    @JsonProperty("description") val description: String?
 )
 
 data class UploadResponseRequestData(

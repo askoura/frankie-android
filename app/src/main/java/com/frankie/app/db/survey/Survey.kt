@@ -27,33 +27,37 @@ data class SurveyDataEntity(
     val syncedResponseCount: Int,
     val saveTimings: Boolean,
     val backgroundAudio: Boolean,
-    val recordGps: Boolean
+    val recordGps: Boolean,
+    val description: String = "",
+    val imageUrl: String = ""
 ) {
     fun toSurveyData(
         localResponseCount: Int,
         localCompleteResponseCount: Int,
         localUnsyncedResponseCount: Int
     ): SurveyData = SurveyData(
-        id,
-        creationDate,
-        lastModified,
-        startDate,
-        endDate,
-        name,
-        status,
-        usage,
-        quota,
-        userQuota,
-        publishInfoEntity.toPublishInfo(),
-        false,
-        localResponseCount,
-        localCompleteResponseCount,
-        localUnsyncedResponseCount,
-        syncedResponseCount,
-        totalResponsesCount,
-        saveTimings,
-        backgroundAudio,
-        recordGps,
+        id = id,
+        creationDate = creationDate,
+        lastModified = lastModified,
+        startDate = startDate,
+        endDate = endDate,
+        name = name,
+        status = status,
+        usage = usage,
+        surveyQuota = quota,
+        userQuota = userQuota,
+        publishInfo = publishInfoEntity.toPublishInfo(),
+        newVersionAvailable = false,
+        localResponsesCount = localResponseCount,
+        localCompleteResponsesCount = localCompleteResponseCount,
+        localUnsyncedResponsesCount = localUnsyncedResponseCount,
+        syncedResponseCount = syncedResponseCount,
+        totalResponseCount = totalResponsesCount,
+        saveTimings = saveTimings,
+        backgroundAudio = backgroundAudio,
+        recordGps = recordGps,
+        description = description,
+        imageUrl = imageUrl
     )
 }
 

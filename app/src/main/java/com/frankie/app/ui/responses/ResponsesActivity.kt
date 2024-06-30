@@ -5,66 +5,73 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import com.frankie.app.R
 import com.frankie.app.business.parcelable
 import com.frankie.app.business.survey.SurveyData
-import com.frankie.app.databinding.ActivityResponsesBinding
-import com.frankie.app.db.model.Response
+import com.frankie.app.ui.common.theme.FrankieTheme
+import com.frankie.app.ui.common.theme.FrankieTopBar
 import com.frankie.app.ui.survey.EMNavProcessor
 import com.frankie.app.ui.survey.SurveyActivity
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 
-class ResponsesActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityResponsesBinding
+class ResponsesActivity : ComponentActivity() {
 
     private val viewModel by lazy { getViewModel<ResponsesViewModel>() }
-    private lateinit var adapter: ResponseListAdapter
 
     val survey: SurveyData
-        get() = intent.parcelable(SURVEY)
-            ?: throw IllegalArgumentException("Survey is required")
+        get() = intent.parcelable(SURVEY) ?: throw IllegalArgumentException("Survey is required")
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityResponsesBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        adapter = ResponseListAdapter({ response: Response ->
-            startActivity(SurveyActivity.createIntent(this, survey, response.id))
-        }, { response: Response ->
-            viewModel.deleteResponse(response.id)
-        })
-        val lm = LinearLayoutManager(binding.root.context)
-        binding.recycler.adapter = adapter
-        binding.recycler.layoutManager = lm
-        binding.swipe.setOnRefreshListener {
-            viewModel.refresh()
-        }
-        binding.recycler.addOnScrollListener(
-            PaginationScrollListener(lm, viewModel::shouldLoadNextPage, viewModel::loadNext)
-        )
-
-        lifecycleScope.launch {
-            viewModel.responses.collect { state ->
-                adapter.submitList(state)
-            }
-        }
-        lifecycleScope.launch {
-            viewModel.isLoading.collect { isVisible ->
-                binding.swipe.isRefreshing = isVisible
-            }
-        }
-
         viewModel.emNavProcessor = EMNavProcessor(this, survey) {
             viewModel.fetchResponses(survey)
         }
 
-        title = getString(R.string.title_activity_responses)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        setContent {
+            val responsesScreenData by viewModel.responsesScreenData.collectAsState()
+
+            FrankieTheme {
+                Scaffold(topBar = {
+                    FrankieTopBar(title = stringResource(id = R.string.title_activity_responses)) {
+                        onBackPressedDispatcher.onBackPressed()
+                    }
+                }) { padding ->
+                    ResponsesScreen(
+                        modifier = Modifier
+                            .padding(padding),
+                        onLoadNext = viewModel::loadNext,
+                        onEditClicked = { id ->
+                            startActivity(
+                                SurveyActivity.createIntent(
+                                    this@ResponsesActivity, survey, id
+                                )
+                            )
+                        },
+                        onDeleteClicked = { id ->
+                            viewModel.deleteResponse(id)
+                        },
+                        screenState = responsesScreenData,
+                        onPlayClicked = viewModel::onPlayClicked,
+                        onPauseClicked = viewModel::onPauseClicked,
+                        onSeekToo = viewModel::onSeekToo
+                    )
+                }
+            }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModel.onPauseClicked()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -84,27 +91,5 @@ class ResponsesActivity : AppCompatActivity() {
             Intent(context, ResponsesActivity::class.java).apply {
                 putExtra(SURVEY, survey as Parcelable)
             }
-    }
-}
-
-class PaginationScrollListener(
-    private val layoutManager: LinearLayoutManager,
-    private val shouldLoadMore: () -> Boolean,
-    private val onLoadMore: () -> Unit,
-) :
-    RecyclerView.OnScrollListener() {
-
-    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-        super.onScrolled(recyclerView, dx, dy)
-        val visibleItemCount: Int = layoutManager.childCount
-        val totalItemCount: Int = layoutManager.itemCount
-        val firstVisibleItemPosition: Int = layoutManager.findFirstVisibleItemPosition()
-        if (shouldLoadMore()) {
-            if (visibleItemCount + firstVisibleItemPosition >= totalItemCount - 4
-                && firstVisibleItemPosition >= 0
-            ) {
-                onLoadMore()
-            }
-        }
     }
 }

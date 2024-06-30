@@ -24,6 +24,7 @@ import com.frankie.app.ui.common.visibleOrGone
 import com.frankie.app.ui.login.LoginActivity
 import com.frankie.app.ui.responses.ResponsesActivity
 import com.frankie.app.ui.survey.SurveyActivity
+import com.frankie.app.ui.survey.SurveyInfoActivity
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.getViewModel
@@ -85,8 +86,9 @@ class MainFragment : Fragment() {
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
-        adapter = SurveyListAdapter(onSyncClicked = { surveyData ->
-            viewModel.syncSurveyForOffline(surveyData)
+        adapter = SurveyListAdapter(
+            onDownloadClicked = { surveyData ->
+                viewModel.downloadSurveyForOffline(surveyData)
         },
             onPlayClicked = { surveyData ->
                 startActivity(
@@ -104,9 +106,10 @@ class MainFragment : Fragment() {
                     )
                 )
             },
-            onInfoClicked = { },
-            onUploadClicked = {
-                viewModel.uploadSurveyResponses()
+            onInfoClicked = { surveyData ->
+                startActivity(
+                    SurveyInfoActivity.createIntent(binding.root.context, surveyData)
+                )
             })
         binding.recycler.adapter = adapter
         binding.recycler.layoutManager = LinearLayoutManager(binding.root.context)

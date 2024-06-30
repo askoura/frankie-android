@@ -14,7 +14,7 @@ import com.frankie.expressionmanager.model.ResponseEvent
 
 interface UploadSurveyResponsesUseCase {
     suspend operator fun invoke()
-
+    suspend fun uploadSurvey(surveyId: String)
 }
 
 class UploadSurveyResponsesUseCaseImpl(
@@ -48,7 +48,7 @@ class UploadSurveyResponsesUseCaseImpl(
         }
     }
 
-    private suspend fun uploadSurvey(surveyId: String) {
+    override suspend fun uploadSurvey(surveyId: String) {
         eventBus.emitEvent(AppEvent.UploadingSurveyResponse(surveyId))
         val responses = responseRepository.getResponses(surveyId)
             .filter { !it.isSynced && it.submitDate != null }

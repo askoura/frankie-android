@@ -104,7 +104,7 @@ class MainViewModel(
         }
     }
 
-    fun syncSurveyForOffline(surveyData: SurveyData) {
+    fun downloadSurveyForOffline(surveyData: SurveyData) {
         viewModelScope.launch(Dispatchers.IO) {
             downloadManager.downloadSurveyFiles(surveyData).collect { result ->
                 when (result) {

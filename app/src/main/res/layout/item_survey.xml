@@ -162,7 +162,7 @@
         android:layout_margin="8dp"
         android:foreground="?android:selectableItemBackground"
         android:padding="8dp"
-        android:src="@drawable/ic_baseline_play_circle_outline_24"
+        android:src="@drawable/ic_play"
         android:tint="@color/tint"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/sync"
