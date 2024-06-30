@@ -2,6 +2,8 @@ package com.frankie.app.ui.responses
 
 import android.app.Application
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -32,6 +34,7 @@ class ResponsesViewModel(
     lateinit var emNavProcessor: EMNavProcessor
     private val exoPlayer by lazy { ExoPlayer.Builder(application).build() }
     private var currentPage: Int = 0
+    private val timingHandler = Handler(Looper.getMainLooper())
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -97,7 +100,8 @@ class ResponsesViewModel(
                                                         surveyId = surveyData.id
                                                     )
                                                     AudioRecordingData(
-                                                        FileUtils.getDuration(filePath) ?: 0,
+                                                        FileUtils.getDuration(filePath)
+                                                            ?.roundToThousand() ?: 0,
                                                         filePath
                                                     )
                                                 }
@@ -142,22 +146,35 @@ class ResponsesViewModel(
             }
 
             exoPlayer.play()
-            _responsesScreenData.update { state ->
-                state.copy(responses = state.responses.map {
-                    if (responseItemData.responseValue.id == it
-                            .responseValue.id
-                    ) {
-                        it.copy(audioRecordingData = it.audioRecordingData?.copy(isPlaying = true))
-                    } else {
-                        it
+            timingHandler.post(object : Runnable {
+                override fun run() {
+                    _responsesScreenData.update { state ->
+                        Log.e("exoplayer", exoPlayer.currentPosition.toString())
+                        state.copy(responses = state.responses.map {
+                            if (responseItemData.responseValue.id == it
+                                    .responseValue.id
+                            ) {
+                                it.copy(
+                                    audioRecordingData = it.audioRecordingData?.copy
+                                        (
+                                        isPlaying = true,
+                                        currentTime = exoPlayer.currentPosition.roundToThousand()
+                                    )
+                                )
+                            } else {
+                                it
+                            }
+                        })
                     }
-                })
-            }
+                    timingHandler.postDelayed(this, 1000)
+                }
+            })
         }
     }
 
     fun onPauseClicked() {
         exoPlayer.pause()
+        timingHandler.removeCallbacksAndMessages(null)
         _responsesScreenData.update { state ->
             state.copy(responses = state.responses.map {
                 if (it.audioRecordingData?.isPlaying == true) {
@@ -167,10 +184,6 @@ class ResponsesViewModel(
                 }
             })
         }
-    }
-
-    fun release() {
-        exoPlayer.release()
     }
 
     fun onSeekToo(responseItemData: ResponseItemData, position: Long) {
@@ -193,7 +206,9 @@ class ResponsesViewModel(
 
     override fun onCleared() {
         super.onCleared()
+        timingHandler.removeCallbacksAndMessages(null)
         emNavProcessor.destroy()
+        exoPlayer.release()
     }
 
     companion object {
@@ -213,3 +228,12 @@ data class AudioRecordingData(
 
 private fun ResponseEvent.VoiceRecording.getFilePath(context: Context, surveyId: String) =
     FileUtils.getResponseFile(context, fileName, surveyId).absolutePath
+
+private fun Long.roundToThousand(): Long {
+    val remainder = this % 1000
+    return if (remainder >= 500) {
+        this + (1000 - remainder)
+    } else {
+        this - remainder
+    }
+}

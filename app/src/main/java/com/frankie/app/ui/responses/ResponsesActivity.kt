@@ -74,11 +74,6 @@ class ResponsesActivity : ComponentActivity() {
         viewModel.onPauseClicked()
     }
 
-    override fun onDestroy() {
-        viewModel.release()
-        super.onDestroy()
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
